@@ -60,6 +60,11 @@ $sectionLabels = [
     'highlights'       => 'Visual Highlights',
     'benefits'         => 'Product Benefits',
     'topbar'           => 'Top Info & Announcement Bar',
+    'catalog'          => 'Catalog Heading',
+    'scope'            => 'Project Scope',
+    'guide'            => 'Buying Guide',
+    'form'             => 'Inquiry Form Heading',
+    'map'              => 'Office Map',
 ];
 
 if ($pageKey === 'home') {
@@ -75,6 +80,41 @@ if ($pageKey === 'home') {
     $sectionLabels['team'] = 'Leadership Team';
     $sectionLabels['testimonials'] = 'Client Voices';
     $sectionLabels['cta'] = 'About Page CTA';
+} elseif ($pageKey === 'services') {
+    $sectionLabels['hero'] = 'Services Hero Banner';
+    $sectionLabels['intro'] = 'Highlights & Stats';
+    $sectionLabels['pillars'] = 'Delivery Pillars';
+    $sectionLabels['catalog'] = 'Service Catalog Heading';
+    $sectionLabels['scope'] = 'Project Scope';
+    $sectionLabels['process'] = 'How We Deliver';
+    $sectionLabels['faq'] = 'Service FAQs';
+    $sectionLabels['cta'] = 'Services CTA';
+} elseif ($pageKey === 'projects') {
+    $sectionLabels['hero'] = 'Projects Hero Banner';
+    $sectionLabels['intro'] = 'Portfolio Intro';
+    $sectionLabels['pillars'] = 'Delivery Principles';
+    $sectionLabels['catalog'] = 'Portfolio Grid Heading';
+    $sectionLabels['approach'] = 'Execution Approach';
+    $sectionLabels['cta'] = 'Projects CTA';
+} elseif ($pageKey === 'gallery') {
+    $sectionLabels['hero'] = 'Gallery Hero Banner';
+    $sectionLabels['intro'] = 'Gallery Intro';
+    $sectionLabels['highlights'] = 'Visual Highlights';
+    $sectionLabels['catalog'] = 'Photo Grid Heading';
+    $sectionLabels['cta'] = 'Gallery CTA';
+} elseif ($pageKey === 'paints') {
+    $sectionLabels['hero'] = 'Products Hero Banner';
+    $sectionLabels['intro'] = 'Finishing Intro';
+    $sectionLabels['benefits'] = 'Product Benefits';
+    $sectionLabels['catalog'] = 'Product Grid Heading';
+    $sectionLabels['guide'] = 'Choosing the Right Coating';
+    $sectionLabels['cta'] = 'Products CTA';
+} elseif ($pageKey === 'contact') {
+    $sectionLabels['hero'] = 'Contact Hero Banner';
+    $sectionLabels['form'] = 'Inquiry Form Heading';
+    $sectionLabels['process'] = 'What Happens Next';
+    $sectionLabels['map'] = 'Office Map';
+    $sectionLabels['cta'] = 'Contact CTA';
 }
 ?>
 

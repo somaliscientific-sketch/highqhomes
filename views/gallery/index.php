@@ -12,11 +12,14 @@ $cms = $sections ?? [];
 $hero = cmsRow($cms, 'hero');
 $intro = cmsRow($cms, 'intro');
 $highlightsSec = cmsRow($cms, 'highlights');
+$catalogSec = cmsRow($cms, 'catalog');
 $ctaSec = cmsRow($cms, 'cta');
+$ctaMap = cmsMap($ctaSec);
 
 $showHero = cmsRowEnabled($cms, 'hero', true);
 $showIntro = cmsRowEnabled($cms, 'intro', true);
 $showHighlights = cmsRowEnabled($cms, 'highlights', true);
+$showCatalog = cmsRowEnabled($cms, 'catalog', true);
 $showCta = cmsRowEnabled($cms, 'cta', true);
 
 $heroKicker = cmsText($hero, 'title', 'Our work');
@@ -28,9 +31,11 @@ $introEyebrow = cmsText($intro, 'title', 'Visual portfolio');
 $introTitle   = cmsText($intro, 'subtitle', 'Craftsmanship in every frame');
 $introLead    = cmsText($intro, 'content', 'Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.');
 
-if (!empty($highlightsSec['data']) && is_array($highlightsSec['data'])) {
-    $highlights = $highlightsSec['data'];
-}
+$highlights = cmsList($highlightsSec) ?: [
+    ['icon' => 'bi-house-heart', 'title' => 'Residential', 'text' => 'Homes and villas finished to live-in quality.'],
+    ['icon' => 'bi-building', 'title' => 'Commercial', 'text' => 'Workspaces and retail built for daily use.'],
+    ['icon' => 'bi-brush', 'title' => 'Finishes', 'text' => 'Detail shots of coatings, interiors, and handover.'],
+];
 ?>
 
 <?php if ($showHero): ?>
@@ -102,12 +107,13 @@ if (!empty($highlightsSec['data']) && is_array($highlightsSec['data'])) {
 </section>
 <?php endif; ?>
 
+<?php if ($showCatalog): ?>
 <section class="hq-gallery-pro-catalog" id="gallery-grid">
   <div class="container-site">
     <header class="hq-gallery-pro-section-head" data-anim="up">
-      <p class="hq-gallery-pro-eyebrow">Photo collection</p>
-      <h2 class="hq-gallery-pro-title">Explore by category</h2>
-      <p class="hq-gallery-pro-lead hq-gallery-pro-section-head__lead">Filter images by project type — click any photo to view full size.</p>
+      <p class="hq-gallery-pro-eyebrow"><?= e(cmsText($catalogSec, 'title', 'Photo collection')) ?></p>
+      <h2 class="hq-gallery-pro-title"><?= e(cmsText($catalogSec, 'subtitle', 'Explore by category')) ?></h2>
+      <p class="hq-gallery-pro-lead hq-gallery-pro-section-head__lead"><?= e(cmsText($catalogSec, 'content', 'Filter images by project type — click any photo to view full size.')) ?></p>
     </header>
 
     <?php if (!empty($categories)): ?>
@@ -166,6 +172,7 @@ if (!empty($highlightsSec['data']) && is_array($highlightsSec['data'])) {
     <?php endif; ?>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if ($showCta): ?>
 <section class="hq-gallery-pro-cta" aria-labelledby="gallery-cta-title">
@@ -177,8 +184,8 @@ if (!empty($highlightsSec['data']) && is_array($highlightsSec['data'])) {
       <p class="hq-gallery-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Share your project vision — we\'ll plan scope, timeline, and premium delivery from day one.') ?></p>
     </div>
     <div class="hq-gallery-pro-cta__actions">
-      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
-      <a href="<?= url('projects') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">View projects</a>
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'Get a quote') ?></a>
+      <a href="<?= url('projects') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMap['cta_secondary'] ?? 'View projects') ?></a>
       <?php if ($phone !== ''): ?>
       <a href="tel:<?= e($phoneHref) ?>" class="hq-gallery-pro-cta__phone"><i class="bi bi-telephone-fill"></i> <?= e($phone) ?></a>
       <?php endif; ?>

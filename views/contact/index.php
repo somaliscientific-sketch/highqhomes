@@ -4,6 +4,13 @@ $pageTitle = $seo['meta_title'] ?? 'Contact Us — HighQ Homes';
 
 $cms      = $sections ?? [];
 $hero     = cmsRow($cms, 'hero');
+$formSec  = cmsRow($cms, 'form');
+$processSec = cmsRow($cms, 'process');
+$mapSec   = cmsRow($cms, 'map');
+$ctaSec   = cmsRow($cms, 'cta');
+$formMap  = cmsMap($formSec);
+$ctaMap   = cmsMap($ctaSec);
+
 $phone    = $settings['phone'] ?? '+252 907 734 667';
 $phone2   = $settings['phone_2'] ?? '';
 $email    = $settings['email'] ?? 'info@highqhomes.net';
@@ -21,17 +28,16 @@ $heroTitle  = cmsText($hero, 'subtitle', 'Let\'s plan your next project');
 $heroLead   = cmsText($hero, 'content', 'Share your site details, drawings, or goals — our team will respond with clear next steps.');
 $heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80');
 $showHero   = cmsRowEnabled($cms, 'hero', true);
-
-$processSec   = cmsRow($cms, 'process');
+$showForm   = cmsRowEnabled($cms, 'form', true);
 $showProcess  = cmsRowEnabled($cms, 'process', true);
-$processSteps = [
+$showMap    = cmsRowEnabled($cms, 'map', true);
+$showCta    = cmsRowEnabled($cms, 'cta', true);
+
+$processSteps = cmsList($processSec) ?: [
     ['num' => '01', 'title' => 'Review', 'text' => 'We assess project type, location, and scope.'],
     ['num' => '02', 'title' => 'Clarify', 'text' => 'We follow up for drawings or key site details.'],
     ['num' => '03', 'title' => 'Plan', 'text' => 'You receive the next step for design or estimate.'],
 ];
-if (!empty($processSec['data']) && is_array($processSec['data'])) {
-    $processSteps = $processSec['data'];
-}
 
 $success = Session::getFlash('success');
 $error   = Session::getFlash('error');
@@ -69,11 +75,13 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
   <div class="container-site">
     <div class="hq-contact-pro-layout">
       <div class="hq-contact-pro-form-wrap" id="contact-form">
+        <?php if ($showForm): ?>
         <header class="hq-contact-pro-form-head" data-anim="up">
-          <p class="hq-contact-pro-eyebrow">Project inquiry</p>
-          <h2 class="hq-contact-pro-title">Send us a message</h2>
-          <p class="hq-contact-pro-lead">Tell us about your build, renovation, or design scope. Your message goes directly to our team inbox.</p>
+          <p class="hq-contact-pro-eyebrow"><?= e(cmsText($formSec, 'title', 'Project inquiry')) ?></p>
+          <h2 class="hq-contact-pro-title"><?= e(cmsText($formSec, 'subtitle', 'Send us a message')) ?></h2>
+          <p class="hq-contact-pro-lead"><?= e(cmsText($formSec, 'content', 'Tell us about your build, renovation, or design scope. Your message goes directly to our team inbox.')) ?></p>
         </header>
+        <?php endif; ?>
 
         <?php if ($success): ?>
         <div class="hq-contact-pro-alert hq-contact-pro-alert--success" data-flash data-anim="up">
@@ -110,7 +118,7 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
           <label>Message *
             <textarea name="message" rows="6" required placeholder="Tell us about your project — location, scope, timeline, and any drawings you have..."></textarea>
           </label>
-          <button type="submit" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-send-fill"></i> Send message</button>
+          <button type="submit" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-send-fill"></i> <?= e($formMap['submit_label'] ?? 'Send message') ?></button>
         </form>
       </div>
 
@@ -184,14 +192,14 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
 
         <?php if ($showProcess && !empty($processSteps)): ?>
         <div class="hq-contact-pro-process">
-          <h3><?= e($processSec['title'] ?? 'How we respond') ?></h3>
+          <h3><?= e(cmsText($processSec, 'title', 'How we respond')) ?></h3>
           <ol>
             <?php foreach ($processSteps as $step): ?>
             <li>
-              <span><?= e($step['num']) ?></span>
+              <span><?= e($step['num'] ?? '') ?></span>
               <div>
-                <strong><?= e($step['title']) ?></strong>
-                <p><?= e($step['text']) ?></p>
+                <strong><?= e($step['title'] ?? '') ?></strong>
+                <p><?= e($step['text'] ?? $step['body'] ?? '') ?></p>
               </div>
             </li>
             <?php endforeach; ?>
@@ -203,12 +211,13 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
   </div>
 </section>
 
+<?php if ($showMap): ?>
 <section class="hq-contact-pro-map" aria-label="Office location">
   <div class="container-site">
     <header class="hq-contact-pro-map__head" data-anim="up">
-      <p class="hq-contact-pro-eyebrow">Visit us</p>
-      <h2 class="hq-contact-pro-title">Our office</h2>
-      <p class="hq-contact-pro-lead"><?= e($address) ?></p>
+      <p class="hq-contact-pro-eyebrow"><?= e(cmsText($mapSec, 'title', 'Visit us')) ?></p>
+      <h2 class="hq-contact-pro-title"><?= e(cmsText($mapSec, 'subtitle', 'Our office')) ?></h2>
+      <p class="hq-contact-pro-lead"><?= e(cmsText($mapSec, 'content', $address)) ?></p>
     </header>
     <div class="hq-contact-pro-map__frame" data-anim="up" data-delay="50">
       <?php if ($mapEmbed !== ''): ?>
@@ -225,3 +234,23 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
     </div>
   </div>
 </section>
+<?php endif; ?>
+
+<?php if ($showCta): ?>
+<section class="hq-contact-pro-cta" aria-labelledby="contact-cta-title">
+  <div class="hq-contact-pro-cta__bg" aria-hidden="true"></div>
+  <div class="container-site hq-contact-pro-cta__box" data-anim="up">
+    <div class="hq-contact-pro-cta__copy">
+      <p class="hq-contact-pro-eyebrow hq-contact-pro-eyebrow--light"><?= e(cmsText($ctaSec, 'title', 'Prefer WhatsApp')) ?></p>
+      <h2 id="contact-cta-title" class="hq-contact-pro-cta__title"><?= e(cmsText($ctaSec, 'subtitle', 'Talk to us now')) ?></h2>
+      <p class="hq-contact-pro-cta__lead"><?= e(cmsText($ctaSec, 'content', 'Message the team for a faster first response on quotes and site visits.')) ?></p>
+    </div>
+    <div class="hq-contact-pro-cta__actions">
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'WhatsApp') ?></a>
+      <?php if ($phone !== ''): ?>
+      <a href="tel:<?= e($phoneHref) ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-telephone-fill"></i> <?= e($ctaMap['cta_secondary'] ?? $phone) ?></a>
+      <?php endif; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>

@@ -13,6 +13,11 @@ $workspaces = [
         'links' => [
             ['Homepage sections', 'admin/sections?page=home', 'bi-layout-text-window-reverse', 'sections.manage'],
             ['About page sections', 'admin/sections?page=about', 'bi-info-circle', 'sections.manage'],
+            ['Services page sections', 'admin/sections?page=services', 'bi-grid-3x3-gap', 'sections.manage'],
+            ['Projects page sections', 'admin/sections?page=projects', 'bi-building', 'sections.manage'],
+            ['Gallery page sections', 'admin/sections?page=gallery', 'bi-images', 'sections.manage'],
+            ['Paints page sections', 'admin/sections?page=paints', 'bi-palette', 'sections.manage'],
+            ['Contact page sections', 'admin/sections?page=contact', 'bi-telephone', 'sections.manage'],
             ['Homepage Hero', 'admin/sliders', 'bi-images'],
             ['Services', 'admin/services', 'bi-grid'],
             ['Projects', 'admin/projects', 'bi-buildings'],
@@ -108,6 +113,8 @@ $workspaces = [
   <?php if (Auth::can('sections.manage')): ?>
   <a href="<?= url('admin/sections?page=home') ?>" class="admin-quick-strip__item admin-quick-strip__item--primary"><i class="bi bi-layout-text-window-reverse"></i> Edit homepage</a>
   <a href="<?= url('admin/sections?page=about') ?>" class="admin-quick-strip__item"><i class="bi bi-info-circle"></i> Edit about page</a>
+  <a href="<?= url('admin/sections?page=services') ?>" class="admin-quick-strip__item"><i class="bi bi-grid-3x3-gap"></i> Edit services</a>
+  <a href="<?= url('admin/sections?page=contact') ?>" class="admin-quick-strip__item"><i class="bi bi-telephone"></i> Edit contact</a>
   <a href="<?= url('admin/sections?page=header') ?>" class="admin-quick-strip__item"><i class="bi bi-window-dock"></i> Header &amp; top bar</a>
   <?php endif; ?>
   <?php if (Auth::can('content.manage')): ?>

@@ -51,12 +51,15 @@ $cms = $sections ?? [];
 $hero = cmsRow($cms, 'hero');
 $intro = cmsRow($cms, 'intro');
 $pillarsSec = cmsRow($cms, 'pillars');
+$catalogSec = cmsRow($cms, 'catalog');
 $approachSec = cmsRow($cms, 'approach');
 $ctaSec = cmsRow($cms, 'cta');
+$ctaMap = cmsMap($ctaSec);
 
 $showHero = cmsRowEnabled($cms, 'hero', true);
 $showIntro = cmsRowEnabled($cms, 'intro', true);
 $showPillars = cmsRowEnabled($cms, 'pillars', true);
+$showCatalog = cmsRowEnabled($cms, 'catalog', true);
 $showApproach = cmsRowEnabled($cms, 'approach', true);
 $showCta = cmsRowEnabled($cms, 'cta', true);
 
@@ -69,12 +72,8 @@ $introEyebrow = cmsText($intro, 'title', 'Our work');
 $introTitle   = cmsText($intro, 'subtitle', 'Built to last. Designed to impress.');
 $introLead    = cmsText($intro, 'content', 'Every project reflects our commitment to transparent delivery, disciplined craftsmanship, and spaces people trust for generations.');
 
-if (!empty($pillarsSec['data']) && is_array($pillarsSec['data'])) {
-    $pillars = $pillarsSec['data'];
-}
-if (!empty($approachSec['data']) && is_array($approachSec['data'])) {
-    $approachItems = $approachSec['data'];
-}
+$pillars = cmsList($pillarsSec) ?: $pillars;
+$approachItems = cmsList($approachSec) ?: $approachItems;
 
 $schemaProjects = array_map(static fn(array $p): array => [
     '@type'       => 'CreativeWork',
@@ -171,12 +170,13 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
+<?php if ($showCatalog): ?>
 <section class="hq-projects-pro-catalog" id="portfolio">
   <div class="container-site">
     <header class="hq-projects-pro-section-head" data-anim="up">
-      <p class="hq-projects-pro-eyebrow">Project portfolio</p>
-      <h2 class="hq-projects-pro-title">Explore our builds</h2>
-      <p class="hq-projects-pro-lead hq-projects-pro-section-head__lead">Filter by category or status to find projects similar to yours.</p>
+      <p class="hq-projects-pro-eyebrow"><?= e(cmsText($catalogSec, 'title', 'Project portfolio')) ?></p>
+      <h2 class="hq-projects-pro-title"><?= e(cmsText($catalogSec, 'subtitle', 'Explore our builds')) ?></h2>
+      <p class="hq-projects-pro-lead hq-projects-pro-section-head__lead"><?= e(cmsText($catalogSec, 'content', 'Filter by category or status to find projects similar to yours.')) ?></p>
     </header>
 
     <div class="hq-projects-pro-toolbar" data-anim="up" data-delay="50">
@@ -233,6 +233,7 @@ $schemaJson = json_encode([
     <?php endif; ?>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if ($showApproach && !empty($approachItems)): ?>
 <section class="hq-projects-pro-approach">
@@ -269,8 +270,8 @@ $schemaJson = json_encode([
       <p class="hq-projects-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Share your vision with our team for a clear plan, honest timeline, and premium delivery.') ?></p>
     </div>
     <div class="hq-projects-pro-cta__actions">
-      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">Contact us</a>
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'Get a quote') ?></a>
+      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMap['cta_secondary'] ?? 'Contact us') ?></a>
       <?php if ($phone !== ''): ?>
       <a href="tel:<?= e($phoneHref) ?>" class="hq-projects-pro-cta__phone"><i class="bi bi-telephone-fill"></i> <?= e($phone) ?></a>
       <?php endif; ?>

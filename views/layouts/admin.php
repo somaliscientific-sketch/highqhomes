@@ -176,6 +176,12 @@
 
 <script type="application/json" id="admin-command-extras"><?= json_encode([
   ['label' => 'Edit homepage sections', 'href' => url('admin/sections?page=home'), 'group' => 'Content'],
+  ['label' => 'Edit about page sections', 'href' => url('admin/sections?page=about'), 'group' => 'Content'],
+  ['label' => 'Edit services page sections', 'href' => url('admin/sections?page=services'), 'group' => 'Content'],
+  ['label' => 'Edit projects page sections', 'href' => url('admin/sections?page=projects'), 'group' => 'Content'],
+  ['label' => 'Edit gallery page sections', 'href' => url('admin/sections?page=gallery'), 'group' => 'Content'],
+  ['label' => 'Edit paints page sections', 'href' => url('admin/sections?page=paints'), 'group' => 'Content'],
+  ['label' => 'Edit contact page sections', 'href' => url('admin/sections?page=contact'), 'group' => 'Content'],
   ['label' => 'Edit header & top bar', 'href' => url('admin/sections?page=header'), 'group' => 'Content'],
   ['label' => 'Edit footer', 'href' => url('admin/sections?page=footer'), 'group' => 'Content'],
   ['label' => 'Preview website', 'href' => url(), 'group' => 'Actions', 'blank' => true],

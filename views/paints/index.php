@@ -28,11 +28,17 @@ $cms = $sections ?? [];
 $hero = cmsRow($cms, 'hero');
 $intro = cmsRow($cms, 'intro');
 $benefitsSec = cmsRow($cms, 'benefits');
+$catalogSec = cmsRow($cms, 'catalog');
+$guideSec = cmsRow($cms, 'guide');
 $ctaSec = cmsRow($cms, 'cta');
+$ctaMap = cmsMap($ctaSec);
+$guideMap = cmsMap($guideSec);
 
 $showHero = cmsRowEnabled($cms, 'hero', true);
 $showIntro = cmsRowEnabled($cms, 'intro', true);
 $showBenefits = cmsRowEnabled($cms, 'benefits', true);
+$showCatalog = cmsRowEnabled($cms, 'catalog', true);
+$showGuide = cmsRowEnabled($cms, 'guide', true);
 $showCta = cmsRowEnabled($cms, 'cta', true);
 
 $heroKicker = cmsText($hero, 'title', 'Products');
@@ -44,9 +50,23 @@ $introEyebrow = cmsText($intro, 'title', 'Finishing Excellence');
 $introTitle   = cmsText($intro, 'subtitle', 'Colors & Coatings That Endure');
 $introLead    = cmsText($intro, 'content', 'HighQ Homes supplies coatings chosen for weather resistance, coverage, and finish quality — backed by application advice from our construction team.');
 
-if (!empty($benefitsSec['data']) && is_array($benefitsSec['data'])) {
-    $benefits = $benefitsSec['data'];
-}
+$benefits = cmsList($benefitsSec) ?: [
+    ['icon' => 'bi-shield-check', 'title' => 'Weather resistant', 'text' => 'Formulations selected for heat, dust, and seasonal rain.'],
+    ['icon' => 'bi-droplet-half', 'title' => 'Reliable coverage', 'text' => 'Predictable yield so you can order the right quantity.'],
+    ['icon' => 'bi-brush', 'title' => 'Premium finish', 'text' => 'Color hold and surface quality that last after handover.'],
+    ['icon' => 'bi-headset', 'title' => 'Expert advice', 'text' => 'Application guidance from the same team that builds the site.'],
+];
+$guideList = (isset($guideMap['checklist']) && is_array($guideMap['checklist'])) ? $guideMap['checklist'] : [
+    'Exterior walls — weather-resistant, UV-stable, breathable coatings',
+    'Textured finishes — hide imperfections with durable cementitious systems',
+    'Interior spaces — washable, low-odour finishes for living and commercial areas',
+    'Surface preparation — priming and substrate guidance before application',
+];
+$guideCards = (isset($guideMap['cards']) && is_array($guideMap['cards'])) ? $guideMap['cards'] : [
+    ['icon' => 'bi-droplet-half', 'title' => 'Coverage & yield', 'text' => 'Calculate m² per unit with our team before ordering.'],
+    ['icon' => 'bi-sun', 'title' => 'Climate suitability', 'text' => 'Products selected for heat, dust, and seasonal rain.'],
+    ['icon' => 'bi-tools', 'title' => 'Application method', 'text' => 'Trowel, roller, or spray — we advise the best approach.'],
+];
 ?>
 
 <?php if ($showHero): ?>
@@ -118,12 +138,13 @@ if (!empty($benefitsSec['data']) && is_array($benefitsSec['data'])) {
 </section>
 <?php endif; ?>
 
+<?php if ($showCatalog): ?>
 <section class="hq-paints-pro-catalog" id="catalog">
   <div class="container-site">
     <header class="hq-paints-pro-section-head" data-anim="up">
-      <p class="hq-paints-pro-eyebrow">Product catalog</p>
-      <h2 class="hq-paints-pro-title">Browse our range</h2>
-      <p class="hq-paints-pro-lead hq-paints-pro-section-head__lead">Filter by category or brand to find the right coating for your project.</p>
+      <p class="hq-paints-pro-eyebrow"><?= e(cmsText($catalogSec, 'title', 'Product catalog')) ?></p>
+      <h2 class="hq-paints-pro-title"><?= e(cmsText($catalogSec, 'subtitle', 'Browse our range')) ?></h2>
+      <p class="hq-paints-pro-lead hq-paints-pro-section-head__lead"><?= e(cmsText($catalogSec, 'content', 'Filter by category or brand to find the right coating for your project.')) ?></p>
     </header>
 
     <div class="hq-paints-pro-toolbar" data-anim="up" data-delay="50">
@@ -205,41 +226,35 @@ if (!empty($benefitsSec['data']) && is_array($benefitsSec['data'])) {
     <?php endif; ?>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showGuide): ?>
 <section class="hq-paints-pro-guide">
   <div class="container-site">
     <div class="hq-paints-pro-guide__shell">
       <div class="hq-paints-pro-guide__copy" data-anim="left">
-        <p class="hq-paints-pro-eyebrow">Professional guidance</p>
-        <h2 class="hq-paints-pro-title">Choosing the right coating</h2>
-        <p class="hq-paints-pro-lead">The right product depends on surface type, exposure, and finish expectations. Our team helps you select coatings that perform in local conditions.</p>
+        <p class="hq-paints-pro-eyebrow"><?= e(cmsText($guideSec, 'title', 'Professional guidance')) ?></p>
+        <h2 class="hq-paints-pro-title"><?= e(cmsText($guideSec, 'subtitle', 'Choosing the right coating')) ?></h2>
+        <p class="hq-paints-pro-lead"><?= e(cmsText($guideSec, 'content', 'The right product depends on surface type, exposure, and finish expectations. Our team helps you select coatings that perform in local conditions.')) ?></p>
         <ul class="hq-paints-pro-guide__list">
-          <li><i class="bi bi-check2-circle"></i> Exterior walls — weather-resistant, UV-stable, breathable coatings</li>
-          <li><i class="bi bi-check2-circle"></i> Textured finishes — hide imperfections with durable cementitious systems</li>
-          <li><i class="bi bi-check2-circle"></i> Interior spaces — washable, low-odour finishes for living and commercial areas</li>
-          <li><i class="bi bi-check2-circle"></i> Surface preparation — priming and substrate guidance before application</li>
+          <?php foreach ($guideList as $line): ?>
+          <li><i class="bi bi-check2-circle"></i> <?= e(is_array($line) ? ($line['title'] ?? $line['text'] ?? '') : $line) ?></li>
+          <?php endforeach; ?>
         </ul>
       </div>
       <div class="hq-paints-pro-guide__cards" data-anim="right">
+        <?php foreach ($guideCards as $card): ?>
         <article class="hq-paints-pro-guide__card">
-          <i class="bi bi-droplet-half"></i>
-          <strong>Coverage &amp; yield</strong>
-          <span>Calculate m² per unit with our team before ordering.</span>
+          <i class="bi <?= e($card['icon'] ?? 'bi-check-circle') ?>"></i>
+          <strong><?= e($card['title'] ?? '') ?></strong>
+          <span><?= e($card['text'] ?? $card['body'] ?? '') ?></span>
         </article>
-        <article class="hq-paints-pro-guide__card">
-          <i class="bi bi-sun"></i>
-          <strong>Climate suitability</strong>
-          <span>Products selected for heat, dust, and seasonal rain.</span>
-        </article>
-        <article class="hq-paints-pro-guide__card">
-          <i class="bi bi-tools"></i>
-          <strong>Application method</strong>
-          <span>Trowel, roller, or spray — we advise the best approach.</span>
-        </article>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if ($showCta): ?>
 <section class="hq-paints-pro-cta">
@@ -251,8 +266,8 @@ if (!empty($benefitsSec['data']) && is_array($benefitsSec['data'])) {
       <p class="hq-paints-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Tell us your project scope — we\'ll recommend the right coatings and supply options.') ?></p>
     </div>
     <div class="hq-paints-pro-cta__actions">
-      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> WhatsApp enquiry</a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">Contact form</a>
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'WhatsApp enquiry') ?></a>
+      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMap['cta_secondary'] ?? 'Contact form') ?></a>
     </div>
   </div>
 </section>

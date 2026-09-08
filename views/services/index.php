@@ -7,50 +7,61 @@ $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%
 $phone     = $settings['phone'] ?? '';
 $phoneHref = preg_replace('/\s+/', '', $phone);
 
-$cms      = $sections ?? [];
-$hero     = cmsRow($cms, 'hero');
-$intro    = cmsRow($cms, 'intro');
-$process  = cmsRow($cms, 'process');
-$faqBlock = cmsRow($cms, 'faq');
-$ctaSec   = cmsRow($cms, 'cta');
+$cms        = $sections ?? [];
+$hero       = cmsRow($cms, 'hero');
+$intro      = cmsRow($cms, 'intro');
+$pillarsSec = cmsRow($cms, 'pillars');
+$catalogSec = cmsRow($cms, 'catalog');
+$scopeSec   = cmsRow($cms, 'scope');
+$process    = cmsRow($cms, 'process');
+$faqBlock   = cmsRow($cms, 'faq');
+$ctaSec     = cmsRow($cms, 'cta');
+$ctaMap     = cmsMap($ctaSec);
+$scopeMap   = cmsMap($scopeSec);
 
 $heroKicker = cmsText($hero, 'title', 'Our Services');
 $heroTitle  = cmsText($hero, 'subtitle', 'Design, build & deliver with one trusted team');
 $heroLead   = cmsText($hero, 'content', 'From architecture to finishing — clear scope, premium quality, and accountable delivery at every step.');
 $heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80');
 
-$heroBadges = is_array($hero['data'] ?? null) ? $hero['data'] : [
+$heroBadges = cmsList($hero) ?: [
   'Licensed & Insured',
   'Transparent Quotes',
   'Premium Finishes',
   'On-Time Delivery',
 ];
 
-$processSteps = is_array($process['data'] ?? null) ? $process['data'] : [
+$processSteps = cmsList($process) ?: [
   ['num' => '01', 'title' => 'Consultation', 'text' => 'Goals, site, budget, and timeline.'],
   ['num' => '02', 'title' => 'Design & Scope', 'text' => 'Drawings and transparent pricing.'],
   ['num' => '03', 'title' => 'Build & QA', 'text' => 'Execution with quality checks.'],
   ['num' => '04', 'title' => 'Handover', 'text' => 'Walkthrough and after-care.'],
 ];
 
-$faqItems = is_array($faqBlock['data'] ?? null) ? $faqBlock['data'] : [
+$faqItems = cmsList($faqBlock) ?: [
   ['q' => 'Do you offer design-only services?', 'a' => 'Yes. Architecture, exterior, interior, and site planning are available standalone or as integrated packages.', 'icon' => 'bi-rulers'],
   ['q' => 'Can I combine multiple services?', 'a' => 'Most clients choose one team for design, construction, and finishing — we coordinate everything end to end.', 'icon' => 'bi-layers'],
   ['q' => 'How are quotes structured?', 'a' => 'Milestone-based with clear scope, materials, and timeline before work begins.', 'icon' => 'bi-calculator'],
   ['q' => 'Do you handle renovations?', 'a' => 'Yes — new builds, renovations, premium finishing, and phased upgrades.', 'icon' => 'bi-tools'],
 ];
 
-$pillars = [
+$pillars = cmsList($pillarsSec) ?: [
   ['icon' => 'bi-diagram-3', 'title' => 'Integrated delivery', 'text' => 'Design, construction, and finishing coordinated under one accountable team.'],
   ['icon' => 'bi-clipboard-check', 'title' => 'Clear milestones', 'text' => 'Structured scope, progress updates, and quality inspections at every phase.'],
   ['icon' => 'bi-gem', 'title' => 'Premium standards', 'text' => 'Materials and workmanship selected for durability in local conditions.'],
   ['icon' => 'bi-headset', 'title' => 'Responsive support', 'text' => 'Direct communication from consultation through handover and after-care.'],
 ];
 
-$scopeItems = [
+$scopeItems = (isset($scopeMap['cards']) && is_array($scopeMap['cards'])) ? $scopeMap['cards'] : [
   ['icon' => 'bi-building', 'title' => 'Residential builds', 'text' => 'Homes, villas, and gated communities with full design-build support.'],
   ['icon' => 'bi-shop', 'title' => 'Commercial projects', 'text' => 'Offices, retail, and mixed-use spaces built to operational requirements.'],
   ['icon' => 'bi-brush', 'title' => 'Finishing & upgrades', 'text' => 'Interior fit-outs, exterior refreshes, and phased renovation work.'],
+];
+$scopeList = (isset($scopeMap['checklist']) && is_array($scopeMap['checklist'])) ? $scopeMap['checklist'] : [
+  'New builds with integrated architecture and construction',
+  'Renovations, extensions, and premium finishing upgrades',
+  'Site planning and landscape design for optimal land use',
+  'Bespoke interior and furniture solutions',
 ];
 
 $schemaServices = array_map(static fn(array $s): array => [
@@ -131,26 +142,29 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
+<?php if (cmsRowEnabled($cms, 'pillars', true) && !empty($pillars)): ?>
 <section class="hq-services-pro-pillars">
   <div class="container-site">
     <div class="hq-services-pro-pillars__grid">
       <?php foreach ($pillars as $i => $item): ?>
       <article class="hq-services-pro-pillar" data-anim="up" data-delay="<?= $i * 45 ?>">
-        <span class="hq-services-pro-pillar__icon"><i class="bi <?= e($item['icon']) ?>"></i></span>
-        <h3><?= e($item['title']) ?></h3>
-        <p><?= e($item['text']) ?></p>
+        <span class="hq-services-pro-pillar__icon"><i class="bi <?= e($item['icon'] ?? 'bi-check-circle') ?>"></i></span>
+        <h3><?= e($item['title'] ?? '') ?></h3>
+        <p><?= e($item['text'] ?? $item['body'] ?? '') ?></p>
       </article>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if (cmsRowEnabled($cms, 'catalog', true)): ?>
 <section class="hq-services-pro-catalog" id="svc-catalog" aria-labelledby="svc-catalog-title">
   <div class="container-site">
     <header class="hq-services-pro-section-head" data-anim="up">
-      <p class="hq-services-pro-eyebrow">Service catalog</p>
-      <h2 id="svc-catalog-title" class="hq-services-pro-title">Everything your project needs</h2>
-      <p class="hq-services-pro-lead hq-services-pro-section-head__lead">Architecture, design, planning, and finishing — delivered with professional oversight from first sketch to final handover.</p>
+      <p class="hq-services-pro-eyebrow"><?= e(cmsText($catalogSec, 'title', 'Service catalog')) ?></p>
+      <h2 id="svc-catalog-title" class="hq-services-pro-title"><?= e(cmsText($catalogSec, 'subtitle', 'Everything your project needs')) ?></h2>
+      <p class="hq-services-pro-lead hq-services-pro-section-head__lead"><?= e(cmsText($catalogSec, 'content', 'Architecture, design, planning, and finishing — delivered with professional oversight from first sketch to final handover.')) ?></p>
     </header>
 
     <?php if (empty($services)): ?>
@@ -173,21 +187,22 @@ $schemaJson = json_encode([
     <?php endif; ?>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if (cmsRowEnabled($cms, 'scope', true)): ?>
 <section class="hq-services-pro-scope">
   <div class="container-site">
     <div class="hq-services-pro-scope__shell">
       <div class="hq-services-pro-scope__copy" data-anim="left">
-        <p class="hq-services-pro-eyebrow">Project scope</p>
-        <h2 class="hq-services-pro-title">Built for residential &amp; commercial clients</h2>
-        <p class="hq-services-pro-lead">Whether you need a single design discipline or full design-build delivery, we scale our team and timeline to match your project.</p>
+        <p class="hq-services-pro-eyebrow"><?= e(cmsText($scopeSec, 'title', 'Project scope')) ?></p>
+        <h2 class="hq-services-pro-title"><?= e(cmsText($scopeSec, 'subtitle', 'Built for residential & commercial clients')) ?></h2>
+        <p class="hq-services-pro-lead"><?= e(cmsText($scopeSec, 'content', 'Whether you need a single design discipline or full design-build delivery, we scale our team and timeline to match your project.')) ?></p>
         <ul class="hq-services-pro-scope__list">
-          <li><i class="bi bi-check2-circle"></i> New builds with integrated architecture and construction</li>
-          <li><i class="bi bi-check2-circle"></i> Renovations, extensions, and premium finishing upgrades</li>
-          <li><i class="bi bi-check2-circle"></i> Site planning and landscape design for optimal land use</li>
-          <li><i class="bi bi-check2-circle"></i> Bespoke interior and furniture solutions</li>
+          <?php foreach ($scopeList as $line): ?>
+          <li><i class="bi bi-check2-circle"></i> <?= e(is_array($line) ? ($line['title'] ?? $line['text'] ?? '') : $line) ?></li>
+          <?php endforeach; ?>
         </ul>
-        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline">View our work <i class="bi bi-arrow-up-right"></i></a>
+        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline"><?= e($scopeMap['cta_label'] ?? 'View our work') ?> <i class="bi bi-arrow-up-right"></i></a>
       </div>
       <div class="hq-services-pro-scope__cards" data-anim="right">
         <?php foreach ($scopeItems as $item): ?>
@@ -201,6 +216,7 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if (cmsRowEnabled($cms, 'process', true) && !empty($processSteps)): ?>
 <section class="hq-services-pro-process" aria-labelledby="svc-process-title">
@@ -217,8 +233,8 @@ $schemaJson = json_encode([
       <li data-anim="up" data-delay="<?= $i * 55 ?>">
         <span class="hq-services-pro-process__num"><?= e($step['num'] ?? str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT)) ?></span>
         <div>
-          <h3><?= e($step['title']) ?></h3>
-          <p><?= e($step['text']) ?></p>
+          <h3><?= e($step['title'] ?? '') ?></h3>
+          <p><?= e($step['text'] ?? $step['body'] ?? '') ?></p>
         </div>
       </li>
       <?php endforeach; ?>
@@ -269,8 +285,8 @@ $schemaJson = json_encode([
       <p class="hq-services-pro-cta__lead"><?= e(cmsText($ctaSec, 'content', 'Get a free consultation — scope, budget, and timeline with no obligation.')) ?></p>
     </div>
     <div class="hq-services-pro-cta__actions">
-      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">Contact us</a>
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'Get a quote') ?></a>
+      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMap['cta_secondary'] ?? 'Contact us') ?></a>
       <?php if ($phone !== ''): ?>
       <a href="tel:<?= e($phoneHref) ?>" class="hq-services-pro-cta__phone"><i class="bi bi-telephone-fill"></i> <?= e($phone) ?></a>
       <?php endif; ?>
