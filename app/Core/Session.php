@@ -8,13 +8,16 @@ class Session
         if (session_status() === PHP_SESSION_NONE) {
             $basePath = parse_url(APP_URL, PHP_URL_PATH) ?? '';
             $cookiePath = ($basePath && $basePath !== '/') ? rtrim($basePath, '/') : '/';
+            $secure = class_exists('Production')
+                ? Production::isHttps() || str_starts_with(APP_URL, 'https://')
+                : (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
             $cookieParams = [
                 'lifetime' => 86400,
                 'path'     => $cookiePath,
                 'domain'   => '',
-                'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+                'secure'   => $secure,
                 'httponly' => true,
-                'samesite' => (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'Strict' : 'Lax',
+                'samesite' => $secure ? 'Strict' : 'Lax',
             ];
             session_set_cookie_params($cookieParams);
             session_name('hqhomes_session');

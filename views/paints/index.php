@@ -25,24 +25,24 @@ $paintImage = static function (array $paint): string {
 };
 
 $cms = $sections ?? [];
-$hero = $cms['hero'] ?? [];
-$intro = $cms['intro'] ?? [];
-$benefitsSec = $cms['benefits'] ?? [];
-$ctaSec = $cms['cta'] ?? [];
+$hero = cmsRow($cms, 'hero');
+$intro = cmsRow($cms, 'intro');
+$benefitsSec = cmsRow($cms, 'benefits');
+$ctaSec = cmsRow($cms, 'cta');
 
-$showHero = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
-$showIntro = !isset($intro['is_enabled']) || !empty($intro['is_enabled']);
-$showBenefits = !isset($benefitsSec['is_enabled']) || !empty($benefitsSec['is_enabled']);
-$showCta = !isset($ctaSec['is_enabled']) || !empty($ctaSec['is_enabled']);
+$showHero = cmsRowEnabled($cms, 'hero', true);
+$showIntro = cmsRowEnabled($cms, 'intro', true);
+$showBenefits = cmsRowEnabled($cms, 'benefits', true);
+$showCta = cmsRowEnabled($cms, 'cta', true);
 
-$heroKicker = $hero['title'] ?? 'Products';
-$heroTitle  = $hero['subtitle'] ?? 'Premium paints & coatings';
-$heroLead   = $hero['content'] ?? 'Professional-grade finishes for exterior walls, interiors, and textured surfaces — supplied with expert guidance for lasting results.';
-$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1920&q=80';
+$heroKicker = cmsText($hero, 'title', 'Products');
+$heroTitle  = cmsText($hero, 'subtitle', 'Premium paints & coatings');
+$heroLead   = cmsText($hero, 'content', 'Professional-grade finishes for exterior walls, interiors, and textured surfaces — supplied with expert guidance for lasting results.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1920&q=80');
 
-$introEyebrow = $intro['title'] ?? 'Finishing Excellence';
-$introTitle   = $intro['subtitle'] ?? 'Colors & Coatings That Endure';
-$introLead    = $intro['content'] ?? 'HighQ Homes supplies coatings chosen for weather resistance, coverage, and finish quality — backed by application advice from our construction team.';
+$introEyebrow = cmsText($intro, 'title', 'Finishing Excellence');
+$introTitle   = cmsText($intro, 'subtitle', 'Colors & Coatings That Endure');
+$introLead    = cmsText($intro, 'content', 'HighQ Homes supplies coatings chosen for weather resistance, coverage, and finish quality — backed by application advice from our construction team.');
 
 if (!empty($benefitsSec['data']) && is_array($benefitsSec['data'])) {
     $benefits = $benefitsSec['data'];

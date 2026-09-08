@@ -84,7 +84,7 @@ class Security
         header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
         header('X-Robots-Tag: noindex, nofollow');
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        if (Production::isHttps() || str_starts_with(APP_URL, 'https://')) {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         }
     }
@@ -95,7 +95,12 @@ class Security
             return;
         }
         header('X-Content-Type-Options: nosniff');
+        header('X-Frame-Options: SAMEORIGIN');
         header('Referrer-Policy: strict-origin-when-cross-origin');
+        header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+        if (Production::isHttps() || str_starts_with(APP_URL, 'https://')) {
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        }
     }
 
     public static function loginAllowed(string $email): bool

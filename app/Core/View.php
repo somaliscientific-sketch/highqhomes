@@ -12,8 +12,7 @@ class View
         ob_start();
         $viewFile = VIEWS_PATH . '/' . $view . '.php';
         if (!file_exists($viewFile)) {
-            http_response_code(500);
-            die("View not found: {$view}");
+            Production::fail(500, "View not found: {$view}");
         }
         include $viewFile;
         $content = ob_get_clean();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 class Upload
 {
     private static array $imageTypes = [
-        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
     ];
 
     private static array $videoTypes = [
@@ -119,7 +119,6 @@ class Upload
             'image/png'               => 'png',
             'image/gif'               => 'gif',
             'image/webp'              => 'webp',
-            'image/svg+xml'           => 'svg',
             'video/mp4'               => 'mp4',
             'video/webm'              => 'webm',
             'video/quicktime'         => 'mov',

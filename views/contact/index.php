@@ -3,7 +3,7 @@ $bodyPage  = 'contact';
 $pageTitle = $seo['meta_title'] ?? 'Contact Us — HighQ Homes';
 
 $cms      = $sections ?? [];
-$hero     = $cms['hero'] ?? [];
+$hero     = cmsRow($cms, 'hero');
 $phone    = $settings['phone'] ?? '+252 907 734 667';
 $phone2   = $settings['phone_2'] ?? '';
 $email    = $settings['email'] ?? 'info@highqhomes.net';
@@ -16,14 +16,14 @@ $wa         = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $phone);
 $waMessage  = rawurlencode($settings['contact_cta_message'] ?? 'Hello HighQ Homes, I would like to discuss a construction project.');
 $quoteHref  = 'https://wa.me/' . $wa . '?text=' . $waMessage;
 
-$heroKicker = $hero['title'] ?? 'Contact Us';
-$heroTitle  = $hero['subtitle'] ?? 'Let\'s plan your next project';
-$heroLead   = $hero['content'] ?? 'Share your site details, drawings, or goals — our team will respond with clear next steps.';
-$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80';
-$showHero   = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
+$heroKicker = cmsText($hero, 'title', 'Contact Us');
+$heroTitle  = cmsText($hero, 'subtitle', 'Let\'s plan your next project');
+$heroLead   = cmsText($hero, 'content', 'Share your site details, drawings, or goals — our team will respond with clear next steps.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80');
+$showHero   = cmsRowEnabled($cms, 'hero', true);
 
-$processSec   = $cms['process'] ?? [];
-$showProcess  = !isset($processSec['is_enabled']) || !empty($processSec['is_enabled']);
+$processSec   = cmsRow($cms, 'process');
+$showProcess  = cmsRowEnabled($cms, 'process', true);
 $processSteps = [
     ['num' => '01', 'title' => 'Review', 'text' => 'We assess project type, location, and scope.'],
     ['num' => '02', 'title' => 'Clarify', 'text' => 'We follow up for drawings or key site details.'],

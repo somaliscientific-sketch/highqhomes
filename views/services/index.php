@@ -8,15 +8,16 @@ $phone     = $settings['phone'] ?? '';
 $phoneHref = preg_replace('/\s+/', '', $phone);
 
 $cms      = $sections ?? [];
-$hero     = $cms['hero'] ?? [];
-$intro    = $cms['intro'] ?? [];
-$process  = $cms['process'] ?? [];
-$faqBlock = $cms['faq'] ?? [];
+$hero     = cmsRow($cms, 'hero');
+$intro    = cmsRow($cms, 'intro');
+$process  = cmsRow($cms, 'process');
+$faqBlock = cmsRow($cms, 'faq');
+$ctaSec   = cmsRow($cms, 'cta');
 
-$heroKicker = $hero['title'] ?? 'Our Services';
-$heroTitle  = $hero['subtitle'] ?? 'Design, build & deliver with one trusted team';
-$heroLead   = $hero['content'] ?? 'From architecture to finishing — clear scope, premium quality, and accountable delivery at every step.';
-$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80';
+$heroKicker = cmsText($hero, 'title', 'Our Services');
+$heroTitle  = cmsText($hero, 'subtitle', 'Design, build & deliver with one trusted team');
+$heroLead   = cmsText($hero, 'content', 'From architecture to finishing — clear scope, premium quality, and accountable delivery at every step.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80');
 
 $heroBadges = is_array($hero['data'] ?? null) ? $hero['data'] : [
   'Licensed & Insured',
@@ -74,7 +75,7 @@ $schemaJson = json_encode([
 
 <script type="application/ld+json"><?= $schemaJson ?></script>
 
-<?php if (!isset($hero['is_enabled']) || !empty($hero['is_enabled'])): ?>
+<?php if (cmsRowEnabled($cms, 'hero', true)): ?>
 <section class="hq-services-pro-hero">
   <div class="hq-services-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
@@ -108,7 +109,7 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
-<?php if (!isset($intro['is_enabled']) || !empty($intro['is_enabled'])): ?>
+<?php if (cmsRowEnabled($cms, 'intro', true)): ?>
 <section class="hq-services-pro-intro" aria-label="Company highlights">
   <div class="container-site">
     <div class="hq-services-pro-intro__shell" data-anim="up">
@@ -201,7 +202,7 @@ $schemaJson = json_encode([
   </div>
 </section>
 
-<?php if (($process['is_enabled'] ?? 1) && !empty($processSteps)): ?>
+<?php if (cmsRowEnabled($cms, 'process', true) && !empty($processSteps)): ?>
 <section class="hq-services-pro-process" aria-labelledby="svc-process-title">
   <div class="container-site">
     <header class="hq-services-pro-section-head" data-anim="up">
@@ -226,7 +227,7 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
-<?php if (($faqBlock['is_enabled'] ?? 1) && !empty($faqItems)): ?>
+<?php if (cmsRowEnabled($cms, 'faq', true) && !empty($faqItems)): ?>
 <section class="hq-services-pro-faq" id="svc-faq" aria-labelledby="svc-faq-title">
   <div class="container-site">
     <div class="hq-services-pro-faq__shell">
@@ -258,14 +259,14 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
-<?php if (!isset($cms['cta']['is_enabled']) || !empty($cms['cta']['is_enabled'])): ?>
+<?php if (cmsRowEnabled($cms, 'cta', true)): ?>
 <section class="hq-services-pro-cta" aria-labelledby="svc-cta-title">
   <div class="hq-services-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-services-pro-cta__box" data-anim="up">
     <div class="hq-services-pro-cta__copy">
-      <p class="hq-services-pro-eyebrow hq-services-pro-eyebrow--light"><?= e($cms['cta']['title'] ?? 'Start your project') ?></p>
-      <h2 id="svc-cta-title" class="hq-services-pro-cta__title"><?= e($cms['cta']['subtitle'] ?? 'Ready to build with confidence?') ?></h2>
-      <p class="hq-services-pro-cta__lead"><?= e($cms['cta']['content'] ?? 'Get a free consultation — scope, budget, and timeline with no obligation.') ?></p>
+      <p class="hq-services-pro-eyebrow hq-services-pro-eyebrow--light"><?= e(cmsText($ctaSec, 'title', 'Start your project')) ?></p>
+      <h2 id="svc-cta-title" class="hq-services-pro-cta__title"><?= e(cmsText($ctaSec, 'subtitle', 'Ready to build with confidence?')) ?></h2>
+      <p class="hq-services-pro-cta__lead"><?= e(cmsText($ctaSec, 'content', 'Get a free consultation — scope, budget, and timeline with no obligation.')) ?></p>
     </div>
     <div class="hq-services-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>

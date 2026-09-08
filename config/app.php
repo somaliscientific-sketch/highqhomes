@@ -21,6 +21,10 @@ if (file_exists($envFile)) {
     }
 }
 
+require_once APP_PATH . '/Core/Production.php';
+Production::applyLiveOverrides();
+Production::enforceCanonical();
+
 define('APP_URL', rtrim($_ENV['APP_URL'] ?? 'http://localhost/highQhomes', '/'));
 define('APP_NAME', $_ENV['APP_NAME'] ?? 'HighQ Homes');
 define('APP_ENV', $_ENV['APP_ENV'] ?? 'production');
@@ -31,12 +35,24 @@ define('UPLOAD_MAX_SIZE', (int)($_ENV['UPLOAD_MAX_SIZE'] ?? 10485760));
 define('UPLOAD_DIR', ROOT_PATH . '/' . trim($_ENV['UPLOAD_PATH'] ?? 'uploads', '/'));
 define('UPLOAD_URL', APP_URL . '/' . trim($_ENV['UPLOAD_PATH'] ?? 'uploads', '/'));
 
-// Enable verbose error reporting in development/debug mode
 if (APP_DEBUG) {
     ini_set('display_errors', '1');
     ini_set('display_startup_errors', '1');
     error_reporting(E_ALL);
 } else {
     ini_set('display_errors', '0');
-    error_reporting(0);
+    ini_set('display_startup_errors', '0');
+    error_reporting(E_ALL);
+    ini_set('log_errors', '1');
+    $logDir = ROOT_PATH . '/tmp';
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0750, true);
+    }
+    ini_set('error_log', $logDir . '/php-error.log');
+}
+
+if (!APP_DEBUG) {
+    set_exception_handler(static function (\Throwable $e): void {
+        Production::fail(500, $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    });
 }

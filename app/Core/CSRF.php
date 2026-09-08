@@ -44,7 +44,12 @@ class CSRF
                 header('Location: ' . APP_URL . '/admin/dashboard');
                 exit;
             }
-            die('CSRF token mismatch.');
+            if (defined('APP_DEBUG') && APP_DEBUG) {
+                die('CSRF token mismatch.');
+            }
+            http_response_code(403);
+            echo 'Security check failed. Please refresh and try again.';
+            exit;
         }
         Session::set(self::TOKEN_KEY, bin2hex(random_bytes(32)));
     }

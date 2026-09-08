@@ -28,6 +28,30 @@ function url(string $path = ''): string
     return APP_URL . '/' . ltrim($path, '/');
 }
 
+function isHttps(): bool
+{
+    return Production::isHttps() || str_starts_with(APP_URL, 'https://');
+}
+
+function isProduction(): bool
+{
+    return APP_ENV === 'production' || Production::isLiveDomain();
+}
+
+function canonicalUrl(?string $path = null): string
+{
+    if ($path === null) {
+        $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        $basePath = parse_url(APP_URL, PHP_URL_PATH) ?: '';
+        if ($basePath && str_starts_with($requestPath, $basePath)) {
+            $requestPath = substr($requestPath, strlen($basePath)) ?: '/';
+        }
+        $path = $requestPath;
+    }
+    $path = '/' . ltrim((string)$path, '/');
+    return rtrim(APP_URL, '/') . ($path === '/' ? '/' : $path);
+}
+
 function adminLoginPath(): string
 {
     return Security::adminLoginPath();

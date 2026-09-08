@@ -18,6 +18,9 @@ class Router
     public function dispatch(): void
     {
         $method = $_SERVER['REQUEST_METHOD'];
+        if ($method === 'HEAD') {
+            $method = 'GET';
+        }
         $uri    = $_SERVER['REQUEST_URI'];
 
         // Strip base path and query string
@@ -52,14 +55,12 @@ class Router
             }
 
             if (!class_exists($className)) {
-                http_response_code(500);
-                die("Controller not found: {$className}");
+                Production::fail(500, "Controller not found: {$className}");
             }
 
             $controller = new $className();
             if (!method_exists($controller, $action)) {
-                http_response_code(500);
-                die("Action not found: {$className}@{$action}");
+                Production::fail(500, "Action not found: {$className}@{$action}");
             }
 
             $controller->$action($params);

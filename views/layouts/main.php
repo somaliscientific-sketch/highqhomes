@@ -3,27 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($seo['meta_title'] ?? ($pageTitle ?? APP_NAME)) ?></title>
-  <?php if (!empty($seo['meta_description'])): ?>
-  <meta name="description" content="<?= e($seo['meta_description']) ?>">
-  <?php endif; ?>
+  <?php
+  $settings = $settings ?? [];
+  $seo = $seo ?? [];
+  $seoTitle = $seo['meta_title'] ?? ($pageTitle ?? APP_NAME);
+  $seoDesc  = $seo['meta_description'] ?? ($settings['tagline'] ?? 'Premium construction and architecture in Garowe, Puntland.');
+  $canonicalUrl = canonicalUrl();
+  $ogImage = !empty($seo['og_image']) ? uploadUrl($seo['og_image']) : '';
+  ?>
+  <title><?= e($seoTitle) ?></title>
+  <meta name="description" content="<?= e($seoDesc) ?>">
   <?php if (!empty($seo['meta_keywords'])): ?>
   <meta name="keywords" content="<?= e($seo['meta_keywords']) ?>">
   <?php endif; ?>
-  <meta property="og:title" content="<?= e($seo['og_title'] ?? $seo['meta_title'] ?? APP_NAME) ?>">
-  <meta property="og:description" content="<?= e($seo['og_description'] ?? $seo['meta_description'] ?? '') ?>">
+  <meta name="theme-color" content="<?= e($settings['primary_color'] ?? '#021D45') ?>">
+  <meta property="og:site_name" content="<?= e($settings['site_name'] ?? APP_NAME) ?>">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="<?= e($seo['og_title'] ?? $seoTitle) ?>">
+  <meta property="og:description" content="<?= e($seo['og_description'] ?? $seoDesc) ?>">
   <meta property="og:type" content="website">
-  <?php
-  $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
-  $basePath = parse_url(APP_URL, PHP_URL_PATH) ?: '';
-  if ($basePath && str_starts_with($requestPath, $basePath)) {
-      $requestPath = substr($requestPath, strlen($basePath)) ?: '/';
-  }
-  $canonicalUrl = APP_URL . '/' . ltrim($requestPath, '/');
-  ?>
   <meta property="og:url" content="<?= e($canonicalUrl) ?>">
-  <?php if (!empty($seo['og_image'])): ?>
-  <meta property="og:image" content="<?= e(uploadUrl($seo['og_image'])) ?>">
+  <?php if ($ogImage !== ''): ?>
+  <meta property="og:image" content="<?= e($ogImage) ?>">
+  <?php endif; ?>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= e($seo['og_title'] ?? $seoTitle) ?>">
+  <meta name="twitter:description" content="<?= e($seo['og_description'] ?? $seoDesc) ?>">
+  <?php if ($ogImage !== ''): ?>
+  <meta name="twitter:image" content="<?= e($ogImage) ?>">
   <?php endif; ?>
   <link rel="canonical" href="<?= e($canonicalUrl) ?>">
   <link rel="icon" href="<?= e(faviconHref($settings ?? [])) ?>">
@@ -37,6 +44,22 @@
   <?php endif; ?>
   <?php if (!empty($seo['schema_markup'])): ?>
   <script type="application/ld+json"><?= $seo['schema_markup'] ?></script>
+  <?php else: ?>
+  <script type="application/ld+json"><?= json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'Organization',
+    'name' => $settings['site_name'] ?? APP_NAME,
+    'url' => APP_URL,
+    'telephone' => $settings['phone'] ?? '',
+    'email' => $settings['email'] ?? '',
+    'address' => [
+      '@type' => 'PostalAddress',
+      'streetAddress' => $settings['address'] ?? 'Garowe, Puntland, Somalia',
+      'addressLocality' => 'Garowe',
+      'addressRegion' => 'Puntland',
+      'addressCountry' => 'SO',
+    ],
+  ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
   <?php endif; ?>
   <?php if (!empty($settings['google_analytics'])): ?>
   <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($settings['google_analytics']) ?>"></script>

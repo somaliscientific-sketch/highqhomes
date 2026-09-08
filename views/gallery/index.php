@@ -9,24 +9,24 @@ $phoneHref = preg_replace('/\s+/', '', $phone);
 $heroImage = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
 
 $cms = $sections ?? [];
-$hero = $cms['hero'] ?? [];
-$intro = $cms['intro'] ?? [];
-$highlightsSec = $cms['highlights'] ?? [];
-$ctaSec = $cms['cta'] ?? [];
+$hero = cmsRow($cms, 'hero');
+$intro = cmsRow($cms, 'intro');
+$highlightsSec = cmsRow($cms, 'highlights');
+$ctaSec = cmsRow($cms, 'cta');
 
-$showHero = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
-$showIntro = !isset($intro['is_enabled']) || !empty($intro['is_enabled']);
-$showHighlights = !isset($highlightsSec['is_enabled']) || !empty($highlightsSec['is_enabled']);
-$showCta = !isset($ctaSec['is_enabled']) || !empty($ctaSec['is_enabled']);
+$showHero = cmsRowEnabled($cms, 'hero', true);
+$showIntro = cmsRowEnabled($cms, 'intro', true);
+$showHighlights = cmsRowEnabled($cms, 'highlights', true);
+$showCta = cmsRowEnabled($cms, 'cta', true);
 
-$heroKicker = $hero['title'] ?? 'Our work';
-$heroTitle  = $hero['subtitle'] ?? 'Project gallery';
-$heroLead   = $hero['content'] ?? 'Photos from residential, commercial, and community projects across Puntland — structure, finishes, and handover.';
-$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
+$heroKicker = cmsText($hero, 'title', 'Our work');
+$heroTitle  = cmsText($hero, 'subtitle', 'Project gallery');
+$heroLead   = cmsText($hero, 'content', 'Photos from residential, commercial, and community projects across Puntland — structure, finishes, and handover.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80');
 
-$introEyebrow = $intro['title'] ?? 'Visual portfolio';
-$introTitle   = $intro['subtitle'] ?? 'Craftsmanship in every frame';
-$introLead    = $intro['content'] ?? 'Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.';
+$introEyebrow = cmsText($intro, 'title', 'Visual portfolio');
+$introTitle   = cmsText($intro, 'subtitle', 'Craftsmanship in every frame');
+$introLead    = cmsText($intro, 'content', 'Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.');
 
 if (!empty($highlightsSec['data']) && is_array($highlightsSec['data'])) {
     $highlights = $highlightsSec['data'];

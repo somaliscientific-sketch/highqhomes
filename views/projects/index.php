@@ -48,26 +48,26 @@ $approachItems = [
 ];
 
 $cms = $sections ?? [];
-$hero = $cms['hero'] ?? [];
-$intro = $cms['intro'] ?? [];
-$pillarsSec = $cms['pillars'] ?? [];
-$approachSec = $cms['approach'] ?? [];
-$ctaSec = $cms['cta'] ?? [];
+$hero = cmsRow($cms, 'hero');
+$intro = cmsRow($cms, 'intro');
+$pillarsSec = cmsRow($cms, 'pillars');
+$approachSec = cmsRow($cms, 'approach');
+$ctaSec = cmsRow($cms, 'cta');
 
-$showHero = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
-$showIntro = !isset($intro['is_enabled']) || !empty($intro['is_enabled']);
-$showPillars = !isset($pillarsSec['is_enabled']) || !empty($pillarsSec['is_enabled']);
-$showApproach = !isset($approachSec['is_enabled']) || !empty($approachSec['is_enabled']);
-$showCta = !isset($ctaSec['is_enabled']) || !empty($ctaSec['is_enabled']);
+$showHero = cmsRowEnabled($cms, 'hero', true);
+$showIntro = cmsRowEnabled($cms, 'intro', true);
+$showPillars = cmsRowEnabled($cms, 'pillars', true);
+$showApproach = cmsRowEnabled($cms, 'approach', true);
+$showCta = cmsRowEnabled($cms, 'cta', true);
 
-$heroKicker = $hero['title'] ?? 'Portfolio';
-$heroTitle  = $hero['subtitle'] ?? 'Projects delivered with confidence';
-$heroLead   = $hero['content'] ?? 'Explore residential, commercial, and community builds — each delivered with structured planning, quality control, and premium finishes.';
-$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
+$heroKicker = cmsText($hero, 'title', 'Portfolio');
+$heroTitle  = cmsText($hero, 'subtitle', 'Projects delivered with confidence');
+$heroLead   = cmsText($hero, 'content', 'Explore residential, commercial, and community builds — each delivered with structured planning, quality control, and premium finishes.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80');
 
-$introEyebrow = $intro['title'] ?? 'Our work';
-$introTitle   = $intro['subtitle'] ?? 'Built to last. Designed to impress.';
-$introLead    = $intro['content'] ?? 'Every project reflects our commitment to transparent delivery, disciplined craftsmanship, and spaces people trust for generations.';
+$introEyebrow = cmsText($intro, 'title', 'Our work');
+$introTitle   = cmsText($intro, 'subtitle', 'Built to last. Designed to impress.');
+$introLead    = cmsText($intro, 'content', 'Every project reflects our commitment to transparent delivery, disciplined craftsmanship, and spaces people trust for generations.');
 
 if (!empty($pillarsSec['data']) && is_array($pillarsSec['data'])) {
     $pillars = $pillarsSec['data'];

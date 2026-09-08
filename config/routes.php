@@ -15,6 +15,8 @@ $router->get('/paints/{slug}', 'PaintsController@show');
 $router->get('/gallery', 'GalleryController@index');
 $router->get('/contact', 'ContactController@index');
 $router->post('/contact', 'ContactController@submit');
+$router->get('/robots.txt', 'SeoPublicController@robots');
+$router->get('/sitemap.xml', 'SeoPublicController@sitemap');
 
 // Admin authentication — secure login URL (legacy /admin/login is blocked)
 $adminLogin = Security::adminLoginPath();

@@ -45,6 +45,7 @@ require_once APP_PATH . '/Controllers/PaintsController.php';
 require_once APP_PATH . '/Controllers/GalleryController.php';
 require_once APP_PATH . '/Controllers/ContactController.php';
 require_once APP_PATH . '/Controllers/PageController.php';
+require_once APP_PATH . '/Controllers/SeoPublicController.php';
 
 // Admin controllers
 require_once APP_PATH . '/Controllers/Admin/AuthController.php';
