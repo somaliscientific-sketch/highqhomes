@@ -63,9 +63,12 @@ class PageSectionModel extends Model
             'home'     => 'Homepage',
             'about'    => 'About Page',
             'services' => 'Services Page',
+            'projects' => 'Projects Page',
+            'gallery'  => 'Gallery Page',
+            'paints'   => 'Paints & Products Page',
             'contact'  => 'Contact Page',
-            'header'   => 'Header',
-            'footer'   => 'Footer',
+            'header'   => 'Header & Topbar',
+            'footer'   => 'Footer & CTA',
         ];
     }
 
