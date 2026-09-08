@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><?= e($seo['meta_title'] ?? ($pageTitle ?? APP_NAME)) ?></title>
+  <?php if (!empty($seo['meta_description'])): ?>
+  <meta name="description" content="<?= e($seo['meta_description']) ?>">
+  <?php endif; ?>
+  <?php if (!empty($seo['meta_keywords'])): ?>
+  <meta name="keywords" content="<?= e($seo['meta_keywords']) ?>">
+  <?php endif; ?>
+  <meta property="og:title" content="<?= e($seo['og_title'] ?? $seo['meta_title'] ?? APP_NAME) ?>">
+  <meta property="og:description" content="<?= e($seo['og_description'] ?? $seo['meta_description'] ?? '') ?>">
+  <meta property="og:type" content="website">
+  <?php
+  $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+  $basePath = parse_url(APP_URL, PHP_URL_PATH) ?: '';
+  if ($basePath && str_starts_with($requestPath, $basePath)) {
+      $requestPath = substr($requestPath, strlen($basePath)) ?: '/';
+  }
+  $canonicalUrl = APP_URL . '/' . ltrim($requestPath, '/');
+  ?>
+  <meta property="og:url" content="<?= e($canonicalUrl) ?>">
+  <?php if (!empty($seo['og_image'])): ?>
+  <meta property="og:image" content="<?= e(uploadUrl($seo['og_image'])) ?>">
+  <?php endif; ?>
+  <link rel="canonical" href="<?= e($canonicalUrl) ?>">
+  <link rel="icon" href="<?= e(faviconHref($settings ?? [])) ?>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="<?= asset('css/hq.css') ?>?v=<?= @filemtime(PUBLIC_PATH . '/css/hq.css') ?: time() ?>">
+  <?php if (!empty($themeCss = brandThemeStyle($settings ?? []))): ?>
+  <style id="hq-brand-theme"><?= $themeCss ?></style>
+  <?php endif; ?>
+  <?php if (!empty($seo['schema_markup'])): ?>
+  <script type="application/ld+json"><?= $seo['schema_markup'] ?></script>
+  <?php endif; ?>
+  <?php if (!empty($settings['google_analytics'])): ?>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($settings['google_analytics']) ?>"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', <?= json_encode($settings['google_analytics']) ?>);
+  </script>
+  <?php endif; ?>
+</head>
+<body data-page="<?= e($bodyPage ?? '') ?>">
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<?php View::partial('navbar', ['settings' => $settings, 'bodyPage' => $bodyPage ?? '']); ?>
+<?php if (($bodyPage ?? '') !== 'contact'): ?>
+<?php View::partial('flash') ?>
+<?php endif; ?>
+
+<main id="main-content">
+  <?= $content ?>
+</main>
+
+<?php View::partial('footer', compact('settings') + ['bodyPage' => $bodyPage ?? '']); ?>
+
+<?php if (($bodyPage ?? '') !== 'contact'): ?>
+<?php $waNum = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $settings['phone'] ?? '+252907734667'); ?>
+<a href="https://wa.me/<?= e($waNum) ?>?text=Hello%20HighQ%20Homes" target="_blank" rel="noopener" class="whatsapp-float" title="Chat on WhatsApp" aria-label="Chat on WhatsApp">
+  <i class="bi bi-whatsapp"></i>
+</a>
+<?php endif; ?>
+
+<div id="lightbox-modal" class="lightbox-modal" role="dialog" aria-modal="true" aria-label="Image preview">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <button class="lightbox-prev" aria-label="Previous"><i class="bi bi-chevron-left"></i></button>
+  <img class="lightbox-img" src="" alt="">
+  <button class="lightbox-next" aria-label="Next"><i class="bi bi-chevron-right"></i></button>
+</div>
+
+<script src="<?= asset('js/app.js') ?>?v=<?= @filemtime(PUBLIC_PATH . '/js/app.js') ?: time() ?>"></script>
+</body>
+</html>

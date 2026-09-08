@@ -1,0 +1,27 @@
+Options -Indexes -MultiViews
+
+# ─────────────────────────────────────────────────────────────────────────
+# XAMPP (local):      RewriteBase /highQhomes/
+# Hostinger (root):   RewriteBase /
+# Adjust to match APP_URL in .env
+# ─────────────────────────────────────────────────────────────────────────
+RewriteEngine On
+RewriteBase /highQhomes/
+
+# Block direct access to sensitive directories
+RewriteRule ^\.env$ - [F,L]
+RewriteRule ^config/ - [F,L]
+RewriteRule ^app/ - [F,L]
+RewriteRule ^views/ - [F,L]
+RewriteRule ^database/ - [F,L]
+
+# Serve existing static files directly (CSS, JS, images)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Serve existing directories directly
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Route everything else through the PHP front controller
+RewriteRule ^(.*)$ index.php [QSA,L]
