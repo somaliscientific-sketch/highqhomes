@@ -76,6 +76,10 @@
   <button class="lightbox-next" aria-label="Next"><i class="bi bi-chevron-right"></i></button>
 </div>
 
+<button type="button" id="hq-back-to-top" class="hq-back-to-top" aria-label="Back to top" title="Back to top">
+  <i class="bi bi-arrow-up"></i>
+</button>
+
 <script src="<?= asset('js/app.js') ?>?v=<?= @filemtime(PUBLIC_PATH . '/js/app.js') ?: time() ?>"></script>
 </body>
 </html>

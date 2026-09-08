@@ -74,6 +74,7 @@ $schemaJson = json_encode([
 
 <script type="application/ld+json"><?= $schemaJson ?></script>
 
+<?php if (!isset($hero['is_enabled']) || !empty($hero['is_enabled'])): ?>
 <section class="hq-services-pro-hero">
   <div class="hq-services-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
@@ -105,7 +106,9 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if (!isset($intro['is_enabled']) || !empty($intro['is_enabled'])): ?>
 <section class="hq-services-pro-intro" aria-label="Company highlights">
   <div class="container-site">
     <div class="hq-services-pro-intro__shell" data-anim="up">
@@ -125,6 +128,7 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="hq-services-pro-pillars">
   <div class="container-site">
@@ -254,13 +258,14 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
+<?php if (!isset($cms['cta']['is_enabled']) || !empty($cms['cta']['is_enabled'])): ?>
 <section class="hq-services-pro-cta" aria-labelledby="svc-cta-title">
   <div class="hq-services-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-services-pro-cta__box" data-anim="up">
     <div class="hq-services-pro-cta__copy">
-      <p class="hq-services-pro-eyebrow hq-services-pro-eyebrow--light">Start your project</p>
-      <h2 id="svc-cta-title" class="hq-services-pro-cta__title">Ready to build with confidence?</h2>
-      <p class="hq-services-pro-cta__lead">Get a free consultation — scope, budget, and timeline with no obligation.</p>
+      <p class="hq-services-pro-eyebrow hq-services-pro-eyebrow--light"><?= e($cms['cta']['title'] ?? 'Start your project') ?></p>
+      <h2 id="svc-cta-title" class="hq-services-pro-cta__title"><?= e($cms['cta']['subtitle'] ?? 'Ready to build with confidence?') ?></h2>
+      <p class="hq-services-pro-cta__lead"><?= e($cms['cta']['content'] ?? 'Get a free consultation — scope, budget, and timeline with no obligation.') ?></p>
     </div>
     <div class="hq-services-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
@@ -271,3 +276,4 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>

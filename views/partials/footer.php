@@ -6,26 +6,40 @@ $address  = $settings['address']  ?? '3CCC, Garowe, Puntland, Somalia';
 $siteName = $settings['site_name'] ?? APP_NAME;
 $copyrightName = trim($settings['legal_name'] ?? '') ?: $siteName;
 $tagline  = $settings['tagline'] ?? 'Premium Construction';
-$contactCtaLabel = $settings['contact_cta_label'] ?? 'Get a Quote';
-$contactHref = url('contact');
+
+// Footer CMS sections
+$footerCtaSec     = cmsSection('footer', 'cta');
+$footerCtaEnabled = cmsSectionEnabled('footer', 'cta', true);
+$footerCtaKicker   = cmsSectionTitle('footer', 'cta', 'Start Your Build');
+$footerCtaHeading  = cmsSectionSubtitle('footer', 'cta', 'Ready to create something exceptional?');
+$footerCtaBtnText  = cmsSectionContent('footer', 'cta', ($settings['contact_cta_label'] ?? 'Get a Quote'));
+$footerCtaData     = is_array($footerCtaSec['data'] ?? null) ? $footerCtaSec['data'] : [];
+$footerCtaHref     = menuUrl($footerCtaData['button_link'] ?? url('contact'));
+
+$footerAboutSec    = cmsSection('footer', 'about');
+$footerAboutEnabled = cmsSectionEnabled('footer', 'about', true);
+$footerAboutText   = cmsSectionContent('footer', 'about', $tagline . ' — premium construction, architecture, and finishing delivered with clarity and care.');
+
 $footerMenus = navMenus('footer');
 ?>
 <footer class="hq-footer">
   <div class="container-site">
-    <?php if (($bodyPage ?? '') !== 'contact'): ?>
+    <?php if ($footerCtaEnabled && ($bodyPage ?? '') !== 'contact'): ?>
     <div class="hq-footer__cta">
       <div>
-        <p class="hq-eyebrow hq-eyebrow--light">Start Your Build</p>
-        <h2>Ready to create something exceptional?</h2>
+        <p class="hq-eyebrow hq-eyebrow--light"><?= e($footerCtaKicker) ?></p>
+        <h2><?= e($footerCtaHeading) ?></h2>
       </div>
-      <a href="<?= e($contactHref) ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($contactCtaLabel) ?></a>
+      <a href="<?= e($footerCtaHref) ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($footerCtaBtnText) ?></a>
     </div>
     <?php endif; ?>
 
     <div class="hq-footer__grid">
       <div class="hq-footer__brand">
         <?php View::partial('brand-logo', compact('siteName', 'settings') + ['variant' => 'footer', 'href' => url()]); ?>
-        <p><?= e($tagline) ?> — premium construction, architecture, and finishing delivered with clarity and care.</p>
+        <?php if ($footerAboutEnabled): ?>
+        <p><?= e($footerAboutText) ?></p>
+        <?php endif; ?>
         <div class="hq-socials">
           <?php foreach (['facebook'=>'bi-facebook','instagram'=>'bi-instagram','twitter'=>'bi-twitter-x','linkedin'=>'bi-linkedin','youtube'=>'bi-youtube'] as $key => $icon): ?>
           <?php if (!empty($settings[$key])): ?>

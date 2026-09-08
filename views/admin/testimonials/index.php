@@ -1,12 +1,24 @@
 <?php $pageTitle = 'Testimonials'; ?>
 
+<header class="admin-page-intro">
+  <div>
+    <span class="admin-report-kicker">Social proof</span>
+    <h2>Testimonials</h2>
+    <p>Review client quotes, ratings, and which testimonials appear on the website.</p>
+  </div>
+</header>
+
 <div class="admin-page-toolbar">
-  <p class="admin-page-meta"><?= count($testimonials) ?> testimonial(s)</p>
+  <label class="admin-list-filter">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input type="search" data-admin-list-filter placeholder="Filter testimonials..." aria-label="Filter testimonials">
+  </label>
+  <p class="admin-page-meta" data-admin-list-count data-noun="testimonial"><?= count($testimonials) ?> testimonial<?= count($testimonials) === 1 ? '' : 's' ?></p>
   <a href="<?= url('admin/testimonials/create') ?>" class="admin-btn admin-btn-primary"><i class="bi bi-plus-lg"></i> Add Testimonial</a>
 </div>
 
 <div class="admin-card">
-  <table class="admin-table">
+  <table class="admin-table admin-table--pro">
     <thead>
       <tr>
         <th>Client</th>
@@ -17,7 +29,7 @@
     </thead>
     <tbody>
       <?php foreach ($testimonials as $t): ?>
-      <tr>
+      <tr data-admin-list-item>
         <td>
           <div class="admin-table-title"><?= e($t['client_name']) ?></div>
           <div class="admin-table-desc"><?= e($t['position'] ?? '') ?> <?= $t['company'] ? '· '.e($t['company']) : '' ?></div>

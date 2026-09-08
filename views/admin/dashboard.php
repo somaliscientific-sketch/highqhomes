@@ -11,6 +11,8 @@ $workspaces = [
         'icon' => 'bi-window-stack',
         'permission' => 'content.view',
         'links' => [
+            ['Homepage sections', 'admin/sections?page=home', 'bi-layout-text-window-reverse', 'sections.manage'],
+            ['About page sections', 'admin/sections?page=about', 'bi-info-circle', 'sections.manage'],
             ['Homepage Hero', 'admin/sliders', 'bi-images'],
             ['Services', 'admin/services', 'bi-grid'],
             ['Projects', 'admin/projects', 'bi-buildings'],
@@ -103,8 +105,13 @@ $workspaces = [
 </section>
 
 <div class="admin-quick-strip admin-quick-strip--pro">
+  <?php if (Auth::can('sections.manage')): ?>
+  <a href="<?= url('admin/sections?page=home') ?>" class="admin-quick-strip__item admin-quick-strip__item--primary"><i class="bi bi-layout-text-window-reverse"></i> Edit homepage</a>
+  <a href="<?= url('admin/sections?page=about') ?>" class="admin-quick-strip__item"><i class="bi bi-info-circle"></i> Edit about page</a>
+  <a href="<?= url('admin/sections?page=header') ?>" class="admin-quick-strip__item"><i class="bi bi-window-dock"></i> Header &amp; top bar</a>
+  <?php endif; ?>
   <?php if (Auth::can('content.manage')): ?>
-  <a href="<?= url('admin/projects/create') ?>" class="admin-quick-strip__item admin-quick-strip__item--primary"><i class="bi bi-plus-circle"></i> New project</a>
+  <a href="<?= url('admin/projects/create') ?>" class="admin-quick-strip__item"><i class="bi bi-plus-circle"></i> New project</a>
   <?php endif; ?>
   <?php if (Auth::can('media.manage')): ?>
   <a href="<?= url('admin/media') ?>" class="admin-quick-strip__item"><i class="bi bi-cloud-upload"></i> Upload media</a>

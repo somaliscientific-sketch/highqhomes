@@ -22,9 +22,27 @@ if ($email === '' || $password === '') {
 $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 $db = Database::getInstance();
 $stmt = $db->prepare(
-    'UPDATE users SET email = ?, password = ?, name = ?, role = ?, is_active = 1 WHERE email IN (?, ?) OR id = 2'
+    'UPDATE users SET email = ?, password = ?, name = ?, role = ?, is_active = 1
+     WHERE id = (
+       SELECT id FROM (
+         SELECT id FROM users
+         WHERE email IN (?, ?, ?, ?) OR role = ?
+         ORDER BY id ASC
+         LIMIT 1
+       ) AS current_admin
+     )'
 );
-$stmt->execute([$email, $hash, 'ICT Admin', 'super_admin', 'info@highqhomes.com', 'info@highqhomes.net']);
+$stmt->execute([
+    $email,
+    $hash,
+    'ICT Admin',
+    'super_admin',
+    'info@highqhomes.com',
+    'info@highqhomes.net',
+    'info@highqhomes.site',
+    'admin@highqhomes.net',
+    'super_admin',
+]);
 
 if ($stmt->rowCount() === 0) {
     $insert = $db->prepare(

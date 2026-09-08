@@ -137,6 +137,53 @@ function statNumber(string $value): string
     return $num !== '' ? $num : '0';
 }
 
+function cmsRow(array $sections, string $key): array
+{
+    return is_array($sections[$key] ?? null) ? $sections[$key] : [];
+}
+
+function cmsRowEnabled(array $sections, string $key, bool $fallback = true): bool
+{
+    if (!isset($sections[$key])) {
+        return $fallback;
+    }
+    return !empty($sections[$key]['is_enabled']);
+}
+
+function cmsText(array $section, string $field, string $fallback = ''): string
+{
+    $value = trim((string)($section[$field] ?? ''));
+    return $value !== '' ? $value : $fallback;
+}
+
+function cmsMediaUrl(?string $path, string $fallback = ''): string
+{
+    $path = trim((string)$path);
+    if ($path === '') {
+        return $fallback;
+    }
+    return str_starts_with($path, 'http') ? $path : uploadUrl($path);
+}
+
+function cmsMap(array $section): array
+{
+    $data = $section['data'] ?? null;
+    return is_array($data) && !array_is_list($data) ? $data : [];
+}
+
+function cmsList(array $section): array
+{
+    $data = $section['data'] ?? null;
+    if (!is_array($data) || $data === []) {
+        return [];
+    }
+    if (array_is_list($data)) {
+        return $data;
+    }
+    $items = $data['items'] ?? null;
+    return is_array($items) && array_is_list($items) ? $items : [];
+}
+
 function projectImageUrl(array $project, string $fallback = ''): string
 {
     $fallback = $fallback ?: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80';
@@ -348,4 +395,70 @@ function navMenus(string $location = 'primary'): array
     }));
 
     return $cache[$location] = $menus;
+}
+
+function pageSections(string $pageKey): array
+{
+    static $cache = [];
+    if (isset($cache[$pageKey])) {
+        return $cache[$pageKey];
+    }
+    try {
+        $model = new PageSectionModel();
+        return $cache[$pageKey] = $model->getByPage($pageKey);
+    } catch (\Throwable $e) {
+        return $cache[$pageKey] = [];
+    }
+}
+
+function cmsSection(string $pageKey, string $sectionKey): ?array
+{
+    $sections = pageSections($pageKey);
+    return $sections[$sectionKey] ?? null;
+}
+
+function cmsSectionEnabled(string $pageKey, string $sectionKey, bool $default = true): bool
+{
+    $sec = cmsSection($pageKey, $sectionKey);
+    if ($sec === null) {
+        return $default;
+    }
+    return !empty($sec['is_enabled']);
+}
+
+function cmsSectionTitle(string $pageKey, string $sectionKey, string $default = ''): string
+{
+    $sec = cmsSection($pageKey, $sectionKey);
+    return trim((string)($sec['title'] ?? '')) ?: $default;
+}
+
+function cmsSectionSubtitle(string $pageKey, string $sectionKey, string $default = ''): string
+{
+    $sec = cmsSection($pageKey, $sectionKey);
+    return trim((string)($sec['subtitle'] ?? '')) ?: $default;
+}
+
+function cmsSectionContent(string $pageKey, string $sectionKey, string $default = ''): string
+{
+    $sec = cmsSection($pageKey, $sectionKey);
+    return trim((string)($sec['content'] ?? '')) ?: $default;
+}
+
+function cmsSectionImage(string $pageKey, string $sectionKey, string $default = ''): string
+{
+    $sec = cmsSection($pageKey, $sectionKey);
+    $url = trim((string)($sec['image_url'] ?? ''));
+    if ($url === '') {
+        return $default;
+    }
+    return str_starts_with($url, 'http') ? $url : uploadUrl($url);
+}
+
+function cmsSectionData(string $pageKey, string $sectionKey, mixed $default = null): mixed
+{
+    $sec = cmsSection($pageKey, $sectionKey);
+    if ($sec === null || !isset($sec['data'])) {
+        return $default;
+    }
+    return $sec['data'] !== null ? $sec['data'] : $default;
 }

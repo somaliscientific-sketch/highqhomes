@@ -24,17 +24,35 @@ $paintImage = static function (array $paint): string {
     return 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80';
 };
 
-$benefits = [
-    ['icon' => 'bi-shield-check', 'title' => 'Quality assured', 'text' => 'Trusted brands selected for durability in Puntland\'s climate.'],
-    ['icon' => 'bi-person-workspace', 'title' => 'Expert guidance', 'text' => 'Product advice for exterior, interior, and textured finishes.'],
-    ['icon' => 'bi-truck', 'title' => 'Project supply', 'text' => 'Coordinated delivery for residential and commercial builds.'],
-    ['icon' => 'bi-brush', 'title' => 'Application support', 'text' => 'Surface prep, coverage, and professional application tips.'],
-];
+$cms = $sections ?? [];
+$hero = $cms['hero'] ?? [];
+$intro = $cms['intro'] ?? [];
+$benefitsSec = $cms['benefits'] ?? [];
+$ctaSec = $cms['cta'] ?? [];
+
+$showHero = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
+$showIntro = !isset($intro['is_enabled']) || !empty($intro['is_enabled']);
+$showBenefits = !isset($benefitsSec['is_enabled']) || !empty($benefitsSec['is_enabled']);
+$showCta = !isset($ctaSec['is_enabled']) || !empty($ctaSec['is_enabled']);
+
+$heroKicker = $hero['title'] ?? 'Products';
+$heroTitle  = $hero['subtitle'] ?? 'Premium paints & coatings';
+$heroLead   = $hero['content'] ?? 'Professional-grade finishes for exterior walls, interiors, and textured surfaces — supplied with expert guidance for lasting results.';
+$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1920&q=80';
+
+$introEyebrow = $intro['title'] ?? 'Finishing Excellence';
+$introTitle   = $intro['subtitle'] ?? 'Colors & Coatings That Endure';
+$introLead    = $intro['content'] ?? 'HighQ Homes supplies coatings chosen for weather resistance, coverage, and finish quality — backed by application advice from our construction team.';
+
+if (!empty($benefitsSec['data']) && is_array($benefitsSec['data'])) {
+    $benefits = $benefitsSec['data'];
+}
 ?>
 
+<?php if ($showHero): ?>
 <section class="hq-paints-pro-hero">
   <div class="hq-paints-pro-hero__bg" aria-hidden="true">
-    <img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1920&q=80" alt="" loading="eager">
+    <img src="<?= e($heroImage) ?>" alt="" loading="eager">
   </div>
   <div class="hq-paints-pro-hero__overlay" aria-hidden="true"></div>
   <div class="container-site hq-paints-pro-hero__inner">
@@ -44,9 +62,9 @@ $benefits = [
       <span class="current">Paints &amp; Products</span>
     </nav>
     <div class="hq-paints-pro-hero__content" data-anim="up">
-      <p class="hq-paints-pro-hero__kicker">Products</p>
-      <h1 class="hq-paints-pro-hero__title">Premium paints &amp; coatings</h1>
-      <p class="hq-paints-pro-hero__lead">Professional-grade finishes for exterior walls, interiors, and textured surfaces — supplied with expert guidance for lasting results.</p>
+      <p class="hq-paints-pro-hero__kicker"><?= e($heroKicker) ?></p>
+      <h1 class="hq-paints-pro-hero__title"><?= e($heroTitle) ?></h1>
+      <p class="hq-paints-pro-hero__lead"><?= e($heroLead) ?></p>
       <div class="hq-paints-pro-hero__actions">
         <a href="#catalog" class="hq-btn hq-btn--orange hq-btn--lg">Browse catalog <i class="bi bi-arrow-down"></i></a>
         <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> Product enquiry</a>
@@ -54,14 +72,16 @@ $benefits = [
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showIntro): ?>
 <section class="hq-paints-pro-intro">
   <div class="container-site">
     <div class="hq-paints-pro-intro__shell" data-anim="up">
       <div class="hq-paints-pro-intro__copy">
-        <p class="hq-paints-pro-eyebrow">Professional supply</p>
-        <h2 class="hq-paints-pro-title">Finishes that protect &amp; impress</h2>
-        <p class="hq-paints-pro-lead">HighQ Homes supplies coatings chosen for weather resistance, coverage, and finish quality — backed by application advice from our construction team.</p>
+        <p class="hq-paints-pro-eyebrow"><?= e($introEyebrow) ?></p>
+        <h2 class="hq-paints-pro-title"><?= e($introTitle) ?></h2>
+        <p class="hq-paints-pro-lead"><?= e($introLead) ?></p>
       </div>
       <div class="hq-paints-pro-intro__stats">
         <div class="hq-paints-pro-stat">
@@ -80,20 +100,23 @@ $benefits = [
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showBenefits && !empty($benefits)): ?>
 <section class="hq-paints-pro-benefits">
   <div class="container-site">
     <div class="hq-paints-pro-benefits__grid">
       <?php foreach ($benefits as $i => $item): ?>
       <article class="hq-paints-pro-benefit" data-anim="up" data-delay="<?= $i * 45 ?>">
-        <span class="hq-paints-pro-benefit__icon"><i class="bi <?= e($item['icon']) ?>"></i></span>
-        <h3><?= e($item['title']) ?></h3>
-        <p><?= e($item['text']) ?></p>
+        <span class="hq-paints-pro-benefit__icon"><i class="bi <?= e($item['icon'] ?? 'bi-brush') ?>"></i></span>
+        <h3><?= e($item['title'] ?? '') ?></h3>
+        <p><?= e($item['text'] ?? '') ?></p>
       </article>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="hq-paints-pro-catalog" id="catalog">
   <div class="container-site">
@@ -218,13 +241,14 @@ $benefits = [
   </div>
 </section>
 
+<?php if ($showCta): ?>
 <section class="hq-paints-pro-cta">
   <div class="hq-paints-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-paints-pro-cta__box" data-anim="up">
     <div class="hq-paints-pro-cta__copy">
-      <p class="hq-paints-pro-eyebrow hq-paints-pro-eyebrow--light">Need a quote?</p>
-      <h2 class="hq-paints-pro-cta__title">Get product advice &amp; pricing</h2>
-      <p class="hq-paints-pro-cta__lead">Tell us your project scope — we'll recommend the right coatings and supply options.</p>
+      <p class="hq-paints-pro-eyebrow hq-paints-pro-eyebrow--light"><?= e($ctaSec['title'] ?? 'Need a quote?') ?></p>
+      <h2 class="hq-paints-pro-cta__title"><?= e($ctaSec['subtitle'] ?? 'Get product advice & pricing') ?></h2>
+      <p class="hq-paints-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Tell us your project scope — we\'ll recommend the right coatings and supply options.') ?></p>
     </div>
     <div class="hq-paints-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> WhatsApp enquiry</a>
@@ -232,3 +256,4 @@ $benefits = [
     </div>
   </div>
 </section>
+<?php endif; ?>

@@ -1,14 +1,26 @@
 <?php $pageTitle = 'Services'; ?>
 
+<header class="admin-page-intro">
+  <div>
+    <span class="admin-report-kicker">Website</span>
+    <h2>Services</h2>
+    <p>Control the service cards shown on the homepage and services page — titles, copy, icons, and visibility.</p>
+  </div>
+</header>
+
 <div class="admin-page-toolbar">
-  <p class="admin-page-meta"><?= count($services) ?> service(s)</p>
+  <label class="admin-list-filter">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input type="search" data-admin-list-filter placeholder="Filter services..." aria-label="Filter services">
+  </label>
+  <p class="admin-page-meta" data-admin-list-count data-noun="service"><?= count($services) ?> service<?= count($services) === 1 ? '' : 's' ?></p>
   <?php if (canManage()): ?>
   <a href="<?= url('admin/services/create') ?>" class="admin-btn admin-btn-primary"><i class="bi bi-plus-lg"></i> Add Service</a>
   <?php endif; ?>
 </div>
 
 <div class="admin-card">
-  <table class="admin-table">
+  <table class="admin-table admin-table--pro">
     <thead>
       <tr>
         <th>Service</th>
@@ -20,7 +32,7 @@
     </thead>
     <tbody>
       <?php foreach ($services as $svc): ?>
-      <tr>
+      <tr data-admin-list-item>
         <td>
           <div class="admin-table-title"><?= e($svc['title']) ?></div>
           <div class="admin-table-desc"><?= e(truncate($svc['short_description'] ?? '', 60)) ?></div>

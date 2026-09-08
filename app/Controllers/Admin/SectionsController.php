@@ -29,7 +29,13 @@ class AdminSectionsController extends Controller
         if (!$section) {
             $this->abort(404);
         }
-        $this->render('admin/sections/form', compact('section'), 'admin');
+        $mediaImages = [];
+        try {
+            $mediaRes = (new MediaModel())->search('', 1, 40, null, 'image');
+            $mediaImages = $mediaRes['items'] ?? [];
+        } catch (\Throwable $e) {}
+
+        $this->render('admin/sections/form', compact('section', 'mediaImages'), 'admin');
     }
 
     public function update(array $params = []): void

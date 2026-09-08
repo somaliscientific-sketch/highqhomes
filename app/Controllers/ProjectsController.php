@@ -13,6 +13,7 @@ class ProjectsController extends Controller
         $categories = $model->getCategories();
         $settings   = (new SettingModel())->getAllAsMap();
         $seo        = (new SeoModel())->findBySlug('projects');
+        $sections   = (new PageSectionModel())->getByPage('projects');
 
         $stats = [
             'showing'     => count($projects),
@@ -22,7 +23,7 @@ class ProjectsController extends Controller
             'categories'  => count($categories),
         ];
 
-        $this->render('projects/index', compact('projects', 'categories', 'category', 'status', 'settings', 'seo', 'stats'));
+        $this->render('projects/index', compact('projects', 'categories', 'category', 'status', 'settings', 'seo', 'stats', 'sections'));
     }
 
     public function show(array $params = []): void

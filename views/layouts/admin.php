@@ -35,6 +35,10 @@
   </div>
 
   <nav class="admin-sidebar-nav">
+    <label class="admin-sidebar-search sidebar-label">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input id="admin-nav-filter" type="search" placeholder="Find a page..." autocomplete="off">
+    </label>
     <div class="admin-nav-section">
       <p class="admin-nav-label sidebar-label">Main</p>
       <a href="<?= url('admin/dashboard') ?>" class="admin-nav-link <?= active('/admin/dashboard', true) ?: active('/admin', true) ?>">
@@ -116,6 +120,11 @@
       </div>
     </div>
     <div class="admin-topbar-end">
+      <button type="button" class="admin-command-trigger" data-admin-command-open aria-haspopup="dialog" aria-controls="admin-command">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <span>Jump to page or action</span>
+        <kbd>Ctrl</kbd><kbd>K</kbd>
+      </button>
       <span class="admin-topbar-secure"><i class="bi bi-shield-check"></i> Secure session</span>
       <div class="admin-user-menu" data-user-menu>
         <button type="button" class="admin-user-menu__toggle admin-topbar-user" aria-expanded="false" aria-haspopup="true" aria-controls="admin-user-menu-panel">
@@ -152,6 +161,25 @@
   </div>
 </div>
 
+<div id="admin-command" class="admin-command" hidden>
+  <button type="button" class="admin-command__backdrop" data-admin-command-close aria-label="Close search"></button>
+  <div class="admin-command__dialog" role="dialog" aria-modal="true" aria-labelledby="admin-command-title">
+    <p id="admin-command-title" class="admin-command__title">Jump to anything</p>
+    <label class="admin-command__field">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input id="admin-command-input" type="search" placeholder="Search pages, sections, settings..." autocomplete="off">
+    </label>
+    <p class="admin-command__hint">Use the keyboard. Press Enter to open. Esc to close.</p>
+    <ul id="admin-command-list" class="admin-command__list"></ul>
+  </div>
+</div>
+
+<script type="application/json" id="admin-command-extras"><?= json_encode([
+  ['label' => 'Edit homepage sections', 'href' => url('admin/sections?page=home'), 'group' => 'Content'],
+  ['label' => 'Edit header & top bar', 'href' => url('admin/sections?page=header'), 'group' => 'Content'],
+  ['label' => 'Edit footer', 'href' => url('admin/sections?page=footer'), 'group' => 'Content'],
+  ['label' => 'Preview website', 'href' => url(), 'group' => 'Actions', 'blank' => true],
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
 <script src="<?= asset('js/admin.js') ?>?v=<?= @filemtime(PUBLIC_PATH . '/js/admin.js') ?: time() ?>"></script>
 </body>
 </html>

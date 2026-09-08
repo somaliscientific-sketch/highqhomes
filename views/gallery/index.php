@@ -8,14 +8,32 @@ $phone     = $settings['phone'] ?? '';
 $phoneHref = preg_replace('/\s+/', '', $phone);
 $heroImage = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
 
-$highlights = [
-    ['icon' => 'bi-buildings', 'title' => 'Residential & commercial', 'text' => 'Exterior and interior shots from homes, offices, and mixed-use builds.'],
-    ['icon' => 'bi-brush', 'title' => 'Finishing details', 'text' => 'Kitchens, bathrooms, joinery, and premium fit-out craftsmanship.'],
-    ['icon' => 'bi-hammer', 'title' => 'On-site progress', 'text' => 'Structure, cladding, and quality checks throughout delivery.'],
-    ['icon' => 'bi-tree', 'title' => 'Landscape & exterior', 'text' => 'Facades, compounds, hardscape, and outdoor spaces.'],
-];
+$cms = $sections ?? [];
+$hero = $cms['hero'] ?? [];
+$intro = $cms['intro'] ?? [];
+$highlightsSec = $cms['highlights'] ?? [];
+$ctaSec = $cms['cta'] ?? [];
+
+$showHero = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
+$showIntro = !isset($intro['is_enabled']) || !empty($intro['is_enabled']);
+$showHighlights = !isset($highlightsSec['is_enabled']) || !empty($highlightsSec['is_enabled']);
+$showCta = !isset($ctaSec['is_enabled']) || !empty($ctaSec['is_enabled']);
+
+$heroKicker = $hero['title'] ?? 'Our work';
+$heroTitle  = $hero['subtitle'] ?? 'Project gallery';
+$heroLead   = $hero['content'] ?? 'Photos from residential, commercial, and community projects across Puntland — structure, finishes, and handover.';
+$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
+
+$introEyebrow = $intro['title'] ?? 'Visual portfolio';
+$introTitle   = $intro['subtitle'] ?? 'Craftsmanship in every frame';
+$introLead    = $intro['content'] ?? 'Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.';
+
+if (!empty($highlightsSec['data']) && is_array($highlightsSec['data'])) {
+    $highlights = $highlightsSec['data'];
+}
 ?>
 
+<?php if ($showHero): ?>
 <section class="hq-gallery-pro-hero">
   <div class="hq-gallery-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
@@ -28,9 +46,9 @@ $highlights = [
       <span class="current">Gallery</span>
     </nav>
     <div class="hq-gallery-pro-hero__content" data-anim="up">
-      <p class="hq-gallery-pro-hero__kicker">Our work</p>
-      <h1 class="hq-gallery-pro-hero__title">Project gallery</h1>
-      <p class="hq-gallery-pro-hero__lead">Photos from residential, commercial, and community projects across Puntland — structure, finishes, and handover.</p>
+      <p class="hq-gallery-pro-hero__kicker"><?= e($heroKicker) ?></p>
+      <h1 class="hq-gallery-pro-hero__title"><?= e($heroTitle) ?></h1>
+      <p class="hq-gallery-pro-hero__lead"><?= e($heroLead) ?></p>
       <div class="hq-gallery-pro-hero__actions">
         <a href="#gallery-grid" class="hq-btn hq-btn--orange hq-btn--lg">Browse photos <i class="bi bi-arrow-down"></i></a>
         <a href="<?= url('projects') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">View projects</a>
@@ -38,14 +56,16 @@ $highlights = [
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showIntro): ?>
 <section class="hq-gallery-pro-intro" aria-label="Gallery highlights">
   <div class="container-site">
     <div class="hq-gallery-pro-intro__shell" data-anim="up">
       <div class="hq-gallery-pro-intro__copy">
-        <p class="hq-gallery-pro-eyebrow">Visual portfolio</p>
-        <h2 class="hq-gallery-pro-title">Craftsmanship in every frame</h2>
-        <p class="hq-gallery-pro-lead">Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.</p>
+        <p class="hq-gallery-pro-eyebrow"><?= e($introEyebrow) ?></p>
+        <h2 class="hq-gallery-pro-title"><?= e($introTitle) ?></h2>
+        <p class="hq-gallery-pro-lead"><?= e($introLead) ?></p>
       </div>
       <div class="hq-gallery-pro-intro__stats">
         <div class="hq-gallery-pro-stat">
@@ -64,20 +84,23 @@ $highlights = [
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showHighlights && !empty($highlights)): ?>
 <section class="hq-gallery-pro-highlights">
   <div class="container-site">
     <div class="hq-gallery-pro-highlights__grid">
       <?php foreach ($highlights as $i => $item): ?>
       <article class="hq-gallery-pro-highlight" data-anim="up" data-delay="<?= $i * 45 ?>">
-        <span class="hq-gallery-pro-highlight__icon"><i class="bi <?= e($item['icon']) ?>"></i></span>
-        <h3><?= e($item['title']) ?></h3>
-        <p><?= e($item['text']) ?></p>
+        <span class="hq-gallery-pro-highlight__icon"><i class="bi <?= e($item['icon'] ?? 'bi-image') ?>"></i></span>
+        <h3><?= e($item['title'] ?? '') ?></h3>
+        <p><?= e($item['text'] ?? '') ?></p>
       </article>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="hq-gallery-pro-catalog" id="gallery-grid">
   <div class="container-site">
@@ -144,13 +167,14 @@ $highlights = [
   </div>
 </section>
 
+<?php if ($showCta): ?>
 <section class="hq-gallery-pro-cta" aria-labelledby="gallery-cta-title">
   <div class="hq-gallery-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-gallery-pro-cta__box" data-anim="up">
     <div class="hq-gallery-pro-cta__copy">
-      <p class="hq-gallery-pro-eyebrow hq-gallery-pro-eyebrow--light">Start your build</p>
-      <h2 id="gallery-cta-title" class="hq-gallery-pro-cta__title">Want results like these on your site?</h2>
-      <p class="hq-gallery-pro-cta__lead">Share your project vision — we'll plan scope, timeline, and premium delivery from day one.</p>
+      <p class="hq-gallery-pro-eyebrow hq-gallery-pro-eyebrow--light"><?= e($ctaSec['title'] ?? 'Start your build') ?></p>
+      <h2 id="gallery-cta-title" class="hq-gallery-pro-cta__title"><?= e($ctaSec['subtitle'] ?? 'Want results like these on your site?') ?></h2>
+      <p class="hq-gallery-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Share your project vision — we\'ll plan scope, timeline, and premium delivery from day one.') ?></p>
     </div>
     <div class="hq-gallery-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
@@ -161,3 +185,4 @@ $highlights = [
     </div>
   </div>
 </section>
+<?php endif; ?>

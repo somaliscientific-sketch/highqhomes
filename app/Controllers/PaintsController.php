@@ -14,6 +14,7 @@ class PaintsController extends Controller
         $brands     = $model->getBrands();
         $settings   = (new SettingModel())->getAllAsMap();
         $seo        = (new SeoModel())->findBySlug('paints');
+        $sections   = (new PageSectionModel())->getByPage('paints');
 
         $stats = [
             'total'      => count($all),
@@ -31,7 +32,8 @@ class PaintsController extends Controller
             'brand',
             'stats',
             'settings',
-            'seo'
+            'seo',
+            'sections'
         ));
     }
 

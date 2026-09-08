@@ -47,6 +47,35 @@ $approachItems = [
     ['icon' => 'bi-key', 'title' => 'Handover', 'text' => 'Final walkthrough, documentation, and after-care support.'],
 ];
 
+$cms = $sections ?? [];
+$hero = $cms['hero'] ?? [];
+$intro = $cms['intro'] ?? [];
+$pillarsSec = $cms['pillars'] ?? [];
+$approachSec = $cms['approach'] ?? [];
+$ctaSec = $cms['cta'] ?? [];
+
+$showHero = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
+$showIntro = !isset($intro['is_enabled']) || !empty($intro['is_enabled']);
+$showPillars = !isset($pillarsSec['is_enabled']) || !empty($pillarsSec['is_enabled']);
+$showApproach = !isset($approachSec['is_enabled']) || !empty($approachSec['is_enabled']);
+$showCta = !isset($ctaSec['is_enabled']) || !empty($ctaSec['is_enabled']);
+
+$heroKicker = $hero['title'] ?? 'Portfolio';
+$heroTitle  = $hero['subtitle'] ?? 'Projects delivered with confidence';
+$heroLead   = $hero['content'] ?? 'Explore residential, commercial, and community builds — each delivered with structured planning, quality control, and premium finishes.';
+$heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
+
+$introEyebrow = $intro['title'] ?? 'Our work';
+$introTitle   = $intro['subtitle'] ?? 'Built to last. Designed to impress.';
+$introLead    = $intro['content'] ?? 'Every project reflects our commitment to transparent delivery, disciplined craftsmanship, and spaces people trust for generations.';
+
+if (!empty($pillarsSec['data']) && is_array($pillarsSec['data'])) {
+    $pillars = $pillarsSec['data'];
+}
+if (!empty($approachSec['data']) && is_array($approachSec['data'])) {
+    $approachItems = $approachSec['data'];
+}
+
 $schemaProjects = array_map(static fn(array $p): array => [
     '@type'       => 'CreativeWork',
     'name'        => $p['title'],
@@ -69,6 +98,7 @@ $schemaJson = json_encode([
 
 <script type="application/ld+json"><?= $schemaJson ?></script>
 
+<?php if ($showHero): ?>
 <section class="hq-projects-pro-hero">
   <div class="hq-projects-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
@@ -81,9 +111,9 @@ $schemaJson = json_encode([
       <span class="current">Projects</span>
     </nav>
     <div class="hq-projects-pro-hero__content" data-anim="up">
-      <p class="hq-projects-pro-hero__kicker">Portfolio</p>
-      <h1 class="hq-projects-pro-hero__title">Projects delivered with confidence</h1>
-      <p class="hq-projects-pro-hero__lead">Explore residential, commercial, and community builds — each delivered with structured planning, quality control, and premium finishes.</p>
+      <p class="hq-projects-pro-hero__kicker"><?= e($heroKicker) ?></p>
+      <h1 class="hq-projects-pro-hero__title"><?= e($heroTitle) ?></h1>
+      <p class="hq-projects-pro-hero__lead"><?= e($heroLead) ?></p>
       <div class="hq-projects-pro-hero__actions">
         <a href="#portfolio" class="hq-btn hq-btn--orange hq-btn--lg">Browse portfolio <i class="bi bi-arrow-down"></i></a>
         <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> Discuss a project</a>
@@ -91,14 +121,16 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showIntro): ?>
 <section class="hq-projects-pro-intro" aria-label="Portfolio highlights">
   <div class="container-site">
     <div class="hq-projects-pro-intro__shell" data-anim="up">
       <div class="hq-projects-pro-intro__copy">
-        <p class="hq-projects-pro-eyebrow">Our work</p>
-        <h2 class="hq-projects-pro-title">Built to last. Designed to impress.</h2>
-        <p class="hq-projects-pro-lead">Every project reflects our commitment to transparent delivery, disciplined craftsmanship, and spaces people trust for generations.</p>
+        <p class="hq-projects-pro-eyebrow"><?= e($introEyebrow) ?></p>
+        <h2 class="hq-projects-pro-title"><?= e($introTitle) ?></h2>
+        <p class="hq-projects-pro-lead"><?= e($introLead) ?></p>
       </div>
       <div class="hq-projects-pro-intro__stats">
         <div class="hq-projects-pro-stat">
@@ -121,20 +153,23 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showPillars && !empty($pillars)): ?>
 <section class="hq-projects-pro-pillars">
   <div class="container-site">
     <div class="hq-projects-pro-pillars__grid">
       <?php foreach ($pillars as $i => $item): ?>
       <article class="hq-projects-pro-pillar" data-anim="up" data-delay="<?= $i * 45 ?>">
-        <span class="hq-projects-pro-pillar__icon"><i class="bi <?= e($item['icon']) ?>"></i></span>
-        <h3><?= e($item['title']) ?></h3>
-        <p><?= e($item['text']) ?></p>
+        <span class="hq-projects-pro-pillar__icon"><i class="bi <?= e($item['icon'] ?? 'bi-shield-check') ?>"></i></span>
+        <h3><?= e($item['title'] ?? '') ?></h3>
+        <p><?= e($item['text'] ?? '') ?></p>
       </article>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="hq-projects-pro-catalog" id="portfolio">
   <div class="container-site">
@@ -199,21 +234,22 @@ $schemaJson = json_encode([
   </div>
 </section>
 
+<?php if ($showApproach && !empty($approachItems)): ?>
 <section class="hq-projects-pro-approach">
   <div class="container-site">
     <div class="hq-projects-pro-approach__shell">
       <header class="hq-projects-pro-approach__head" data-anim="left">
-        <p class="hq-projects-pro-eyebrow">Our approach</p>
-        <h2 class="hq-projects-pro-title">How every project is delivered</h2>
-        <p class="hq-projects-pro-lead">From first site visit to final handover — a proven path that keeps builds on schedule and quality on point.</p>
+        <p class="hq-projects-pro-eyebrow"><?= e($approachSec['title'] ?? 'Our approach') ?></p>
+        <h2 class="hq-projects-pro-title"><?= e($approachSec['subtitle'] ?? 'How every project is delivered') ?></h2>
+        <p class="hq-projects-pro-lead"><?= e($approachSec['content'] ?? 'From first site visit to final handover — a proven path that keeps builds on schedule and quality on point.') ?></p>
       </header>
       <div class="hq-projects-pro-approach__steps" data-anim="right">
         <?php foreach ($approachItems as $i => $item): ?>
         <article class="hq-projects-pro-approach__step">
           <span class="hq-projects-pro-approach__num"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
           <div>
-            <strong><i class="bi <?= e($item['icon']) ?>"></i> <?= e($item['title']) ?></strong>
-            <p><?= e($item['text']) ?></p>
+            <strong><i class="bi <?= e($item['icon'] ?? 'bi-check-circle') ?>"></i> <?= e($item['title'] ?? '') ?></strong>
+            <p><?= e($item['text'] ?? '') ?></p>
           </div>
         </article>
         <?php endforeach; ?>
@@ -221,14 +257,16 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
 
+<?php if ($showCta): ?>
 <section class="hq-projects-pro-cta" aria-labelledby="projects-cta-title">
   <div class="hq-projects-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-projects-pro-cta__box" data-anim="up">
     <div class="hq-projects-pro-cta__copy">
-      <p class="hq-projects-pro-eyebrow hq-projects-pro-eyebrow--light">Start your build</p>
-      <h2 id="projects-cta-title" class="hq-projects-pro-cta__title">Ready to add your project to our portfolio?</h2>
-      <p class="hq-projects-pro-cta__lead">Share your vision with our team for a clear plan, honest timeline, and premium delivery.</p>
+      <p class="hq-projects-pro-eyebrow hq-projects-pro-eyebrow--light"><?= e($ctaSec['title'] ?? 'Start your build') ?></p>
+      <h2 id="projects-cta-title" class="hq-projects-pro-cta__title"><?= e($ctaSec['subtitle'] ?? 'Ready to add your project to our portfolio?') ?></h2>
+      <p class="hq-projects-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Share your vision with our team for a clear plan, honest timeline, and premium delivery.') ?></p>
     </div>
     <div class="hq-projects-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
@@ -239,3 +277,4 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>

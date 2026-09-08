@@ -1,5 +1,13 @@
 <?php $pageTitle = 'Pages'; ?>
 
+<header class="admin-page-intro">
+  <div>
+    <span class="admin-report-kicker">Website</span>
+    <h2>Pages</h2>
+    <p>Create and publish extra website pages, then keep their copy and visibility in one place.</p>
+  </div>
+</header>
+
 <div class="admin-page-toolbar">
   <form method="GET" class="admin-search-bar">
     <input class="admin-input" name="q" value="<?= e($q ?? '') ?>" placeholder="Search pages...">

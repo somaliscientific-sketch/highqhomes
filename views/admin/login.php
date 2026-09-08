@@ -85,7 +85,7 @@ $cmsLogo = cmsLogoUrl();
           <label class="login-pro__label" for="login-email">Email address</label>
           <div class="login-pro__input-wrap">
             <i class="bi bi-envelope" aria-hidden="true"></i>
-            <input id="login-email" type="email" name="email" required autofocus class="login-pro__input" placeholder="info@highqhomes.net" value="<?= e($_POST['email'] ?? '') ?>" autocomplete="username" maxlength="190">
+            <input id="login-email" type="email" name="email" required autofocus class="login-pro__input" placeholder="info@highqhomes.site" value="<?= e($_POST['email'] ?? '') ?>" autocomplete="username" maxlength="190">
           </div>
         </div>
 

@@ -12,6 +12,7 @@ class GalleryController extends Controller
         $categories = $model->getCategories();
         $settings   = (new SettingModel())->getAllAsMap();
         $seo        = (new SeoModel())->findBySlug('gallery');
+        $sections   = (new PageSectionModel())->getByPage('gallery');
 
         $stats = [
             'total'      => $model->countPublished(),
@@ -19,6 +20,6 @@ class GalleryController extends Controller
             'categories' => count($categories),
         ];
 
-        $this->render('gallery/index', compact('items', 'categories', 'category', 'settings', 'seo', 'stats'));
+        $this->render('gallery/index', compact('items', 'categories', 'category', 'settings', 'seo', 'stats', 'sections'));
     }
 }

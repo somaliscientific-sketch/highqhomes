@@ -1,14 +1,26 @@
 <?php $pageTitle = 'Projects'; ?>
 
+<header class="admin-page-intro">
+  <div>
+    <span class="admin-report-kicker">Website</span>
+    <h2>Projects</h2>
+    <p>Publish portfolio work, keep drafts private, and update the projects visitors see on the website.</p>
+  </div>
+</header>
+
 <div class="admin-page-toolbar">
-  <p class="admin-page-meta"><?= $total ?> project(s) total</p>
+  <label class="admin-list-filter">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input type="search" data-admin-list-filter placeholder="Filter by title, location, or status..." aria-label="Filter projects">
+  </label>
+  <p class="admin-page-meta" data-admin-list-count data-noun="project"><?= (int)$total ?> project<?= (int)$total === 1 ? '' : 's' ?></p>
   <?php if (canManage()): ?>
   <a href="<?= url('admin/projects/create') ?>" class="admin-btn admin-btn-primary"><i class="bi bi-plus-lg"></i> Add Project</a>
   <?php endif; ?>
 </div>
 
 <div class="admin-card">
-  <table class="admin-table">
+  <table class="admin-table admin-table--pro">
     <thead>
       <tr>
         <th style="width:56px"></th>
@@ -21,7 +33,7 @@
     </thead>
     <tbody>
       <?php foreach ($items as $proj): ?>
-      <tr>
+      <tr data-admin-list-item>
         <td>
           <div class="admin-table-thumb">
             <?php if (!empty($proj['featured_image'])): ?>

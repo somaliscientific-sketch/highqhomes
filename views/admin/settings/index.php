@@ -23,7 +23,7 @@
         <h2 class="admin-card-title" style="text-transform:capitalize"><?= e($group) ?> Settings</h2>
       </div>
 
-      <form action="<?= url('admin/settings') ?>" method="POST" enctype="multipart/form-data">
+      <form action="<?= url('admin/settings') ?>" method="POST" enctype="multipart/form-data" data-admin-save>
         <?= csrf() ?>
         <input type="hidden" name="group" value="<?= e($group) ?>">
 
@@ -70,7 +70,8 @@
           <?php endforeach; ?>
         </div>
 
-        <div class="admin-form-footer">
+        <div class="admin-form-footer admin-form-footer--sticky">
+          <p class="admin-section-editor__save-hint"><i class="bi bi-keyboard"></i> Press <kbd>Ctrl</kbd> + <kbd>S</kbd> to save</p>
           <button type="submit" class="admin-btn admin-btn-primary">
             <i class="bi bi-check-lg"></i> Save Settings
           </button>

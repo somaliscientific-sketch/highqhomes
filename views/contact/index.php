@@ -20,12 +20,18 @@ $heroKicker = $hero['title'] ?? 'Contact Us';
 $heroTitle  = $hero['subtitle'] ?? 'Let\'s plan your next project';
 $heroLead   = $hero['content'] ?? 'Share your site details, drawings, or goals — our team will respond with clear next steps.';
 $heroImage  = !empty($hero['image_url']) ? (str_starts_with($hero['image_url'], 'http') ? $hero['image_url'] : uploadUrl($hero['image_url'])) : 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80';
+$showHero   = !isset($hero['is_enabled']) || !empty($hero['is_enabled']);
 
+$processSec   = $cms['process'] ?? [];
+$showProcess  = !isset($processSec['is_enabled']) || !empty($processSec['is_enabled']);
 $processSteps = [
     ['num' => '01', 'title' => 'Review', 'text' => 'We assess project type, location, and scope.'],
     ['num' => '02', 'title' => 'Clarify', 'text' => 'We follow up for drawings or key site details.'],
     ['num' => '03', 'title' => 'Plan', 'text' => 'You receive the next step for design or estimate.'],
 ];
+if (!empty($processSec['data']) && is_array($processSec['data'])) {
+    $processSteps = $processSec['data'];
+}
 
 $success = Session::getFlash('success');
 $error   = Session::getFlash('error');
@@ -34,6 +40,7 @@ $mapQuery = rawurlencode($address ?: 'Garowe, Puntland, Somalia');
 $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
 ?>
 
+<?php if ($showHero): ?>
 <section class="hq-contact-pro-hero">
   <div class="hq-contact-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
@@ -56,6 +63,7 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="hq-contact-pro-main">
   <div class="container-site">
@@ -174,8 +182,9 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
           <?php endif; ?>
         </div>
 
+        <?php if ($showProcess && !empty($processSteps)): ?>
         <div class="hq-contact-pro-process">
-          <h3>How we respond</h3>
+          <h3><?= e($processSec['title'] ?? 'How we respond') ?></h3>
           <ol>
             <?php foreach ($processSteps as $step): ?>
             <li>
@@ -188,6 +197,7 @@ $mapFallback = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
             <?php endforeach; ?>
           </ol>
         </div>
+        <?php endif; ?>
       </aside>
     </div>
   </div>

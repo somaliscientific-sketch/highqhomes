@@ -126,29 +126,140 @@ $faqItems = [
 ];
 
 $cms = $sections ?? [];
-if (!empty($cms['hero_trust']['data']) && is_array($cms['hero_trust']['data'])) {
-  $trustBarItems = $cms['hero_trust']['data'];
-}
-if (!empty($cms['why_us']['data']) && is_array($cms['why_us']['data'])) {
-  $whyItems = $cms['why_us']['data'];
-}
-if (!empty($cms['process']['data']) && is_array($cms['process']['data'])) {
-  $steps = $cms['process']['data'];
-}
-if (!empty($cms['connect']['data']) && is_array($cms['connect']['data'])) {
-  $promiseItems = $cms['connect']['data'];
-}
-if (!empty($cms['excellence']['data']) && is_array($cms['excellence']['data'])) {
-  $excellencePillars = $cms['excellence']['data'];
-}
-if (!empty($cms['faq']['data']) && is_array($cms['faq']['data'])) {
-  $faqItems = $cms['faq']['data'];
+$heroSec          = cmsRow($cms, 'hero');
+$heroTrustSec     = cmsRow($cms, 'hero_trust');
+$aboutSec         = cmsRow($cms, 'about_highlights');
+$capabilitiesSec  = cmsRow($cms, 'capabilities');
+$projectsSec      = cmsRow($cms, 'projects');
+$whySec           = cmsRow($cms, 'why_us');
+$processSec       = cmsRow($cms, 'process');
+$excellenceSec    = cmsRow($cms, 'excellence');
+$connectSec       = cmsRow($cms, 'connect');
+$statsSec         = cmsRow($cms, 'stats');
+$testimonialsSec  = cmsRow($cms, 'testimonials');
+$faqSec           = cmsRow($cms, 'faq');
+$ctaSec           = cmsRow($cms, 'cta');
+$projectsMeta     = cmsMap($projectsSec);
+$testimonialsMeta = cmsMap($testimonialsSec);
+$ctaMeta          = cmsMap($ctaSec);
+$excellenceMeta   = cmsMap($excellenceSec);
+$faqMeta          = cmsMap($faqSec);
+$heroMetricsCms   = [];
+
+$excellenceChecklist = [
+  'End-to-end project accountability',
+  'Premium materials & skilled trades',
+  'Milestone-based progress reporting',
+  'Clean, organized, professional sites',
+];
+if (!empty($excellenceMeta['checklist']) && is_array($excellenceMeta['checklist'])) {
+  $excellenceChecklist = $excellenceMeta['checklist'];
 }
 
-$showProjects = ($settings['home_projects_enabled'] ?? '1') === '1';
-$showAbout    = ($settings['home_about_enabled'] ?? '1') === '1';
-$showTestimonials = ($settings['home_testimonials_enabled'] ?? '1') === '1' && !empty($testimonials);
-$showCta = ($settings['home_cta_enabled'] ?? '1') === '1';
+$faqChips = ['Quick answers', 'Expert guidance', 'Free consultation'];
+if (!empty($faqMeta['chips']) && is_array($faqMeta['chips'])) {
+  $faqChips = $faqMeta['chips'];
+}
+
+$trustList = cmsList($heroTrustSec);
+if ($trustList !== []) {
+  $trustBarItems = $trustList;
+} elseif (!empty($heroTrustSec['data']) && is_array($heroTrustSec['data'])) {
+  $trustBarItems = $heroTrustSec['data'];
+}
+
+$capList = cmsList($capabilitiesSec);
+if ($capList !== []) {
+  $capabilities = array_map(static function ($row) {
+    if (!is_array($row)) {
+      return $row;
+    }
+    if (empty($row['img']) && !empty($row['image_url'])) {
+      $row['img'] = cmsMediaUrl((string)$row['image_url']);
+    } elseif (!empty($row['img'])) {
+      $row['img'] = cmsMediaUrl((string)$row['img'], (string)$row['img']);
+    }
+    return $row;
+  }, $capList);
+}
+
+$aboutList = cmsList($aboutSec);
+if ($aboutList !== []) {
+  $aboutHighlights = $aboutList;
+}
+$whyList = cmsList($whySec);
+if ($whyList !== []) {
+  $whyItems = $whyList;
+}
+$processList = cmsList($processSec);
+if ($processList !== []) {
+  $steps = $processList;
+}
+$connectList = cmsList($connectSec);
+if ($connectList !== []) {
+  $promiseItems = $connectList;
+}
+$excellenceList = cmsList($excellenceSec);
+if ($excellenceList !== []) {
+  $excellencePillars = $excellenceList;
+}
+$faqList = cmsList($faqSec);
+if ($faqList !== []) {
+  $faqItems = $faqList;
+}
+$statsList = cmsList($statsSec);
+if ($statsList !== []) {
+  $mappedStats = [];
+  foreach ($statsList as $row) {
+    if (!is_array($row)) continue;
+    $value = (string)($row['value'] ?? $row['num'] ?? '');
+    $label = (string)($row['label'] ?? $row['title'] ?? $row['text'] ?? '');
+    if ($value === '' && $label === '') continue;
+    $mappedStats[] = [
+      'value'  => $value !== '' ? $value : $label,
+      'num'    => statNumber((string)($row['num'] ?? $value)),
+      'suffix' => (string)($row['suffix'] ?? ''),
+      'label'  => $label !== '' ? $label : $value,
+      'icon'   => (string)($row['icon'] ?? 'bi-award'),
+    ];
+  }
+  if ($mappedStats !== []) {
+    $statItems = $mappedStats;
+  }
+}
+$heroList = cmsList($heroSec);
+if ($heroList !== []) {
+  $mappedHeroMetrics = [];
+  foreach ($heroList as $row) {
+    if (!is_array($row)) continue;
+    $mappedHeroMetrics[] = [
+      'num'    => statNumber((string)($row['num'] ?? $row['value'] ?? '0')),
+      'suffix' => (string)($row['suffix'] ?? ''),
+      'label'  => (string)($row['label'] ?? $row['title'] ?? ''),
+      'icon'   => (string)($row['icon'] ?? 'bi-award'),
+    ];
+  }
+  if ($mappedHeroMetrics !== []) {
+    $heroMetricsCms = $mappedHeroMetrics;
+  }
+}
+
+$aboutImg = cmsMediaUrl($aboutSec['image_url'] ?? '', $aboutImg);
+$ctaImg   = cmsMediaUrl($ctaSec['image_url'] ?? '', $ctaImg);
+
+$showHero         = cmsRowEnabled($cms, 'hero', true);
+$showHeroTrust    = cmsRowEnabled($cms, 'hero_trust', true);
+$showCapabilities = cmsRowEnabled($cms, 'capabilities', true);
+$showAbout        = cmsRowEnabled($cms, 'about_highlights', ($settings['home_about_enabled'] ?? '1') === '1');
+$showProjects     = cmsRowEnabled($cms, 'projects', ($settings['home_projects_enabled'] ?? '1') === '1');
+$showWhyUs        = cmsRowEnabled($cms, 'why_us', true);
+$showProcess      = cmsRowEnabled($cms, 'process', true);
+$showExcellence   = cmsRowEnabled($cms, 'excellence', true);
+$showConnect      = cmsRowEnabled($cms, 'connect', true);
+$showStats        = cmsRowEnabled($cms, 'stats', true);
+$showTestimonials = cmsRowEnabled($cms, 'testimonials', ($settings['home_testimonials_enabled'] ?? '1') === '1') && !empty($testimonials);
+$showFaq          = cmsRowEnabled($cms, 'faq', true);
+$showCta          = cmsRowEnabled($cms, 'cta', ($settings['home_cta_enabled'] ?? '1') === '1');
 ?>
 
 <!-- HERO -->
@@ -182,14 +293,17 @@ $heroMetrics = [
   ['num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '', 'label' => 'Completed', 'icon' => 'bi-check2-circle'],
   ['num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '', 'label' => 'Years', 'icon' => 'bi-award'],
 ];
+if (!empty($heroMetricsCms)) {
+  $heroMetrics = $heroMetricsCms;
+}
 
-$heroBandStats = [
-  ['num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '', 'label' => 'Profiled Projects'],
-  ['num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '', 'label' => 'Completed Projects'],
-  ['num' => statNumber((string)($settings['stat_satisfaction'] ?? '5')), 'suffix' => '', 'label' => 'Current Projects'],
-  ['num' => statNumber((string)($settings['stat_awards'] ?? '2016')), 'suffix' => '', 'label' => 'Established'],
-];
+$heroBandStats = array_map(static fn(array $stat): array => [
+  'num' => $stat['num'],
+  'suffix' => $stat['suffix'] ?? '',
+  'label' => $stat['label'],
+], array_slice($statItems, 0, 4));
 ?>
+<?php if ($showHero): ?>
 <section
   class="hq-hero hq-hero--showcase<?= $heroMulti ? ' hq-hero--carousel' : '' ?>"
   id="hero"
@@ -226,7 +340,7 @@ $heroBandStats = [
               <?php if ($parts['accent'] !== ''): ?><span class="hq-hero__title-accent"><?= e($parts['accent']) ?></span><?php endif; ?>
             </h1>
             <?php if ($showDesc): ?>
-            <p class="hq-hero__desc"><?= e(truncate($slide['description'], 130)) ?></p>
+            <p class="hq-hero__desc"><?= e($slide['description']) ?></p>
             <?php endif; ?>
             <div class="hq-hero__actions">
               <a href="<?= e($homeHref($normalizeCta($slide['button_link'] ?? $quoteHref))) ?>"<?= $homeTarget($slide['button_link'] ?? $quoteHref) ?> class="hq-btn hq-btn--orange hq-btn--lg hq-hero__btn-primary">
@@ -281,8 +395,8 @@ $heroBandStats = [
         <div class="hq-hero__badge-live">
           <i class="bi bi-lightning-charge-fill"></i>
           <div>
-            <strong>Trusted Builder</strong>
-            <span>Since <?= e($settings['stat_years'] ?? '4') ?>+ years</span>
+            <strong><?= e(cmsText($heroSec, 'title', 'Trusted Builder')) ?></strong>
+            <span><?= e(cmsText($heroSec, 'subtitle', 'Since ' . ($settings['stat_awards'] ?? '2016'))) ?></span>
           </div>
         </div>
       </div>
@@ -324,15 +438,18 @@ $heroBandStats = [
 
   <div class="hq-hero__slant" aria-hidden="true"></div>
 </section>
+<?php endif; ?>
 
 <!-- TRUST BAR -->
+<?php if ($showHeroTrust && !empty($trustBarItems)): ?>
 <div class="hq-trustbar" aria-label="Company credentials">
   <div class="hq-trustbar__track">
     <?php for ($t = 0; $t < 2; $t++): foreach ($trustBarItems as $item): ?>
-    <span class="hq-trustbar__item"><i class="bi bi-check-circle-fill"></i> <?= e($item) ?></span>
+    <span class="hq-trustbar__item"><i class="bi bi-check-circle-fill"></i> <?= e(is_array($item) ? ($item['label'] ?? $item['title'] ?? '') : $item) ?></span>
     <?php endforeach; endfor; ?>
   </div>
 </div>
+<?php endif; ?>
 
 <!-- ABOUT -->
 <?php if ($showAbout): ?>
@@ -351,9 +468,9 @@ $heroBandStats = [
       </div>
 
       <div class="hq-about-premium__content" data-anim="right">
-        <p class="hq-eyebrow hq-about-premium__eyebrow">Who We Are</p>
-        <h2 class="hq-title hq-about-premium__title">Built on Integrity.<br>Delivered with Precision.</h2>
-        <p class="hq-lead hq-about-premium__lead"><?= e($aboutText ?: 'HighQ Homes is a full-service construction partner turning ambitious plans into durable, beautifully finished spaces — with disciplined planning and craftsmanship you can see in every detail.') ?></p>
+        <p class="hq-eyebrow hq-about-premium__eyebrow"><?= e(cmsText($aboutSec, 'title', 'Who We Are')) ?></p>
+        <h2 class="hq-title hq-about-premium__title"><?= e(cmsText($aboutSec, 'subtitle', 'Built on Integrity. Delivered with Precision.')) ?></h2>
+        <p class="hq-lead hq-about-premium__lead"><?= e(cmsText($aboutSec, 'content', $aboutText ?: 'HighQ Homes is a full-service construction partner turning ambitious plans into durable, beautifully finished spaces — with disciplined planning and craftsmanship you can see in every detail.')) ?></p>
 
         <div class="hq-about-premium__highlights">
           <?php foreach ($aboutHighlights as $i => $h): ?>
@@ -385,25 +502,26 @@ $heroBandStats = [
 <?php endif; ?>
 
 <!-- CAPABILITIES -->
+<?php if ($showCapabilities): ?>
 <section class="hq-section hq-section--soft" id="capabilities">
   <div class="container-site">
     <?php View::partial('home/section-head', [
-      'kicker' => 'What We Build',
-      'title' => 'Spaces Crafted With Purpose',
-      'desc' => 'From family homes to commercial landmarks — every project is planned, built, and finished to premium standards.',
+      'kicker' => cmsText($capabilitiesSec, 'title', 'What We Build'),
+      'title' => cmsText($capabilitiesSec, 'subtitle', 'Spaces Crafted With Purpose'),
+      'desc' => cmsText($capabilitiesSec, 'content', 'From family homes to commercial landmarks — every project is planned, built, and finished to premium standards.'),
       'ctaHref' => url('projects'),
       'ctaLabel' => 'Explore Portfolio',
       'id' => 'hp-capabilities-title',
     ]); ?>
     <div class="hq-bento">
       <?php foreach ($capabilities as $i => $cap): ?>
-      <a href="<?= e($cap['href']) ?>" class="hq-bento__card<?= $cap['mod'] !== '' ? ' hq-bento__card--' . e($cap['mod']) : '' ?>" data-anim="up" data-delay="<?= $i * 60 ?>">
-        <img src="<?= e($cap['img']) ?>" alt="" loading="lazy" aria-hidden="true">
+      <a href="<?= e(menuUrl($cap['href'] ?? '/projects')) ?>" class="hq-bento__card<?= !empty($cap['mod']) ? ' hq-bento__card--' . e($cap['mod']) : '' ?>" data-anim="up" data-delay="<?= $i * 60 ?>">
+        <img src="<?= e($cap['img'] ?? '') ?>" alt="" loading="lazy" aria-hidden="true">
         <div class="hq-bento__shade"></div>
         <div class="hq-bento__body">
-          <span class="hq-bento__icon"><i class="bi <?= e($cap['icon']) ?>"></i></span>
-          <h3><?= e($cap['title']) ?></h3>
-          <p><?= e($cap['text']) ?></p>
+          <span class="hq-bento__icon"><i class="bi <?= e($cap['icon'] ?? 'bi-building') ?>"></i></span>
+          <h3><?= e($cap['title'] ?? '') ?></h3>
+          <p><?= e($cap['text'] ?? '') ?></p>
           <span class="hq-bento__link">Learn more <i class="bi bi-arrow-up-right"></i></span>
         </div>
       </a>
@@ -411,6 +529,7 @@ $heroBandStats = [
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- PORTFOLIO -->
 <?php if ($showProjects && (!empty($featuredProjects) || !empty($latestProjects))): ?>
@@ -435,15 +554,25 @@ $portfolioIntroLabel = $portfolioHero
     <header class="hq-port-intro" data-anim="up">
       <div class="hq-port-intro__grid">
         <div class="hq-port-intro__copy">
-          <p class="hq-port-intro__kicker">Portfolio</p>
+          <p class="hq-port-intro__kicker"><?= e(cmsText($projectsSec, 'title', 'Portfolio')) ?></p>
+          <?php
+            $projectsHeading = cmsText($projectsSec, 'subtitle', 'Signature Work That Defines Our Standard');
+            $projectsAccent = '';
+            if (preg_match('/\s(Defines Our Standard|Our Standard)$/i', $projectsHeading, $accentMatch)) {
+              $projectsAccent = trim($accentMatch[1]);
+              $projectsHeading = trim(substr($projectsHeading, 0, -strlen($accentMatch[0])));
+            }
+          ?>
           <h2 class="hq-port-intro__title" id="hp-portfolio-title">
-            Signature Work That
-            <span class="hq-port-intro__accent">Defines Our Standard</span>
+            <?= e($projectsHeading) ?>
+            <?php if ($projectsAccent !== ''): ?>
+            <span class="hq-port-intro__accent"><?= e($projectsAccent) ?></span>
+            <?php endif; ?>
           </h2>
-          <p class="hq-port-intro__desc">Explore featured builds and recent completions — each project reflects our commitment to quality, clarity, and premium finish.</p>
+          <p class="hq-port-intro__desc"><?= e(cmsText($projectsSec, 'content', 'Explore featured builds and recent completions — each project reflects our commitment to quality, clarity, and premium finish.')) ?></p>
           <div class="hq-port-intro__actions">
-            <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange">Full Portfolio <i class="bi bi-arrow-up-right"></i></a>
-            <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline">View Gallery</a>
+            <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange"><?= e($projectsMeta['cta_primary'] ?? 'Full Portfolio') ?> <i class="bi bi-arrow-up-right"></i></a>
+            <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline"><?= e($projectsMeta['cta_secondary'] ?? 'View Gallery') ?></a>
           </div>
         </div>
 
@@ -484,8 +613,8 @@ $portfolioIntroLabel = $portfolioHero
     <div class="hq-hp-portfolio__recent">
       <div class="hq-hp-portfolio__recent-head">
         <div>
-          <p class="hq-hp-portfolio__recent-kicker"><i class="bi bi-hammer"></i> Recent Sites</p>
-          <h3 class="hq-hp-portfolio__recent-title">Fresh Completions & Active Builds</h3>
+          <p class="hq-hp-portfolio__recent-kicker"><i class="bi bi-hammer"></i> <?= e($projectsMeta['recent_kicker'] ?? 'Recent Sites') ?></p>
+          <h3 class="hq-hp-portfolio__recent-title"><?= e($projectsMeta['recent_title'] ?? 'Fresh Completions & Active Builds') ?></h3>
         </div>
         <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline">Browse All Projects</a>
       </div>
@@ -499,8 +628,8 @@ $portfolioIntroLabel = $portfolioHero
 
     <div class="hq-hp-portfolio__band" data-anim="up">
       <div class="hq-hp-portfolio__band-copy">
-        <strong>Ready to start your next build?</strong>
-        <span>Share your vision and receive a structured consultation from our team.</span>
+        <strong><?= e($projectsMeta['band_title'] ?? 'Ready to start your next build?') ?></strong>
+        <span><?= e($projectsMeta['band_text'] ?? 'Share your vision and receive a structured consultation from our team.') ?></span>
       </div>
       <div class="hq-hp-portfolio__band-actions">
         <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange"><i class="bi bi-whatsapp"></i> Get a Quote</a>
@@ -512,55 +641,67 @@ $portfolioIntroLabel = $portfolioHero
 <?php endif; ?>
 
 <!-- WHY CHOOSE US -->
+<?php if ($showWhyUs && !empty($whyItems)): ?>
 <section class="hq-section hq-section--soft hq-why-section">
   <div class="container-site">
-    <?php View::partial('home/section-head', ['kicker' => 'Why Choose Us', 'title' => 'The HighQ Homes Difference', 'desc' => 'Six principles that guide every project — from first consultation to final handover.']); ?>
+    <?php View::partial('home/section-head', [
+      'kicker' => cmsText($whySec, 'title', 'Why Choose Us'),
+      'title' => cmsText($whySec, 'subtitle', 'The HighQ Homes Difference'),
+      'desc' => cmsText($whySec, 'content', 'Six principles that guide every project — from first consultation to final handover.')
+    ]); ?>
     <div class="hq-why__grid hq-why__grid--premium">
       <?php foreach ($whyItems as $i => $item): ?>
       <article class="hq-card hq-why hq-why--premium" data-anim="up" data-delay="<?= $i * 50 ?>">
         <span class="hq-why__index"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
-        <span class="hq-why__icon"><i class="bi <?= e($item['icon']) ?>"></i></span>
-        <h3><?= e($item['title']) ?></h3>
-        <p><?= e($item['text']) ?></p>
+        <span class="hq-why__icon"><i class="bi <?= e($item['icon'] ?? 'bi-shield-check') ?>"></i></span>
+        <h3><?= e($item['title'] ?? '') ?></h3>
+        <p><?= e($item['text'] ?? '') ?></p>
       </article>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- PROCESS -->
+<?php if ($showProcess && !empty($steps)): ?>
 <section class="hq-section hq-process-section">
   <div class="container-site">
-    <?php View::partial('home/section-head', ['kicker' => 'Our Process', 'title' => 'From Vision to Handover', 'desc' => 'A structured, transparent path designed to reduce risk and deliver exceptional results.']); ?>
+    <?php View::partial('home/section-head', [
+      'kicker' => cmsText($processSec, 'title', 'Our Process'),
+      'title' => cmsText($processSec, 'subtitle', 'From Vision to Handover'),
+      'desc' => cmsText($processSec, 'content', 'A structured, transparent path designed to reduce risk and deliver exceptional results.')
+    ]); ?>
     <div class="hq-process__timeline">
       <?php foreach ($steps as $i => $step): ?>
       <article class="hq-step hq-step--timeline" data-anim="up" data-delay="<?= $i * 60 ?>">
-        <span class="hq-step__num"><?= e($step['num']) ?></span>
+        <span class="hq-step__num"><?= e($step['num'] ?? str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT)) ?></span>
         <div class="hq-step__body">
-          <h3><?= e($step['title']) ?></h3>
-          <p><?= e($step['text']) ?></p>
+          <h3><?= e($step['title'] ?? '') ?></h3>
+          <p><?= e($step['text'] ?? '') ?></p>
         </div>
       </article>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- EXCELLENCE -->
+<?php if ($showExcellence && !empty($excellencePillars)): ?>
 <section class="hq-section hq-section--soft hq-excellence" id="excellence">
   <div class="container-site">
     <div class="hq-excellence__shell">
       <div class="hq-excellence__intro" data-anim="left">
-        <p class="hq-eyebrow">Built to Last</p>
-        <h2 class="hq-title">Construction Excellence You Can Measure</h2>
-        <p class="hq-lead">Every HighQ Homes project is managed with the same standard — rigorous planning, accountable execution, and finishes that stand up to daily use and time.</p>
+        <p class="hq-eyebrow"><?= e(cmsText($excellenceSec, 'title', 'Built to Last')) ?></p>
+        <h2 class="hq-title"><?= e(cmsText($excellenceSec, 'subtitle', 'Construction Excellence You Can Measure')) ?></h2>
+        <p class="hq-lead"><?= e(cmsText($excellenceSec, 'content', 'Every HighQ Homes project is managed with the same standard — rigorous planning, accountable execution, and finishes that stand up to daily use and time.')) ?></p>
         <ul class="hq-excellence__list">
-          <li><i class="bi bi-check2"></i> End-to-end project accountability</li>
-          <li><i class="bi bi-check2"></i> Premium materials & skilled trades</li>
-          <li><i class="bi bi-check2"></i> Milestone-based progress reporting</li>
-          <li><i class="bi bi-check2"></i> Clean, organized, professional sites</li>
+          <?php foreach ($excellenceChecklist as $check): ?>
+          <li><i class="bi bi-check2"></i> <?= e(is_array($check) ? (string)($check['title'] ?? $check['text'] ?? $check['label'] ?? '') : (string)$check) ?></li>
+          <?php endforeach; ?>
         </ul>
-        <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline">View Gallery <i class="bi bi-images"></i></a>
+        <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline"><?= e($excellenceMeta['cta_label'] ?? 'View Gallery') ?> <i class="bi bi-images"></i></a>
       </div>
       <div class="hq-excellence__grid" data-anim="right">
         <?php foreach ($excellencePillars as $i => $pillar): ?>
@@ -574,15 +715,17 @@ $portfolioIntroLabel = $portfolioHero
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- CONNECT -->
+<?php if ($showConnect): ?>
 <section class="hq-section hq-connect" id="connect">
   <div class="container-site">
     <div class="hq-connect__shell">
       <div class="hq-connect__copy" data-anim="left">
-        <p class="hq-eyebrow">Start With Confidence</p>
-        <h2 class="hq-title">Your Project Deserves a Builder You Can Trust</h2>
-        <p class="hq-lead">HighQ Homes combines disciplined project management, skilled craftsmanship, and transparent communication — so you stay informed from the first conversation to final handover.</p>
+        <p class="hq-eyebrow"><?= e(cmsText($connectSec, 'title', 'Start With Confidence')) ?></p>
+        <h2 class="hq-title"><?= e(cmsText($connectSec, 'subtitle', 'Your Project Deserves a Builder You Can Trust')) ?></h2>
+        <p class="hq-lead"><?= e(cmsText($connectSec, 'content', 'HighQ Homes combines disciplined project management, skilled craftsmanship, and transparent communication — so you stay informed from the first conversation to final handover.')) ?></p>
         <ul class="hq-connect__promises">
           <?php foreach ($promiseItems as $item): ?>
           <li>
@@ -635,11 +778,19 @@ $portfolioIntroLabel = $portfolioHero
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- STATS -->
+<?php if ($showStats): ?>
 <section class="hq-section hq-section--navy">
   <div class="container-site">
-    <?php View::partial('home/section-head', ['kicker' => 'Achievements', 'title' => 'Proof of Excellence', 'desc' => 'Real outcomes from real projects.', 'light' => true, 'id' => 'hp-stats-title']); ?>
+    <?php View::partial('home/section-head', [
+      'kicker' => cmsText($statsSec, 'title', 'Achievements'),
+      'title' => cmsText($statsSec, 'subtitle', 'Proof of Excellence'),
+      'desc' => cmsText($statsSec, 'content', 'Real outcomes from real projects.'),
+      'light' => true,
+      'id' => 'hp-stats-title'
+    ]); ?>
     <div class="hq-stats__grid">
       <?php foreach ($statItems as $i => $stat): ?>
       <article class="hq-stat" data-anim="up" data-delay="<?= $i * 55 ?>">
@@ -651,6 +802,7 @@ $portfolioIntroLabel = $portfolioHero
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- TESTIMONIALS -->
 <?php if ($showTestimonials): ?>
@@ -668,13 +820,17 @@ $portfolioIntroLabel = $portfolioHero
   <div class="container-site">
     <div class="hq-testimonials-premium__shell">
       <aside class="hq-testimonials-premium__aside" data-anim="left">
-        <p class="hq-testimonials-premium__kicker">Testimonials</p>
-        <h2 class="hq-testimonials-premium__title">What Our Clients Say</h2>
-        <p class="hq-testimonials-premium__lead">Trusted by owners, developers, and community partners across every project type.</p>
+        <p class="hq-testimonials-premium__kicker"><?= e(cmsText($testimonialsSec, 'title', 'Testimonials')) ?></p>
+        <h2 class="hq-testimonials-premium__title"><?= e(cmsText($testimonialsSec, 'subtitle', 'What Our Clients Say')) ?></h2>
+        <p class="hq-testimonials-premium__lead"><?= e(cmsText($testimonialsSec, 'content', 'Trusted by owners, developers, and community partners across every project type.')) ?></p>
+        <?php
+          $testimonialChips = $testimonialsMeta['chips'] ?? ['Client-rated excellence', 'Verified project delivery', 'Residential & commercial'];
+          $testimonialChipIcons = ['bi-star-fill', 'bi-shield-check', 'bi-buildings'];
+        ?>
         <ul class="hq-testimonials-premium__chips">
-          <li><i class="bi bi-star-fill"></i> Client-rated excellence</li>
-          <li><i class="bi bi-shield-check"></i> Verified project delivery</li>
-          <li><i class="bi bi-buildings"></i> Residential &amp; commercial</li>
+          <?php foreach (array_slice($testimonialChips, 0, 4) as $i => $chip): ?>
+          <li><i class="bi <?= e($testimonialChipIcons[$i] ?? 'bi-check2') ?>"></i> <?= e(is_array($chip) ? ($chip['label'] ?? $chip['title'] ?? '') : $chip) ?></li>
+          <?php endforeach; ?>
         </ul>
         <div class="hq-testimonials-premium__score">
           <div class="hq-testimonials-premium__score-main">
@@ -763,18 +919,24 @@ $portfolioIntroLabel = $portfolioHero
 <?php endif; ?>
 
 <!-- FAQ -->
+<?php if ($showFaq && !empty($faqItems)): ?>
 <section class="hq-section hq-faq-premium" id="faq">
   <div class="hq-faq-premium__bg" aria-hidden="true"></div>
   <div class="container-site">
     <div class="hq-faq-premium__shell">
       <aside class="hq-faq-premium__aside" data-anim="left">
-        <p class="hq-faq-premium__kicker"><?= e($cms['faq']['title'] ?? 'Questions & Answers') ?></p>
-        <h2 class="hq-faq-premium__title"><?= e($cms['faq']['subtitle'] ?? 'Everything You Need to Know') ?> <em>Before You Build</em></h2>
-        <p class="hq-faq-premium__lead"><?= e($cms['faq']['content'] ?? 'Clear answers to the questions clients ask most — so you can plan your project with confidence.') ?></p>
+        <p class="hq-faq-premium__kicker"><?= e(cmsText($faqSec, 'title', 'Questions & Answers')) ?></p>
+        <?php
+          $faqHeading = cmsText($faqSec, 'subtitle', 'Everything You Need to Know');
+          $faqHasAccent = (bool)preg_match('/before you build/i', $faqHeading);
+        ?>
+        <h2 class="hq-faq-premium__title"><?= e($faqHeading) ?><?php if (!$faqHasAccent): ?> <em>Before You Build</em><?php endif; ?></h2>
+        <p class="hq-faq-premium__lead"><?= e(cmsText($faqSec, 'content', 'Clear answers to the questions clients ask most — so you can plan your project with confidence.')) ?></p>
+        <?php $faqChipIcons = ['bi-lightning-charge', 'bi-shield-check', 'bi-chat-square-text']; ?>
         <ul class="hq-faq-premium__chips">
-          <li><i class="bi bi-lightning-charge"></i> Quick answers</li>
-          <li><i class="bi bi-shield-check"></i> Expert guidance</li>
-          <li><i class="bi bi-chat-square-text"></i> Free consultation</li>
+          <?php foreach (array_slice($faqChips, 0, 4) as $i => $chip): ?>
+          <li><i class="bi <?= e(is_array($chip) ? ($chip['icon'] ?? $faqChipIcons[$i] ?? 'bi-check2') : ($faqChipIcons[$i] ?? 'bi-check2')) ?>"></i> <?= e(is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? '') : (string)$chip) ?></li>
+          <?php endforeach; ?>
         </ul>
         <div class="hq-faq-premium__ask" id="ask-our-team">
           <div class="hq-faq-premium__ask-glow" aria-hidden="true"></div>
@@ -822,18 +984,19 @@ $portfolioIntroLabel = $portfolioHero
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- FINAL CTA -->
 <?php if ($showCta): ?>
 <section class="hq-final" style="background-image:url('<?= e($ctaImg) ?>')">
   <div class="hq-final__overlay"></div>
   <div class="container-site hq-final__inner" data-anim="up">
-    <p class="hq-eyebrow hq-eyebrow--light">Ready When You Are</p>
-    <h2 class="hq-title hq-title--light"><?= e($settings['home_cta_title'] ?? 'Let\'s Build Something Exceptional') ?></h2>
-    <p class="hq-lead hq-lead--light"><?= e($settings['home_cta_text'] ?? 'Share your vision with our team for confident planning from groundbreaking to handover.') ?></p>
+    <p class="hq-eyebrow hq-eyebrow--light"><?= e(cmsText($ctaSec, 'title', 'Ready When You Are')) ?></p>
+    <h2 class="hq-title hq-title--light"><?= e(cmsText($ctaSec, 'subtitle', $settings['home_cta_title'] ?? 'Let\'s Build Something Exceptional')) ?></h2>
+    <p class="hq-lead hq-lead--light"><?= e(cmsText($ctaSec, 'content', $settings['home_cta_text'] ?? 'Share your vision with our team for confident planning from groundbreaking to handover.')) ?></p>
     <div class="hq-actions hq-mt-xl">
-      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> WhatsApp Us</a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">Contact Us</a>
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMeta['button_text'] ?? 'WhatsApp Us') ?></a>
+      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMeta['button_text_2'] ?? 'Contact Us') ?></a>
     </div>
     <div class="hq-final__meta">
       <a href="tel:<?= e($phoneHref) ?>"><i class="bi bi-telephone"></i> <?= e($phone) ?></a>

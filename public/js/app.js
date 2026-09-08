@@ -456,10 +456,29 @@ if (!document.querySelector('.admin-main')) {
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    revealTargets.forEach((el, index) => {
-      el.classList.add('premium-reveal');
-      el.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
-      revealObserver.observe(el);
-    });
-  }
+  revealTargets.forEach((el, index) => {
+    el.classList.add('premium-reveal');
+    el.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
+    revealObserver.observe(el);
+  });
 }
+
+// ─── Back-to-Top Button ──────────────────────────────────────
+(function initBackToTop() {
+  const btn = document.getElementById('hq-back-to-top');
+  if (!btn) return;
+
+  const THRESHOLD = 320;
+
+  const onScroll = () => {
+    btn.classList.toggle('is-visible', window.scrollY > THRESHOLD);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // sync on load
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
