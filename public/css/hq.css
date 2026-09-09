@@ -821,7 +821,7 @@ body.hq-menu-open {
 
 .hq-footer__grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  grid-template-columns: 1.6fr 1fr 1.3fr;
   gap: 2rem;
   padding-bottom: 2.5rem;
 }

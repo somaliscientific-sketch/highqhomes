@@ -59,17 +59,6 @@ $footerMenus = navMenus('footer');
       </div>
 
       <div>
-        <h3>Services</h3>
-        <div class="hq-footer__links">
-          <?php try { foreach (array_slice((new ServiceModel())->getPublished(), 0, 6) as $svc): ?>
-          <a href="<?= url('services/' . $svc['slug']) ?>"><?= e($svc['title']) ?></a>
-          <?php endforeach; } catch (\Throwable $e) { ?>
-          <a href="<?= url('services') ?>">View All Services</a>
-          <?php } ?>
-        </div>
-      </div>
-
-      <div>
         <h3>Contact</h3>
         <div class="hq-footer__contact">
           <a href="tel:<?= e(preg_replace('/\s+/', '', $phone)) ?>"><i class="bi bi-telephone-fill"></i><?= e($phone) ?></a>
