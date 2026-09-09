@@ -298,9 +298,10 @@ if (!empty($heroMetricsCms)) {
 }
 
 $heroBandStats = array_map(static fn(array $stat): array => [
-  'num' => $stat['num'],
+  'num'    => $stat['num'],
   'suffix' => $stat['suffix'] ?? '',
-  'label' => $stat['label'],
+  'label'  => $stat['label'],
+  'icon'   => $stat['icon'] ?? 'bi-award',
 ], array_slice($statItems, 0, 4));
 ?>
 <?php if ($showHero): ?>
@@ -316,7 +317,9 @@ $heroBandStats = array_map(static fn(array $stat): array => [
   <div class="hq-hero__backdrop" aria-hidden="true">
     <div class="hq-hero__orb hq-hero__orb--a"></div>
     <div class="hq-hero__orb hq-hero__orb--b"></div>
+    <div class="hq-hero__orb hq-hero__orb--c"></div>
     <div class="hq-hero__mesh"></div>
+    <div class="hq-hero__grid-pattern"></div>
   </div>
 
   <div class="container-site hq-hero__wrap">
@@ -332,8 +335,11 @@ $heroBandStats = array_map(static fn(array $stat): array => [
           ?>
           <div class="<?= $paneClass ?><?= $i === 0 ? ' is-active' : '' ?>" data-hero-pane aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
             <div class="hq-hero__eyebrow">
-              <span class="hq-hero__eyebrow-line"></span>
-              <span><?= e($slide['subtitle'] ?? 'Premium Construction & Architecture') ?></span>
+              <span class="hq-hero__eyebrow-pill">
+                <span class="hq-hero__pulse-dot" aria-hidden="true"></span>
+                <span class="hq-hero__eyebrow-label"><?= e($slide['subtitle'] ?? 'Premium Construction & Architecture') ?></span>
+              </span>
+              <span class="hq-hero__eyebrow-tag"><i class="bi bi-geo-alt-fill"></i> <?= e($heroLocation !== '' ? $heroLocation : 'Garowe · Somalia') ?></span>
             </div>
             <h1 class="hq-hero__title">
               <?php if ($parts['main'] !== ''): ?><span class="hq-hero__title-main"><?= e($parts['main']) ?></span><?php endif; ?>
@@ -344,10 +350,13 @@ $heroBandStats = array_map(static fn(array $stat): array => [
             <?php endif; ?>
             <div class="hq-hero__actions">
               <a href="<?= e($homeHref($normalizeCta($slide['button_link'] ?? $quoteHref))) ?>"<?= $homeTarget($slide['button_link'] ?? $quoteHref) ?> class="hq-btn hq-btn--orange hq-btn--lg hq-hero__btn-primary">
-                <span><i class="bi bi-chat-dots-fill"></i> <?= e($slide['button_text'] ?? 'Get a Free Quote') ?></span>
+                <span class="hq-btn__icon"><i class="bi bi-whatsapp"></i></span>
+                <span><?= e($slide['button_text'] ?? 'Get a Free Quote') ?></span>
+                <i class="bi bi-arrow-right hq-btn__arrow"></i>
               </a>
-              <a href="<?= e($homeHref($normalizeCta($slide['button_link_2'] ?? '/projects'))) ?>" class="hq-btn hq-btn--outline hq-btn--lg">
-                <?= e($slide['button_text_2'] ?? 'View Our Work') ?> <i class="bi bi-arrow-up-right"></i>
+              <a href="<?= e($homeHref($normalizeCta($slide['button_link_2'] ?? '/projects'))) ?>" class="hq-btn hq-btn--outline hq-btn--lg hq-hero__btn-secondary">
+                <span><?= e($slide['button_text_2'] ?? 'View Our Work') ?></span>
+                <i class="bi bi-arrow-up-right hq-btn__arrow"></i>
               </a>
             </div>
           </div>
@@ -355,14 +364,21 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         </div>
 
         <div class="hq-hero__trust">
-          <?php foreach (array_slice($trustBarItems, 0, 3) as $trustLabel): ?>
-          <div class="hq-hero__trust-item"><i class="bi bi-check2-circle"></i><span><?= e(is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel) ?></span></div>
+          <?php 
+            $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-patch-check', 'bi-award', 'bi-gem'];
+            foreach (array_slice($trustBarItems, 0, 3) as $tIdx => $trustLabel): 
+              $tLabelText = is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel;
+              $tIcon = $trustIcons[$tIdx % count($trustIcons)];
+          ?>
+          <div class="hq-hero__trust-item"><i class="bi <?= $tIcon ?>"></i><span><?= e($tLabelText) ?></span></div>
           <?php endforeach; ?>
         </div>
       </div>
 
       <div class="hq-hero__showcase" data-anim="right" data-delay="100">
         <div class="hq-hero__ring" aria-hidden="true"></div>
+        <div class="hq-hero__glow" aria-hidden="true"></div>
+
         <div class="hq-hero__panes hq-hero__panes--media">
           <?php foreach ($sliders as $i => $slide): ?>
           <?php
@@ -380,11 +396,19 @@ $heroBandStats = array_map(static fn(array $stat): array => [
           <?php endforeach; ?>
         </div>
 
+        <div class="hq-hero__badge-live">
+          <span class="hq-hero__badge-live-icon"><i class="bi bi-patch-check-fill"></i></span>
+          <div class="hq-hero__badge-live-text">
+            <strong><?= e(cmsText($heroSec, 'title', 'Trusted Builder')) ?></strong>
+            <span><?= e(cmsText($heroSec, 'subtitle', 'Since ' . ($settings['stat_awards'] ?? '2016'))) ?></span>
+          </div>
+        </div>
+
         <div class="hq-hero__metrics">
           <?php foreach ($heroMetrics as $i => $m): ?>
           <article class="hq-hero__metric" style="--metric-i: <?= $i ?>">
-            <span class="hq-hero__metric-icon"><i class="bi <?= e($m['icon']) ?>"></i></span>
-            <div>
+            <span class="hq-hero__metric-icon"><i class="bi <?= e($m['icon'] ?? 'bi-buildings') ?>"></i></span>
+            <div class="hq-hero__metric-text">
               <strong data-counter data-target="<?= e($m['num']) ?>" data-suffix="<?= e($m['suffix']) ?>"><?= e($m['num']) ?><?= e($m['suffix']) ?></strong>
               <span><?= e($m['label']) ?></span>
             </div>
@@ -392,12 +416,9 @@ $heroBandStats = array_map(static fn(array $stat): array => [
           <?php endforeach; ?>
         </div>
 
-        <div class="hq-hero__badge-live">
-          <i class="bi bi-lightning-charge-fill"></i>
-          <div>
-            <strong><?= e(cmsText($heroSec, 'title', 'Trusted Builder')) ?></strong>
-            <span><?= e(cmsText($heroSec, 'subtitle', 'Since ' . ($settings['stat_awards'] ?? '2016'))) ?></span>
-          </div>
+        <div class="hq-hero__floating-guarantee">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>100% Quality &amp; On-Time Delivery</span>
         </div>
       </div>
     </div>
@@ -426,13 +447,18 @@ $heroBandStats = array_map(static fn(array $stat): array => [
     <?php endif; ?>
 
     <div class="hq-hero__band" data-anim="up" data-delay="180">
-      <?php foreach ($heroBandStats as $i => $bs): ?>
-      <div class="hq-hero__band-item">
-        <strong data-counter data-target="<?= e($bs['num']) ?>" data-suffix="<?= e($bs['suffix']) ?>"><?= e($bs['num']) ?><?= e($bs['suffix']) ?></strong>
-        <span><?= e($bs['label']) ?></span>
+      <div class="hq-hero__band-inner">
+        <?php foreach ($heroBandStats as $i => $bs): ?>
+        <div class="hq-hero__band-item">
+          <span class="hq-hero__band-icon"><i class="bi <?= e($bs['icon'] ?? 'bi-award') ?>"></i></span>
+          <div class="hq-hero__band-content">
+            <strong data-counter data-target="<?= e($bs['num']) ?>" data-suffix="<?= e($bs['suffix']) ?>"><?= e($bs['num']) ?><?= e($bs['suffix']) ?></strong>
+            <span><?= e($bs['label']) ?></span>
+          </div>
+        </div>
+        <?php if ($i < count($heroBandStats) - 1): ?><span class="hq-hero__band-div" aria-hidden="true"></span><?php endif; ?>
+        <?php endforeach; ?>
       </div>
-      <?php if ($i < count($heroBandStats) - 1): ?><span class="hq-hero__band-div" aria-hidden="true"></span><?php endif; ?>
-      <?php endforeach; ?>
     </div>
   </div>
 
