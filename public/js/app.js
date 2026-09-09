@@ -10,35 +10,88 @@ if (navbar) {
   updateNav();
 }
 
-// ─── Mobile menu toggle ─────────────────────────────────────
-const menuBtn = document.getElementById('mobile-menu-btn');
-const mobileMenu = document.getElementById('mobile-menu');
-const menuClose = document.getElementById('mobile-menu-close');
-if (menuBtn && mobileMenu) {
+// ─── Mobile menu ────────────────────────────────────────────
+(function initMobileMenu() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuClose = document.getElementById('mobile-menu-close');
+  if (!menuBtn || !mobileMenu) return;
+
+  const desktopQuery = window.matchMedia('(min-width: 1181px)');
+  let lastFocus = null;
+  let lastScrollY = 0;
+
+  const isOpen = () => mobileMenu.classList.contains('is-open');
+
+  const lockScroll = () => {
+    lastScrollY = window.scrollY;
+    document.documentElement.classList.add('hq-menu-open');
+    document.body.classList.add('hq-menu-open');
+    document.body.style.top = `-${lastScrollY}px`;
+  };
+
+  const unlockScroll = () => {
+    document.documentElement.classList.remove('hq-menu-open');
+    document.body.classList.remove('hq-menu-open');
+    document.body.style.top = '';
+    window.scrollTo(0, lastScrollY);
+  };
+
   const openMenu = () => {
+    if (isOpen()) return;
+    lastFocus = document.activeElement;
     mobileMenu.classList.add('is-open');
     menuBtn.classList.add('is-active');
-    document.body.style.overflow = 'hidden';
     menuBtn.setAttribute('aria-expanded', 'true');
+    menuBtn.setAttribute('aria-label', 'Close menu');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    lockScroll();
+    window.requestAnimationFrame(() => {
+      (menuClose || mobileMenu.querySelector('.hq-mobile__links a'))?.focus();
+    });
   };
+
   const closeMenu = () => {
+    if (!isOpen()) return;
     mobileMenu.classList.remove('is-open');
     menuBtn.classList.remove('is-active');
-    document.body.style.overflow = '';
     menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.setAttribute('aria-label', 'Open menu');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    unlockScroll();
+    if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus();
+    } else {
+      menuBtn.focus();
+    }
   };
+
   menuBtn.addEventListener('click', () => {
-    if (mobileMenu.classList.contains('is-open')) closeMenu();
+    if (isOpen()) closeMenu();
     else openMenu();
   });
   menuClose?.addEventListener('click', closeMenu);
-  mobileMenu.addEventListener('click', (e) => {
-    if (e.target === mobileMenu || e.target.classList.contains('hq-mobile-backdrop')) closeMenu();
+  mobileMenu.querySelectorAll('.hq-mobile-backdrop, .hq-mobile__backdrop').forEach((el) => {
+    el.addEventListener('click', closeMenu);
+  });
+  mobileMenu.querySelectorAll('.hq-mobile__links a, .hq-mobile__head a, .hq-mobile__footer a').forEach((link) => {
+    link.addEventListener('click', () => closeMenu());
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) closeMenu();
+    if (e.key === 'Escape' && isOpen()) {
+      e.preventDefault();
+      closeMenu();
+    }
   });
-}
+  const onDesktopChange = (event) => {
+    if (event.matches) closeMenu();
+  };
+  if (desktopQuery.addEventListener) {
+    desktopQuery.addEventListener('change', onDesktopChange);
+  } else {
+    desktopQuery.addListener(onDesktopChange);
+  }
+})();
 
 // ─── Hero parallax (premium frame + legacy bg) ───────────────
 const heroParallaxImg = document.querySelector('.hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
@@ -459,11 +512,12 @@ if (!document.querySelector('.admin-main')) {
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-  revealTargets.forEach((el, index) => {
-    el.classList.add('premium-reveal');
-    el.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
-    revealObserver.observe(el);
-  });
+    revealTargets.forEach((el, index) => {
+      el.classList.add('premium-reveal');
+      el.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
+      revealObserver.observe(el);
+    });
+  }
 }
 
 // ─── Back-to-Top Button ──────────────────────────────────────

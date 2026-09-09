@@ -71,17 +71,21 @@ $headerCtaHref    = menuUrl(cmsSectionSubtitle('header', 'cta', '/contact'));
   </header>
 </div>
 
-<div id="mobile-menu" class="hq-mobile" role="dialog" aria-modal="true" aria-label="Mobile navigation">
-  <button type="button" class="hq-mobile__backdrop hq-mobile-backdrop" aria-label="Close menu"></button>
+<div id="mobile-menu" class="hq-mobile" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Mobile navigation">
+  <button type="button" class="hq-mobile__backdrop hq-mobile-backdrop" tabindex="-1" aria-label="Close menu"></button>
   <aside class="hq-mobile__panel">
     <div class="hq-mobile__head">
       <?php View::partial('brand-logo', compact('siteName', 'settings') + ['variant' => 'mobile', 'href' => url()]); ?>
-      <button id="mobile-menu-close" class="hq-mobile__close" aria-label="Close menu"><i class="bi bi-x-lg"></i></button>
+      <button type="button" id="mobile-menu-close" class="hq-mobile__close" aria-label="Close menu"><i class="bi bi-x-lg"></i></button>
     </div>
     <nav class="hq-mobile__links" aria-label="Mobile menu">
       <?php foreach ($primaryMenus as $menu): ?>
-      <a href="<?= e(menuUrl($menu['url'])) ?>" target="<?= e($menu['target'] ?? '_self') ?>">
-        <span><?= e($menu['label']) ?></span><i class="bi bi-arrow-right"></i>
+      <?php
+        $href = menuUrl($menu['url']);
+        $isActive = active(parse_url($menu['url'], PHP_URL_PATH) ?: '/');
+      ?>
+      <a href="<?= e($href) ?>" target="<?= e($menu['target'] ?? '_self') ?>" class="<?= $isActive ?>">
+        <span><?= e($menu['label']) ?></span><i class="bi bi-arrow-right" aria-hidden="true"></i>
       </a>
       <?php endforeach; ?>
     </nav>
