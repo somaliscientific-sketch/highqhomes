@@ -297,173 +297,163 @@ if (!empty($heroMetricsCms)) {
   $heroMetrics = $heroMetricsCms;
 }
 
+$heroBandSource = !empty($heroMetricsCms) ? $heroMetrics : array_slice($statItems, 0, 4);
 $heroBandStats = array_map(static fn(array $stat): array => [
   'num'    => $stat['num'],
   'suffix' => $stat['suffix'] ?? '',
   'label'  => $stat['label'],
   'icon'   => $stat['icon'] ?? 'bi-award',
-], array_slice($statItems, 0, 4));
+], array_slice($heroBandSource, 0, 4));
 ?>
 <?php if ($showHero): ?>
 <section
-  class="hq-hero hq-hero--showcase<?= $heroMulti ? ' hq-hero--carousel' : '' ?>"
+  class="hq-hero hq-hero--cinematic<?= $heroMulti ? ' hq-hero--carousel' : '' ?>"
   id="hero"
   data-hero-carousel="<?= $heroMulti ? '1' : '0' ?>"
   data-autoplay="<?= $heroCarouselOpts['autoplay'] ? '1' : '0' ?>"
   data-interval="<?= (int)$heroCarouselOpts['interval'] * 1000 ?>"
   data-dots="<?= $heroCarouselOpts['dots'] ? '1' : '0' ?>"
   data-pause-hover="<?= $heroCarouselOpts['pause_hover'] ? '1' : '0' ?>"
+  aria-label="<?= e($siteName) ?> featured introduction"
+  <?= $heroMulti ? 'aria-roledescription="carousel"' : '' ?>
 >
-  <div class="hq-hero__backdrop" aria-hidden="true">
-    <div class="hq-hero__orb hq-hero__orb--a"></div>
-    <div class="hq-hero__orb hq-hero__orb--b"></div>
-    <div class="hq-hero__orb hq-hero__orb--c"></div>
-    <div class="hq-hero__mesh"></div>
-    <div class="hq-hero__grid-pattern"></div>
+  <div class="hq-hero__stage">
+    <div class="hq-hero__panes hq-hero__panes--media">
+      <?php foreach ($sliders as $i => $slide): ?>
+      <?php
+        $sImg = !empty($slide['image']) ? (str_starts_with($slide['image'], 'http') ? $slide['image'] : uploadUrl($slide['image'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
+        $focus = $imageFocusMap[$slide['image_focus'] ?? 'center'] ?? 'center';
+        $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
+        $slideTitle = (string)($slide['title'] ?? $siteName);
+      ?>
+      <figure class="hq-hero__shot hq-hero__pane<?= $i === 0 ? ' is-active' : '' ?>" data-hero-pane aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
+        <img
+          src="<?= e($sImg) ?>"
+          alt="<?= e($slideTitle) ?>"
+          width="1920"
+          height="1080"
+          sizes="100vw"
+          loading="<?= $i === 0 ? 'eager' : 'lazy' ?>"
+          decoding="async"
+          fetchpriority="<?= $i === 0 ? 'high' : 'low' ?>"
+          style="object-position:<?= e($focus) ?>"
+        >
+        <figcaption class="hq-hero__caption">
+          <span class="hq-hero__caption-tag">Featured</span>
+          <span class="hq-hero__caption-title"><?= e($badge) ?></span>
+        </figcaption>
+      </figure>
+      <?php endforeach; ?>
+    </div>
+    <div class="hq-hero__wash" aria-hidden="true"></div>
+    <div class="hq-hero__scrim" aria-hidden="true"></div>
   </div>
 
   <div class="container-site hq-hero__wrap">
-    <div class="hq-hero__layout">
-      <div class="hq-hero__copy" data-anim="up">
-        <div class="hq-hero__panes hq-hero__panes--copy">
-          <?php foreach ($sliders as $i => $slide): ?>
-          <?php
-            $parts = $heroParseTitle($slide['title'] ?? $siteName);
-            $style = $slide['content_style'] ?? 'standard';
-            $showDesc = ($slide['show_description'] ?? 1) && !empty($slide['description']);
-            $paneClass = 'hq-hero__pane' . ($style !== 'standard' ? ' hq-hero__pane--' . e($style) : '');
-          ?>
-          <div class="<?= $paneClass ?><?= $i === 0 ? ' is-active' : '' ?>" data-hero-pane aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
-            <div class="hq-hero__eyebrow">
-              <span class="hq-hero__eyebrow-pill">
-                <span class="hq-hero__pulse-dot" aria-hidden="true"></span>
-                <span class="hq-hero__eyebrow-label"><?= e($slide['subtitle'] ?? 'Premium Construction & Architecture') ?></span>
-              </span>
-              <span class="hq-hero__eyebrow-tag"><i class="bi bi-geo-alt-fill"></i> <?= e($heroLocation !== '' ? $heroLocation : 'Garowe · Somalia') ?></span>
-            </div>
-            <h1 class="hq-hero__title">
-              <?php if ($parts['main'] !== ''): ?><span class="hq-hero__title-main"><?= e($parts['main']) ?></span><?php endif; ?>
-              <?php if ($parts['accent'] !== ''): ?><span class="hq-hero__title-accent"><?= e($parts['accent']) ?></span><?php endif; ?>
-            </h1>
-            <?php if ($showDesc): ?>
-            <p class="hq-hero__desc"><?= e($slide['description']) ?></p>
-            <?php endif; ?>
-            <div class="hq-hero__actions">
-              <a href="<?= e($homeHref($normalizeCta($slide['button_link'] ?? $quoteHref))) ?>"<?= $homeTarget($slide['button_link'] ?? $quoteHref) ?> class="hq-btn hq-btn--orange hq-btn--lg hq-hero__btn-primary">
-                <span class="hq-btn__icon"><i class="bi bi-whatsapp"></i></span>
-                <span><?= e($slide['button_text'] ?? 'Get a Free Quote') ?></span>
-                <i class="bi bi-arrow-right hq-btn__arrow"></i>
-              </a>
-              <a href="<?= e($homeHref($normalizeCta($slide['button_link_2'] ?? '/projects'))) ?>" class="hq-btn hq-btn--outline hq-btn--lg hq-hero__btn-secondary">
-                <span><?= e($slide['button_text_2'] ?? 'View Our Work') ?></span>
-                <i class="bi bi-arrow-up-right hq-btn__arrow"></i>
-              </a>
-            </div>
-          </div>
-          <?php endforeach; ?>
-        </div>
-
-        <div class="hq-hero__trust">
-          <?php 
-            $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-patch-check', 'bi-award', 'bi-gem'];
-            foreach (array_slice($trustBarItems, 0, 3) as $tIdx => $trustLabel): 
-              $tLabelText = is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel;
-              $tIcon = $trustIcons[$tIdx % count($trustIcons)];
-          ?>
-          <div class="hq-hero__trust-item"><i class="bi <?= $tIcon ?>"></i><span><?= e($tLabelText) ?></span></div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-
-      <div class="hq-hero__showcase" data-anim="right" data-delay="100">
-        <div class="hq-hero__ring" aria-hidden="true"></div>
-        <div class="hq-hero__glow" aria-hidden="true"></div>
-
-        <div class="hq-hero__panes hq-hero__panes--media">
-          <?php foreach ($sliders as $i => $slide): ?>
-          <?php
-            $sImg = !empty($slide['image']) ? (str_starts_with($slide['image'], 'http') ? $slide['image'] : uploadUrl($slide['image'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
-            $focus = $imageFocusMap[$slide['image_focus'] ?? 'center'] ?? 'center';
-            $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
-          ?>
-          <figure class="hq-hero__photo hq-hero__pane<?= $i === 0 ? ' is-active' : '' ?>" data-hero-pane aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
-            <img src="<?= e($sImg) ?>" alt="<?= e($slide['title'] ?? $siteName) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" fetchpriority="<?= $i === 0 ? 'high' : 'auto' ?>" style="object-position:<?= e($focus) ?>">
-            <figcaption class="hq-hero__photo-cap">
-              <span class="hq-hero__photo-dot"></span>
-              <span class="hq-hero__photo-tag">FEATURED</span>
-              <span class="hq-hero__photo-title"><?= e($badge) ?></span>
-            </figcaption>
-          </figure>
-          <?php endforeach; ?>
-        </div>
-
-        <div class="hq-hero__badge-live">
-          <span class="hq-hero__badge-live-icon"><i class="bi bi-patch-check-fill"></i></span>
-          <div class="hq-hero__badge-live-text">
-            <strong><?= e(cmsText($heroSec, 'title', 'Trusted Builder')) ?></strong>
-            <span><?= e(cmsText($heroSec, 'subtitle', 'Since ' . ($settings['stat_awards'] ?? '2016'))) ?></span>
-          </div>
-        </div>
-
-        <div class="hq-hero__metrics">
-          <?php foreach ($heroMetrics as $i => $m): ?>
-          <article class="hq-hero__metric" style="--metric-i: <?= $i ?>">
-            <span class="hq-hero__metric-icon"><i class="bi <?= e($m['icon'] ?? 'bi-buildings') ?>"></i></span>
-            <div class="hq-hero__metric-text">
-              <strong data-counter data-target="<?= e($m['num']) ?>" data-suffix="<?= e($m['suffix']) ?>"><?= e($m['num']) ?><?= e($m['suffix']) ?></strong>
-              <span><?= e($m['label']) ?></span>
-            </div>
-          </article>
-          <?php endforeach; ?>
-        </div>
-
-        <div class="hq-hero__floating-guarantee">
-          <i class="bi bi-shield-lock-fill"></i>
-          <span>100% Quality &amp; On-Time Delivery</span>
-        </div>
-      </div>
-    </div>
-
-    <?php if ($heroMulti): ?>
-    <div class="hq-hero__controls" aria-label="Hero carousel controls">
-      <div class="hq-hero__counter" aria-live="polite">
-        <span class="hq-hero__counter-current" data-hero-current>01</span>
-        <span class="hq-hero__counter-sep">/</span>
-        <span class="hq-hero__counter-total"><?= str_pad((string)count($sliders), 2, '0', STR_PAD_LEFT) ?></span>
-      </div>
-      <?php if ($heroCarouselOpts['dots']): ?>
-      <div class="hq-hero__dots" role="tablist" aria-label="Hero slides">
+    <div class="hq-hero__copy" data-anim="up">
+      <div class="hq-hero__panes hq-hero__panes--copy">
         <?php foreach ($sliders as $i => $slide): ?>
-        <button type="button" class="hq-hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>" role="tab" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-label="Slide <?= $i + 1 ?>: <?= e($slide['title']) ?>">
-          <span class="hq-hero__dot-fill" data-hero-dot-fill></span>
-        </button>
+        <?php
+          $parts = $heroParseTitle($slide['title'] ?? $siteName);
+          $style = $slide['content_style'] ?? 'standard';
+          $showDesc = ($slide['show_description'] ?? 1) && !empty($slide['description']);
+          $paneClass = 'hq-hero__pane' . ($style !== 'standard' ? ' hq-hero__pane--' . e($style) : '');
+          $primaryHref = $homeHref($normalizeCta($slide['button_link'] ?? $quoteHref));
+          $secondaryHref = $homeHref($normalizeCta($slide['button_link_2'] ?? '/projects'));
+        ?>
+        <div class="<?= $paneClass ?><?= $i === 0 ? ' is-active' : '' ?>" data-hero-pane aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
+          <div class="hq-hero__eyebrow">
+            <span class="hq-hero__eyebrow-pill">
+              <span class="hq-hero__pulse-dot" aria-hidden="true"></span>
+              <span class="hq-hero__eyebrow-label"><?= e($slide['subtitle'] ?? 'Premium Construction & Architecture') ?></span>
+            </span>
+            <span class="hq-hero__eyebrow-tag"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> <?= e($heroLocation !== '' ? $heroLocation : 'Garowe · Somalia') ?></span>
+          </div>
+          <?php $headingTag = $i === 0 ? 'h1' : 'p'; ?>
+          <<?= $headingTag ?> class="hq-hero__title">
+            <?php if ($parts['main'] !== ''): ?><span class="hq-hero__title-main"><?= e($parts['main']) ?></span><?php endif; ?>
+            <?php if ($parts['accent'] !== ''): ?><span class="hq-hero__title-accent"><?= e($parts['accent']) ?></span><?php endif; ?>
+          </<?= $headingTag ?>>
+          <?php if ($showDesc): ?>
+          <p class="hq-hero__desc"><?= e($slide['description']) ?></p>
+          <?php endif; ?>
+          <div class="hq-hero__actions">
+            <a href="<?= e($primaryHref) ?>"<?= $homeTarget($slide['button_link'] ?? $quoteHref) ?> class="hq-btn hq-btn--orange hq-btn--lg hq-hero__btn-primary">
+              <span class="hq-btn__icon" aria-hidden="true"><i class="bi bi-whatsapp"></i></span>
+              <span><?= e($slide['button_text'] ?? 'Get a Free Quote') ?></span>
+              <i class="bi bi-arrow-right hq-btn__arrow" aria-hidden="true"></i>
+            </a>
+            <a href="<?= e($secondaryHref) ?>" class="hq-btn hq-btn--lg hq-hero__btn-secondary">
+              <span><?= e($slide['button_text_2'] ?? 'View Our Work') ?></span>
+              <i class="bi bi-arrow-up-right hq-btn__arrow" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
         <?php endforeach; ?>
       </div>
-      <?php endif; ?>
-      <div class="hq-hero__nav">
-        <button type="button" class="hq-hero__nav-btn" data-hero-prev aria-label="Previous slide"><i class="bi bi-arrow-left"></i></button>
-        <button type="button" class="hq-hero__nav-btn" data-hero-next aria-label="Next slide"><i class="bi bi-arrow-right"></i></button>
-      </div>
-    </div>
-    <?php endif; ?>
 
-    <div class="hq-hero__band" data-anim="up" data-delay="180">
+      <div class="hq-hero__proof">
+        <span class="hq-hero__proof-icon" aria-hidden="true"><i class="bi bi-patch-check-fill"></i></span>
+        <div class="hq-hero__proof-text">
+          <strong><?= e(cmsText($heroSec, 'title', 'Trusted Builder')) ?></strong>
+          <span><?= e(cmsText($heroSec, 'subtitle', 'Since ' . ($settings['stat_awards'] ?? '2016'))) ?></span>
+        </div>
+      </div>
+
+      <div class="hq-hero__trust">
+        <?php
+          $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-gem', 'bi-award', 'bi-patch-check'];
+          foreach (array_slice($trustBarItems, 0, 3) as $tIdx => $trustLabel):
+            $tLabelText = is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel;
+            $tIcon = $trustIcons[$tIdx % count($trustIcons)];
+            if ($tLabelText === '') continue;
+        ?>
+        <div class="hq-hero__trust-item"><i class="bi <?= e($tIcon) ?>" aria-hidden="true"></i><span><?= e($tLabelText) ?></span></div>
+        <?php endforeach; ?>
+      </div>
+
+      <?php if ($heroMulti): ?>
+      <div class="hq-hero__controls" aria-label="Hero carousel controls">
+        <div class="hq-hero__counter" aria-live="polite">
+          <span class="hq-hero__counter-current" data-hero-current>01</span>
+          <span class="hq-hero__counter-sep">/</span>
+          <span class="hq-hero__counter-total"><?= str_pad((string)count($sliders), 2, '0', STR_PAD_LEFT) ?></span>
+        </div>
+        <?php if ($heroCarouselOpts['dots']): ?>
+        <div class="hq-hero__dots" role="tablist" aria-label="Hero slides">
+          <?php foreach ($sliders as $i => $slide): ?>
+          <button type="button" class="hq-hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>" role="tab" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-controls="hero" aria-label="Slide <?= $i + 1 ?>: <?= e($slide['title']) ?>">
+            <span class="hq-hero__dot-fill" data-hero-dot-fill></span>
+          </button>
+          <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <div class="hq-hero__nav">
+          <button type="button" class="hq-hero__nav-btn" data-hero-prev aria-label="Previous slide"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+          <button type="button" class="hq-hero__nav-btn" data-hero-next aria-label="Next slide"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <?php if (!empty($heroBandStats)): ?>
+  <div class="hq-hero__band" data-anim="up" data-delay="180">
+    <div class="container-site">
       <div class="hq-hero__band-inner">
         <?php foreach ($heroBandStats as $i => $bs): ?>
         <div class="hq-hero__band-item">
-          <span class="hq-hero__band-icon"><i class="bi <?= e($bs['icon'] ?? 'bi-award') ?>"></i></span>
+          <span class="hq-hero__band-icon" aria-hidden="true"><i class="bi <?= e($bs['icon'] ?? 'bi-award') ?>"></i></span>
           <div class="hq-hero__band-content">
             <strong data-counter data-target="<?= e($bs['num']) ?>" data-suffix="<?= e($bs['suffix']) ?>"><?= e($bs['num']) ?><?= e($bs['suffix']) ?></strong>
             <span><?= e($bs['label']) ?></span>
           </div>
         </div>
-        <?php if ($i < count($heroBandStats) - 1): ?><span class="hq-hero__band-div" aria-hidden="true"></span><?php endif; ?>
         <?php endforeach; ?>
       </div>
     </div>
   </div>
-
-  <div class="hq-hero__slant" aria-hidden="true"></div>
+  <?php endif; ?>
 </section>
 <?php endif; ?>
 

@@ -93,17 +93,17 @@ if (navbar) {
   }
 })();
 
-// ─── Hero parallax (premium frame + legacy bg) ───────────────
-const heroParallaxImg = document.querySelector('.hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
+// ─── Hero parallax (cinematic + legacy) ──────────────────────
+const heroParallaxImg = document.querySelector('.hq-hero__shot.is-active img, .hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
 if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       requestAnimationFrame(() => {
         const scrolled = window.scrollY;
-        const img = document.querySelector('.hq-hero__photo.is-active img') || heroParallaxImg;
+        const img = document.querySelector('.hq-hero__shot.is-active img, .hq-hero__photo.is-active img') || heroParallaxImg;
         if (scrolled < window.innerHeight && img) {
-          img.style.transform = `scale(${1 + scrolled * 0.0002}) translateY(${scrolled * 0.12}px)`;
+          img.style.transform = `scale(${1 + scrolled * 0.00018}) translateY(${scrolled * 0.1}px)`;
         }
         ticking = false;
       });
@@ -238,6 +238,27 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
   }
 
   window.addEventListener('resize', syncCopyHeight);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      paused = true;
+      stop();
+    } else {
+      paused = false;
+      start();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (!hero.contains(document.activeElement)) return;
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      setSlide(current + 1);
+      start();
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      setSlide(current - 1);
+      start();
+    }
+  });
   setSlide(0);
   start();
 })();
