@@ -5,11 +5,19 @@ class AboutController extends Controller
 {
     public function index(array $params = []): void
     {
-        $testimonials = (new TestimonialModel())->getFeatured(3);
-        $team         = (new TeamModel())->getPublished();
-        $settings     = (new SettingModel())->getAllAsMap();
-        $seo          = (new SeoModel())->findBySlug('about');
-        $sections     = (new PageSectionModel())->getByPage('about');
+        $testimonials = [];
+        $team         = [];
+        $settings     = [];
+        $seo          = null;
+        $sections     = [];
+
+        $this->tryLoad(function () use (&$testimonials, &$team, &$settings, &$seo, &$sections): void {
+            $testimonials = (new TestimonialModel())->getFeatured(3);
+            $team         = (new TeamModel())->getPublished();
+            $settings     = (new SettingModel())->getAllAsMap();
+            $seo          = (new SeoModel())->findBySlug('about');
+            $sections     = (new PageSectionModel())->getByPage('about');
+        });
 
         $statItems = [
             ['num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '', 'label' => 'Years Operating', 'icon' => 'bi-award'],

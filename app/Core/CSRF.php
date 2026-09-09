@@ -47,9 +47,7 @@ class CSRF
             if (defined('APP_DEBUG') && APP_DEBUG) {
                 die('CSRF token mismatch.');
             }
-            http_response_code(403);
-            echo 'Security check failed. Please refresh and try again.';
-            exit;
+            Production::fail(419, 'CSRF token mismatch');
         }
         Session::set(self::TOKEN_KEY, bin2hex(random_bytes(32)));
     }

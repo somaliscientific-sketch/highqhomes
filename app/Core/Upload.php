@@ -106,9 +106,17 @@ class Upload
         }
         file_put_contents(
             $htaccess,
-            "Options -Indexes\n" .
-            "<Files ~ \"\.(php|php3|php4|php5|phtml|shtml|pl|py|rb|cgi|sh)$\">\n" .
-            "  Order Deny,Allow\n  Deny from all\n</Files>\n"
+            "Options -Indexes\n\n" .
+            "<IfModule mod_authz_core.c>\n" .
+            "  <FilesMatch \"\\.(php|php\\d|phtml|phar|pl|py|jsp|asp|aspx|shtml|sh|cgi)$\">\n" .
+            "    Require all denied\n" .
+            "  </FilesMatch>\n" .
+            "</IfModule>\n" .
+            "<IfModule !mod_authz_core.c>\n" .
+            "  <FilesMatch \"\\.(php|php\\d|phtml|phar|pl|py|jsp|asp|aspx|shtml|sh|cgi)$\">\n" .
+            "    Order Deny,Allow\n    Deny from all\n" .
+            "  </FilesMatch>\n" .
+            "</IfModule>\n"
         );
     }
 

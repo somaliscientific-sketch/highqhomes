@@ -5,12 +5,18 @@ class ContactController extends Controller
 {
     public function index(array $params = []): void
     {
-        $settings = (new SettingModel())->getAllAsMap();
-        $sections = (new PageSectionModel())->getByPage('contact');
-        $seo = (new SeoModel())->findBySlug('contact') ?? [
+        $settings = [];
+        $sections = [];
+        $seo      = [
             'meta_title' => 'Contact HighQ Homes',
             'meta_description' => 'Contact HighQ Homes for construction, architecture, interiors, paints, and project consultation.',
         ];
+
+        $this->tryLoad(function () use (&$settings, &$sections, &$seo): void {
+            $settings = (new SettingModel())->getAllAsMap();
+            $sections = (new PageSectionModel())->getByPage('contact');
+            $seo      = (new SeoModel())->findBySlug('contact') ?? $seo;
+        });
 
         $this->render('contact/index', compact('settings', 'seo', 'sections'));
     }
@@ -36,20 +42,26 @@ class ContactController extends Controller
         }
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-        $model = new MessageModel();
-        if (!$model->rateLimitCheck($ip)) {
-            Session::flash('error', 'Please wait before sending another message.');
+        try {
+            $model = new MessageModel();
+            if (!$model->rateLimitCheck($ip)) {
+                Session::flash('error', 'Please wait before sending another message.');
+                $this->redirect('/contact');
+            }
+
+            $model->insert([
+                'name'       => $name,
+                'email'      => (string)$email,
+                'phone'      => $phone,
+                'subject'    => $subject,
+                'message'    => $message,
+                'ip_address' => $ip,
+            ]);
+        } catch (\Throwable $e) {
+            Production::log('contact submit: ' . $e->getMessage());
+            Session::flash('error', 'We could not save your message right now. Please try WhatsApp or email.');
             $this->redirect('/contact');
         }
-
-        $model->insert([
-            'name'       => $name,
-            'email'      => (string)$email,
-            'phone'      => $phone,
-            'subject'    => $subject,
-            'message'    => $message,
-            'ip_address' => $ip,
-        ]);
 
         Session::flash('success', 'Thank you. Your message has been sent to our team.');
         $this->redirect('/contact');

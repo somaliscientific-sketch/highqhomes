@@ -5,22 +5,29 @@ class ServicesController extends Controller
 {
     public function index(array $params = []): void
     {
-        $model    = new ServiceModel();
-        $services = $model->getPublished();
-        $settings = (new SettingModel())->getAllAsMap();
-        $seo      = (new SeoModel())->findBySlug('services');
-        $sections = (new PageSectionModel())->getByPage('services');
+        $services = [];
+        $settings = [];
+        $seo      = null;
+        $sections = [];
+        $stats    = ['total' => 0, 'featured' => 0];
+
+        $this->tryLoad(function () use (&$services, &$settings, &$seo, &$sections, &$stats): void {
+            $model    = new ServiceModel();
+            $services = $model->getPublished();
+            $settings = (new SettingModel())->getAllAsMap();
+            $seo      = (new SeoModel())->findBySlug('services');
+            $sections = (new PageSectionModel())->getByPage('services');
+            $stats    = [
+                'total'    => $model->countPublished(),
+                'featured' => $model->countFeatured(),
+            ];
+        });
 
         $statItems = [
             ['num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '', 'label' => 'Profiled Projects', 'icon' => 'bi-buildings'],
             ['num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '', 'label' => 'Years Operating', 'icon' => 'bi-award'],
             ['num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '', 'label' => 'Completed Projects', 'icon' => 'bi-check2-circle'],
             ['num' => statNumber((string)($settings['stat_satisfaction'] ?? '5')), 'suffix' => '', 'label' => 'Current Projects', 'icon' => 'bi-building-gear'],
-        ];
-
-        $stats = [
-            'total'    => $model->countPublished(),
-            'featured' => $model->countFeatured(),
         ];
 
         $this->render('services/index', compact('services', 'settings', 'seo', 'sections', 'statItems', 'stats'));

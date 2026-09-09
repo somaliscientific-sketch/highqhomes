@@ -27,7 +27,10 @@ if (menuBtn && mobileMenu) {
     document.body.style.overflow = '';
     menuBtn.setAttribute('aria-expanded', 'false');
   };
-  menuBtn.addEventListener('click', openMenu);
+  menuBtn.addEventListener('click', () => {
+    if (mobileMenu.classList.contains('is-open')) closeMenu();
+    else openMenu();
+  });
   menuClose?.addEventListener('click', closeMenu);
   mobileMenu.addEventListener('click', (e) => {
     if (e.target === mobileMenu || e.target.classList.contains('hq-mobile-backdrop')) closeMenu();

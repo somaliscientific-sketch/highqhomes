@@ -1,7 +1,13 @@
-# Allow only image files to be served
-<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|htm|html|shtml|sh|cgi)$">
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+  <FilesMatch "\.(php|php\d|phtml|phar|pl|py|jsp|asp|aspx|shtml|sh|cgi)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "\.(php|php\d|phtml|phar|pl|py|jsp|asp|aspx|shtml|sh|cgi)$">
     Order Deny,Allow
     Deny from all
-</FilesMatch>
-
-Options -Indexes
+  </FilesMatch>
+</IfModule>

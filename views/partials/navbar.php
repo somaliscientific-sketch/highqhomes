@@ -63,7 +63,7 @@ $headerCtaHref    = menuUrl(cmsSectionSubtitle('header', 'cta', '/contact'));
         </a>
         <?php endif; ?>
 
-        <button id="mobile-menu-btn" class="hq-menu-btn" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+        <button type="button" id="mobile-menu-btn" class="hq-menu-btn" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>

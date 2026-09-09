@@ -1,6 +1,12 @@
 <?php
 declare(strict_types=1);
 
+if (PHP_VERSION_ID < 80100) {
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=UTF-8');
+    exit('HighQ Homes requires PHP 8.1 or newer. Set PHP 8.2 or 8.3 in Hostinger hPanel.');
+}
+
 define('ROOT_PATH', dirname(__DIR__));
 define('APP_PATH', ROOT_PATH . '/app');
 define('VIEWS_PATH', ROOT_PATH . '/views');
@@ -16,8 +22,15 @@ if (file_exists($envFile)) {
         }
 
         [$key, $value] = explode('=', $line, 2);
-        $_ENV[trim($key)] = trim($value);
-        putenv(trim($key) . '=' . trim($value));
+        $value = trim($value);
+        if (
+            (str_starts_with($value, '"') && str_ends_with($value, '"'))
+            || (str_starts_with($value, "'") && str_ends_with($value, "'"))
+        ) {
+            $value = substr($value, 1, -1);
+        }
+        $_ENV[trim($key)] = $value;
+        putenv(trim($key) . '=' . $value);
     }
 }
 

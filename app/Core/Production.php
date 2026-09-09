@@ -67,6 +67,13 @@ class Production
         if (!is_dir($dir)) {
             @mkdir($dir, 0750, true);
         }
+        $deny = $dir . '/.htaccess';
+        if (!is_file($deny)) {
+            @file_put_contents(
+                $deny,
+                "<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\nOrder deny,allow\nDeny from all\n</IfModule>\n"
+            );
+        }
         @file_put_contents(
             $dir . '/app.log',
             '[' . date('c') . '] ' . $message . PHP_EOL,
@@ -81,7 +88,9 @@ class Production
             die($internal);
         }
         self::log($internal);
-        $view = VIEWS_PATH . '/errors/' . ($code === 404 ? '404' : '500') . '.php';
+        $allowed = [403, 404, 419, 500];
+        $page = in_array($code, $allowed, true) ? $code : 500;
+        $view = VIEWS_PATH . '/errors/' . $page . '.php';
         if (file_exists($view)) {
             $settings = [];
             try {

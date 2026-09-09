@@ -8,6 +8,19 @@ abstract class Controller
         View::render($view, $data, $layout);
     }
 
+    /**
+     * Load CMS/public data without taking the whole page down if MySQL is unavailable.
+     */
+    protected function tryLoad(callable $loader, mixed $fallback = null): mixed
+    {
+        try {
+            return $loader();
+        } catch (\Throwable $e) {
+            Production::log(static::class . ': ' . $e->getMessage());
+            return $fallback;
+        }
+    }
+
     protected function redirect(string $path): never
     {
         $url = str_starts_with($path, 'http') ? $path : APP_URL . $path;
@@ -87,12 +100,17 @@ abstract class Controller
 
     protected function abort(int $code = 404): never
     {
-        http_response_code($code);
-        $view = VIEWS_PATH . "/errors/{$code}.php";
+        $allowed = [403, 404, 419, 500];
+        $page = in_array($code, $allowed, true) ? $code : 404;
+        if ($page === 500 || $page === 419) {
+            Production::fail($page, 'Controller abort ' . $page);
+        }
+        http_response_code($page);
+        $view = VIEWS_PATH . "/errors/{$page}.php";
         if (file_exists($view)) {
             include $view;
         } else {
-            echo "<h1>Error {$code}</h1>";
+            echo "<h1>Error {$page}</h1>";
         }
         exit;
     }
