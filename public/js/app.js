@@ -17,11 +17,21 @@ if (navbar) {
   const menuClose = document.getElementById('mobile-menu-close');
   if (!menuBtn || !mobileMenu) return;
 
-  const desktopQuery = window.matchMedia('(min-width: 1181px)');
+  const desktopQuery = window.matchMedia('(min-width: 1024px)');
   let lastFocus = null;
   let lastScrollY = 0;
 
   const isOpen = () => mobileMenu.classList.contains('is-open');
+
+  const focusable = () => Array.from(
+    mobileMenu.querySelectorAll('a[href], button:not([disabled])')
+  ).filter((el) => el.getAttribute('tabindex') !== '-1');
+
+  const setInert = (on) => {
+    if ('inert' in mobileMenu) {
+      mobileMenu.inert = on;
+    }
+  };
 
   const lockScroll = () => {
     lastScrollY = window.scrollY;
@@ -38,13 +48,14 @@ if (navbar) {
   };
 
   const openMenu = () => {
-    if (isOpen()) return;
+    if (isOpen() || desktopQuery.matches) return;
     lastFocus = document.activeElement;
     mobileMenu.classList.add('is-open');
     menuBtn.classList.add('is-active');
     menuBtn.setAttribute('aria-expanded', 'true');
     menuBtn.setAttribute('aria-label', 'Close menu');
     mobileMenu.setAttribute('aria-hidden', 'false');
+    setInert(false);
     lockScroll();
     window.requestAnimationFrame(() => {
       (menuClose || mobileMenu.querySelector('.hq-mobile__links a'))?.focus();
@@ -58,6 +69,7 @@ if (navbar) {
     menuBtn.setAttribute('aria-expanded', 'false');
     menuBtn.setAttribute('aria-label', 'Open menu');
     mobileMenu.setAttribute('aria-hidden', 'true');
+    setInert(true);
     unlockScroll();
     if (lastFocus && typeof lastFocus.focus === 'function') {
       lastFocus.focus();
@@ -78,9 +90,23 @@ if (navbar) {
     link.addEventListener('click', () => closeMenu());
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isOpen()) {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') {
       e.preventDefault();
       closeMenu();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const items = focusable();
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
     }
   });
   const onDesktopChange = (event) => {
@@ -91,6 +117,7 @@ if (navbar) {
   } else {
     desktopQuery.addListener(onDesktopChange);
   }
+  setInert(true);
 })();
 
 // ─── Hero parallax (cinematic + legacy) ──────────────────────
