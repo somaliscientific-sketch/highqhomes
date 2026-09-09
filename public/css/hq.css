@@ -1125,8 +1125,8 @@ body.hq-menu-open {
   background: linear-gradient(135deg, #e88b09 0%, #f59e0b 45%, #d97706 85%, #b45309 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
-  filter: drop-shadow(0 2px 14px rgba(232, 139, 9, 0.2));
 }
 
 .hq-hero__desc {
@@ -1331,7 +1331,7 @@ body.hq-menu-open {
   gap: 0.625rem;
   padding: 0.75rem 1.15rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.95);
@@ -1340,6 +1340,25 @@ body.hq-menu-open {
   font-weight: 700;
   color: var(--hq-navy);
   z-index: 2;
+}
+
+.hq-hero__photo-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: var(--hq-navy);
+  color: var(--hq-orange-light);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hq-hero__photo-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hq-hero__photo-dot {
@@ -5310,6 +5329,13 @@ body.hq-menu-open {
 .hq-final__inner { text-align: center; }
 
 /* ─── Responsive ─── */
+@media (min-width: 1181px) and (max-width: 1320px) {
+  .hq-hero__layout { gap: 2.25rem; }
+  .hq-hero__metrics { left: -1.25rem; }
+  .hq-hero__badge-live { right: -0.75rem; }
+  .hq-hero__floating-guarantee { right: -0.75rem; }
+}
+
 @media (max-width: 1180px) {
   .hq-hero__layout { grid-template-columns: 1fr; gap: 3rem; }
   .hq-hero__copy { max-width: 680px; margin: 0 auto; text-align: center; }

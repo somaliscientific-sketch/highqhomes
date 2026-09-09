@@ -35,10 +35,10 @@ $hero = $sliders[0] ?? [];
 $heroImg = !empty($hero['image']) ? (str_starts_with($hero['image'], 'http') ? $hero['image'] : uploadUrl($hero['image'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
 
 $statItems = [
-  ['value' => $settings['stat_years'] ?? '10', 'num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '', 'label' => 'Years Operating', 'icon' => 'bi-award'],
-  ['value' => $settings['stat_projects'] ?? '8', 'num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '', 'label' => 'Profiled Projects', 'icon' => 'bi-buildings'],
-  ['value' => $settings['stat_clients'] ?? '3', 'num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '', 'label' => 'Completed Projects', 'icon' => 'bi-check2-circle'],
-  ['value' => $settings['stat_satisfaction'] ?? '5', 'num' => statNumber((string)($settings['stat_satisfaction'] ?? '5')), 'suffix' => '', 'label' => 'Current Projects', 'icon' => 'bi-building-gear'],
+  ['value' => $settings['stat_years'] ?? '10', 'num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '+', 'label' => 'Years Operating', 'icon' => 'bi-award'],
+  ['value' => $settings['stat_projects'] ?? '8', 'num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '+', 'label' => 'Profiled Projects', 'icon' => 'bi-buildings'],
+  ['value' => $settings['stat_clients'] ?? '3', 'num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '+', 'label' => 'Completed Projects', 'icon' => 'bi-check2-circle'],
+  ['value' => $settings['stat_satisfaction'] ?? '5', 'num' => statNumber((string)($settings['stat_satisfaction'] ?? '5')), 'suffix' => '+', 'label' => 'Current Projects', 'icon' => 'bi-building-gear'],
   ['value' => $settings['stat_awards'] ?? '2016', 'num' => statNumber((string)($settings['stat_awards'] ?? '2016')), 'suffix' => '', 'label' => 'Established', 'icon' => 'bi-calendar2-check'],
 ];
 
@@ -289,9 +289,9 @@ $heroMulti = count($sliders) > 1;
 $imageFocusMap = ['center' => 'center', 'top' => 'center top', 'bottom' => 'center bottom'];
 
 $heroMetrics = [
-  ['num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '', 'label' => 'Projects', 'icon' => 'bi-buildings'],
-  ['num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '', 'label' => 'Completed', 'icon' => 'bi-check2-circle'],
-  ['num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '', 'label' => 'Years', 'icon' => 'bi-award'],
+  ['num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '+', 'label' => 'Projects Profiled', 'icon' => 'bi-buildings'],
+  ['num' => statNumber((string)($settings['stat_clients'] ?? '3')), 'suffix' => '+', 'label' => 'Completed Projects', 'icon' => 'bi-check2-circle'],
+  ['num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '+', 'label' => 'Years Experience', 'icon' => 'bi-award'],
 ];
 if (!empty($heroMetricsCms)) {
   $heroMetrics = $heroMetricsCms;
@@ -390,7 +390,8 @@ $heroBandStats = array_map(static fn(array $stat): array => [
             <img src="<?= e($sImg) ?>" alt="<?= e($slide['title'] ?? $siteName) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>" fetchpriority="<?= $i === 0 ? 'high' : 'auto' ?>" style="object-position:<?= e($focus) ?>">
             <figcaption class="hq-hero__photo-cap">
               <span class="hq-hero__photo-dot"></span>
-              <span><?= e($badge) ?></span>
+              <span class="hq-hero__photo-tag">FEATURED</span>
+              <span class="hq-hero__photo-title"><?= e($badge) ?></span>
             </figcaption>
           </figure>
           <?php endforeach; ?>
