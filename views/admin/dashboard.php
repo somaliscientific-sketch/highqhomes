@@ -18,7 +18,7 @@ $workspaces = [
             ['Gallery page sections', 'admin/sections?page=gallery', 'bi-images', 'sections.manage'],
             ['Paints page sections', 'admin/sections?page=paints', 'bi-palette', 'sections.manage'],
             ['Contact page sections', 'admin/sections?page=contact', 'bi-telephone', 'sections.manage'],
-            ['Homepage Hero', 'admin/sliders', 'bi-images'],
+            ['Hero Slider', 'admin/sliders', 'bi-images'],
             ['Services', 'admin/services', 'bi-grid'],
             ['Projects', 'admin/projects', 'bi-buildings'],
             ['Pages & Sections', 'admin/pages', 'bi-file-earmark-text'],

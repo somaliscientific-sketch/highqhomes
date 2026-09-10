@@ -70,7 +70,7 @@ if (is_array($data) && !empty($data)) {
     <p>Page: <strong><?= e($pageName) ?></strong> &middot; Key: <code><?= e($section['section_key']) ?></code></p>
     <?php
       $sectionHints = [
-        'home.hero' => 'Hero slides stay in Homepage Hero. Here you control the live badge, metric cards, and whether the banner is visible.',
+        'home.hero' => 'Hero slides stay in Hero Slider. Here you control the live badge, metric cards, and whether the banner is visible.',
         'home.hero_trust' => 'Edit the scrolling trust badges shown under the homepage hero.',
         'home.about_highlights' => 'Controls the Who We Are copy, highlight cards, and the featured photo.',
         'home.capabilities' => 'Controls the What We Build bento cards, including image, icon, and link.',

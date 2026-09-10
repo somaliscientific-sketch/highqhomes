@@ -3,36 +3,63 @@ declare(strict_types=1);
 
 class AdminSlidersController extends Controller
 {
-    private const HERO_SLOTS = 4;
+    private const TRANSITIONS = ['inherit', 'fade', 'slide', 'kenburns'];
+    private const GLOBAL_TRANSITIONS = ['fade', 'slide', 'kenburns'];
+    private const EXAMPLE_TITLES = [
+        'Build Your Dream Home With HighQ Homes',
+        'Modern Architecture. Timeless Design.',
+        'Built With Quality. Designed To Last.',
+        'Your Vision. Our Expertise.',
+    ];
+    private const EXAMPLE_SUBTITLES = [
+        'Premium Construction & Architecture',
+        'Residential and commercial builds',
+        'Craftsmanship you can trust',
+        'From concept to handover',
+    ];
 
     private SliderModel $model;
 
     public function __construct()
     {
         $this->model = new SliderModel();
+        $this->model->ensureSchema();
     }
 
     public function index(array $params = []): void
     {
         $this->requireView();
-        $allSliders = $this->model->findAll('sort_order', 'ASC');
-        $heroSlots  = $this->mapHeroSlots($allSliders);
-        $activeTab  = max(1, min(self::HERO_SLOTS, (int)($_GET['tab'] ?? 1)));
-        $settings   = (new SettingModel())->getAllAsMap();
-        $heroOptions = [
-            'autoplay'    => ($settings['hero_carousel_autoplay'] ?? '1') === '1',
-            'interval'    => max(3, min(15, (int)($settings['hero_carousel_interval'] ?? 6))),
-            'dots'        => ($settings['hero_carousel_dots'] ?? '1') === '1',
-            'pause_hover' => ($settings['hero_carousel_pause_hover'] ?? '1') === '1',
-        ];
-        $this->render('admin/sliders/index', compact('heroSlots', 'activeTab', 'heroOptions'), 'admin');
+        $sliders = $this->model->findAll('sort_order', 'ASC');
+        $settings = (new SettingModel())->getAllAsMap();
+        $heroOptions = $this->carouselOptions($settings);
+        $this->render('admin/sliders/index', compact('sliders', 'heroOptions'), 'admin');
     }
 
     public function create(array $params = []): void
     {
         $this->requireManage();
-        $tab = max(1, min(self::HERO_SLOTS, (int)($_GET['tab'] ?? 1)));
-        $this->redirect('/admin/sliders?tab=' . $tab);
+        $index = $this->model->count() % 4;
+        $slider = [
+            'title'            => self::EXAMPLE_TITLES[$index],
+            'subtitle'         => self::EXAMPLE_SUBTITLES[$index],
+            'description'      => 'From blueprint to handover — disciplined planning, transparent timelines, and craftsmanship in every detail.',
+            'button_text'      => 'Get a Free Quote',
+            'button_link'      => '/contact',
+            'button_text_2'    => 'View Our Work',
+            'button_link_2'    => '/projects',
+            'is_published'     => 1,
+            'show_description' => 1,
+            'image_focus'      => 'center',
+            'content_style'    => 'standard',
+            'text_align'       => 'center',
+            'overlay_opacity'  => 0.6,
+            'transition_type'  => 'inherit',
+        ];
+        $this->render('admin/sliders/form', [
+            'slider' => $slider,
+            'isEdit' => false,
+            'action' => url('admin/sliders/create'),
+        ], 'admin');
     }
 
     public function store(array $params = []): void
@@ -40,27 +67,24 @@ class AdminSlidersController extends Controller
         $this->requireManage();
         CSRF::check();
 
-        $slot = max(1, min(self::HERO_SLOTS, (int)$this->post('hero_slot', 1)));
-        $data = $this->formData($slot);
-
-        if (!empty($_FILES['image']['name'])) {
-            $data['image'] = Upload::image($_FILES['image'], 'sliders');
+        $data = $this->formData();
+        $data['sort_order'] = $this->model->nextSortOrder();
+        if ($data['title'] === '') {
+            Session::flash('error', 'A slide title is required.');
+            $this->redirect('/admin/sliders/create');
         }
 
-        $existing = $this->slotSlider($slot);
-        if ($existing) {
-            if (!empty($_FILES['image']['name']) && $existing['image']) {
-                Upload::delete($existing['image']);
-            }
-            $this->model->update((int)$existing['id'], $data);
-            $this->audit('update', 'sliders', "Updated hero section {$slot}", 'slider', (int)$existing['id']);
-            $this->tabRedirect($slot, 'Hero section ' . $slot . ' updated.');
-            return;
+        try {
+            $data = $this->applyUploads($data, null);
+        } catch (\Throwable $e) {
+            Session::flash('error', $e->getMessage());
+            $this->redirect('/admin/sliders/create');
         }
 
-        $id = $this->model->insert($data);
-        $this->audit('create', 'sliders', "Created hero section {$slot}", 'slider', $id);
-        $this->tabRedirect($slot, 'Hero section ' . $slot . ' created.');
+        $id = $this->model->insert($this->model->onlyColumns($data));
+        $this->audit('create', 'sliders', 'Created hero slide "' . $data['title'] . '"', 'slider', $id);
+        Session::flash('success', 'Hero slide created. It will appear on the homepage if it is published.');
+        $this->redirect('/admin/sliders');
     }
 
     public function edit(array $params = []): void
@@ -70,9 +94,11 @@ class AdminSlidersController extends Controller
         if (!$slider) {
             $this->abort(404);
         }
-
-        $tab = max(1, min(self::HERO_SLOTS, (int)$slider['sort_order'] + 1));
-        $this->redirect('/admin/sliders?tab=' . $tab);
+        $this->render('admin/sliders/form', [
+            'slider' => $slider,
+            'isEdit' => true,
+            'action' => url('admin/sliders/' . $slider['id'] . '/edit'),
+        ], 'admin');
     }
 
     public function update(array $params = []): void
@@ -80,25 +106,32 @@ class AdminSlidersController extends Controller
         $this->requireManage();
         CSRF::check();
 
-        $id     = (int)$params['id'];
+        $id = (int)$params['id'];
         $slider = $this->model->findById($id);
         if (!$slider) {
             $this->abort(404);
         }
 
-        $slot = max(1, min(self::HERO_SLOTS, (int)$this->post('hero_slot', (int)$slider['sort_order'] + 1)));
-        $data = $this->formData($slot);
-
-        if (!empty($_FILES['image']['name'])) {
-            if ($slider['image']) {
-                Upload::delete($slider['image']);
-            }
-            $data['image'] = Upload::image($_FILES['image'], 'sliders');
+        $data = $this->formData();
+        if ($this->model->hasColumn('updated_at')) {
+            $data['updated_at'] = date('Y-m-d H:i:s');
+        }
+        if ($data['title'] === '') {
+            Session::flash('error', 'A slide title is required.');
+            $this->redirect('/admin/sliders/' . $id . '/edit');
         }
 
-        $this->model->update($id, $data);
-        $this->audit('update', 'sliders', "Updated hero section {$slot}", 'slider', $id);
-        $this->tabRedirect($slot, 'Hero section ' . $slot . ' saved.');
+        try {
+            $data = $this->applyUploads($data, $slider);
+        } catch (\Throwable $e) {
+            Session::flash('error', $e->getMessage());
+            $this->redirect('/admin/sliders/' . $id . '/edit');
+        }
+
+        $this->model->update($id, $this->model->onlyColumns($data));
+        $this->audit('update', 'sliders', 'Updated hero slide "' . $data['title'] . '"', 'slider', $id);
+        Session::flash('success', 'Hero slide saved.');
+        $this->redirect('/admin/sliders');
     }
 
     public function destroy(array $params = []): void
@@ -106,15 +139,14 @@ class AdminSlidersController extends Controller
         $this->requireManage();
         CSRF::check();
         $slider = $this->model->findById((int)$params['id']);
-        $slot = max(1, min(self::HERO_SLOTS, (int)$this->post('hero_slot', $slider ? (int)$slider['sort_order'] + 1 : 1)));
-        if ($slider && $slider['image']) {
-            Upload::delete($slider['image']);
-        }
         if ($slider) {
+            $this->deleteImageIfUnused((string)($slider['image'] ?? ''), (int)$slider['id']);
+            $this->deleteImageIfUnused((string)($slider['mobile_image'] ?? ''), (int)$slider['id']);
             $this->model->delete((int)$params['id']);
-            $this->audit('delete', 'sliders', "Cleared hero section {$slot}", 'slider', (int)$params['id']);
+            $this->audit('delete', 'sliders', 'Deleted hero slide "' . ($slider['title'] ?? '') . '"', 'slider', (int)$params['id']);
         }
-        $this->tabRedirect($slot, 'Hero section ' . $slot . ' cleared.');
+        Session::flash('success', 'Hero slide removed.');
+        $this->redirect('/admin/sliders');
     }
 
     public function toggle(array $params = []): void
@@ -122,12 +154,52 @@ class AdminSlidersController extends Controller
         $this->requireManage();
         CSRF::check();
         $slider = $this->model->findById((int)$params['id']);
-        $slot = max(1, min(self::HERO_SLOTS, (int)$this->post('hero_slot', $slider ? (int)$slider['sort_order'] + 1 : 1)));
         if ($slider) {
-            $this->model->update($slider['id'], ['is_published' => $slider['is_published'] ? 0 : 1]);
-            $this->audit('toggle', 'sliders', 'Toggled hero section ' . $slot . ' visibility', 'slider', (int)$slider['id']);
+            $next = empty($slider['is_published']) ? 1 : 0;
+            $this->model->update((int)$slider['id'], $this->model->onlyColumns(['is_published' => $next]));
+            $this->audit('toggle', 'sliders', 'Toggled hero slide visibility', 'slider', (int)$slider['id']);
+            Session::flash('success', $next ? 'Slide is now live on the homepage.' : 'Slide unpublished.');
         }
-        $this->tabRedirect($slot, 'Hero section ' . $slot . ' visibility updated.');
+        $this->redirect('/admin/sliders');
+    }
+
+    public function duplicate(array $params = []): void
+    {
+        $this->requireManage();
+        CSRF::check();
+        $slider = $this->model->findById((int)$params['id']);
+        if (!$slider) {
+            $this->abort(404);
+        }
+
+        unset($slider['id'], $slider['created_at'], $slider['updated_at']);
+        $slider['title'] = trim((string)$slider['title'] . ' (copy)');
+        $slider['is_published'] = 0;
+        $slider['sort_order'] = $this->model->nextSortOrder();
+        $slider['image'] = $this->copyUpload((string)($slider['image'] ?? ''));
+        $slider['mobile_image'] = $this->copyUpload((string)($slider['mobile_image'] ?? ''));
+
+        $id = $this->model->insert($this->model->onlyColumns($slider));
+        $this->audit('create', 'sliders', 'Duplicated hero slide', 'slider', $id);
+        Session::flash('success', 'Slide duplicated as a draft. Review it before publishing.');
+        $this->redirect('/admin/sliders/' . $id . '/edit');
+    }
+
+    public function reorder(array $params = []): void
+    {
+        $this->requireManage();
+        if (!CSRF::checkApi()) {
+            $this->json(['ok' => false, 'error' => 'Security token expired. Refresh and try again.'], 419);
+        }
+
+        $ids = $_POST['ids'] ?? [];
+        if (!is_array($ids)) {
+            $this->json(['ok' => false, 'error' => 'Invalid slide order.'], 422);
+        }
+        $ids = array_values(array_filter(array_map('intval', $ids)));
+        $this->model->reorder($ids);
+        $this->audit('update', 'sliders', 'Reordered hero slides');
+        $this->json(['ok' => true, 'csrf' => CSRF::token()]);
     }
 
     public function updateSettings(array $params = []): void
@@ -135,62 +207,168 @@ class AdminSlidersController extends Controller
         $this->requireManage();
         CSRF::check();
 
+        $transition = $this->post('hero_carousel_transition', 'kenburns');
+        if (!in_array($transition, self::GLOBAL_TRANSITIONS, true)) {
+            $transition = 'kenburns';
+        }
+
         (new SettingModel())->setBulk([
             'hero_carousel_autoplay'    => $this->post('hero_carousel_autoplay') ? '1' : '0',
             'hero_carousel_interval'    => (string)max(3, min(15, (int)$this->post('hero_carousel_interval', 6))),
             'hero_carousel_dots'        => $this->post('hero_carousel_dots') ? '1' : '0',
             'hero_carousel_pause_hover' => $this->post('hero_carousel_pause_hover') ? '1' : '0',
+            'hero_carousel_transition'  => $transition,
         ]);
         $this->audit('update', 'sliders', 'Updated hero carousel display options');
-
-        $tab = max(1, min(self::HERO_SLOTS, (int)$this->post('hero_tab', 1)));
-        $this->tabRedirect($tab, 'Hero display options saved.');
+        Session::flash('success', 'Hero slider settings saved.');
+        $this->redirect('/admin/sliders');
     }
 
-    /** @return array<int, array|null> */
-    private function mapHeroSlots(array $sliders): array
+    /** @return array<string, mixed> */
+    private function carouselOptions(array $settings): array
     {
-        $slots = array_fill(0, self::HERO_SLOTS, null);
-        foreach ($sliders as $slider) {
-            $order = (int)$slider['sort_order'];
-            if ($order >= 0 && $order < self::HERO_SLOTS && $slots[$order] === null) {
-                $slots[$order] = $slider;
-            }
+        $transition = (string)($settings['hero_carousel_transition'] ?? 'kenburns');
+        if (!in_array($transition, self::GLOBAL_TRANSITIONS, true)) {
+            $transition = 'kenburns';
         }
-        return $slots;
-    }
-
-    private function slotSlider(int $slot): ?array
-    {
-        $slots = $this->mapHeroSlots($this->model->findAll('sort_order', 'ASC'));
-        return $slots[$slot - 1] ?? null;
-    }
-
-    private function tabRedirect(int $slot, string $message): void
-    {
-        Session::flash('success', $message);
-        $tab = max(1, min(self::HERO_SLOTS, $slot));
-        $this->redirect('/admin/sliders?tab=' . $tab);
-    }
-
-    private function formData(int $slot): array
-    {
         return [
-            'title'           => $this->sanitize($this->post('title', '')),
-            'subtitle'        => $this->sanitize($this->post('subtitle', '')),
-            'description'     => $this->sanitize($this->post('description', '')),
-            'button_text'     => $this->sanitize($this->post('button_text', '')),
-            'button_link'     => $this->sanitize($this->post('button_link', '')),
-            'button_text_2'   => $this->sanitize($this->post('button_text_2', '')),
-            'button_link_2'   => $this->sanitize($this->post('button_link_2', '')),
-            'overlay_opacity' => (float)$this->post('overlay_opacity', 0.6),
-            'text_align'      => $this->post('text_align', 'center'),
-            'show_description'=> $this->post('show_description') ? 1 : 0,
-            'image_focus'     => in_array($this->post('image_focus', 'center'), ['center', 'top', 'bottom'], true) ? $this->post('image_focus', 'center') : 'center',
-            'content_style'   => in_array($this->post('content_style', 'standard'), ['standard', 'minimal', 'bold'], true) ? $this->post('content_style', 'standard') : 'standard',
-            'badge_text'      => $this->sanitize($this->post('badge_text', '')) ?: null,
-            'sort_order'      => max(0, min(self::HERO_SLOTS - 1, $slot - 1)),
-            'is_published'    => $this->post('is_published') ? 1 : 0,
+            'autoplay'    => ($settings['hero_carousel_autoplay'] ?? '1') === '1',
+            'interval'    => max(3, min(15, (int)($settings['hero_carousel_interval'] ?? 6))),
+            'dots'        => ($settings['hero_carousel_dots'] ?? '1') === '1',
+            'pause_hover' => ($settings['hero_carousel_pause_hover'] ?? '1') === '1',
+            'transition'  => $transition,
         ];
+    }
+
+    /** @return array<string, mixed> */
+    private function formData(): array
+    {
+        $transition = $this->post('transition_type', 'inherit');
+        if (!in_array($transition, self::TRANSITIONS, true)) {
+            $transition = 'inherit';
+        }
+        $focus = $this->post('image_focus', 'center');
+        if (!in_array($focus, ['center', 'top', 'bottom'], true)) {
+            $focus = 'center';
+        }
+        $style = $this->post('content_style', 'standard');
+        if (!in_array($style, ['standard', 'minimal', 'bold'], true)) {
+            $style = 'standard';
+        }
+        $align = $this->post('text_align', 'center');
+        if (!in_array($align, ['left', 'center', 'right'], true)) {
+            $align = 'center';
+        }
+        $duration = (int)$this->post('autoplay_duration', 0);
+        $start = trim((string)$this->post('start_date', ''));
+        $end = trim((string)$this->post('end_date', ''));
+
+        return [
+            'title'             => $this->sanitize((string)$this->post('title', '')),
+            'subtitle'          => $this->sanitize((string)$this->post('subtitle', '')),
+            'description'       => $this->sanitize((string)$this->post('description', '')),
+            'button_text'       => $this->sanitize((string)$this->post('button_text', '')),
+            'button_link'       => $this->sanitizeUrl((string)$this->post('button_link', '')),
+            'button_text_2'     => $this->sanitize((string)$this->post('button_text_2', '')),
+            'button_link_2'     => $this->sanitizeUrl((string)$this->post('button_link_2', '')),
+            'overlay_opacity'   => min(1, max(0, (float)$this->post('overlay_opacity', 0.6))),
+            'text_align'        => $align,
+            'show_description'  => $this->post('show_description') ? 1 : 0,
+            'image_focus'       => $focus,
+            'content_style'     => $style,
+            'badge_text'        => $this->sanitize((string)$this->post('badge_text', '')) ?: null,
+            'autoplay_duration' => $duration >= 3 && $duration <= 20 ? $duration : null,
+            'transition_type'   => $transition,
+            'start_date'        => $this->normalizeDate($start),
+            'end_date'          => $this->normalizeDate($end),
+            'is_published'      => $this->post('is_published') ? 1 : 0,
+        ];
+    }
+
+    private function sanitizeUrl(string $url): string
+    {
+        $url = trim(strip_tags($url));
+        if ($url === '') {
+            return '';
+        }
+        if (preg_match('#^(https?:)?//#i', $url) || str_starts_with($url, '/')) {
+            return $url;
+        }
+        return '/' . ltrim($url, '/');
+    }
+
+    private function normalizeDate(string $value): ?string
+    {
+        if ($value === '') {
+            return null;
+        }
+        $value = str_replace('T', ' ', $value);
+        $ts = strtotime($value);
+        return $ts ? date('Y-m-d H:i:s', $ts) : null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, mixed>|null $existing
+     * @return array<string, mixed>
+     */
+    private function applyUploads(array $data, ?array $existing): array
+    {
+        if (!empty($_FILES['image']['name'])) {
+            if (!empty($existing['image'])) {
+                $this->deleteImageIfUnused((string)$existing['image'], isset($existing['id']) ? (int)$existing['id'] : null);
+            }
+            $data['image'] = Upload::image($_FILES['image'], 'sliders');
+        } elseif ($this->post('remove_image') && $existing) {
+            $this->deleteImageIfUnused((string)($existing['image'] ?? ''), (int)$existing['id']);
+            $data['image'] = null;
+        }
+
+        if (!empty($_FILES['mobile_image']['name'])) {
+            if (!empty($existing['mobile_image'])) {
+                $this->deleteImageIfUnused((string)$existing['mobile_image'], isset($existing['id']) ? (int)$existing['id'] : null);
+            }
+            $data['mobile_image'] = Upload::image($_FILES['mobile_image'], 'sliders');
+        } elseif ($this->post('remove_mobile_image') && $existing) {
+            $this->deleteImageIfUnused((string)($existing['mobile_image'] ?? ''), (int)$existing['id']);
+            $data['mobile_image'] = null;
+        }
+
+        return $data;
+    }
+
+    private function deleteImageIfUnused(string $path, ?int $exceptId = null): void
+    {
+        if ($path === '' || str_starts_with($path, 'http')) {
+            return;
+        }
+        if ($this->model->hasColumn('mobile_image') && $this->model->countUsingImage($path, $exceptId) > 0) {
+            return;
+        }
+        Upload::delete($path);
+    }
+
+    private function copyUpload(string $path): ?string
+    {
+        if ($path === '') {
+            return null;
+        }
+        if (str_starts_with($path, 'http')) {
+            return $path;
+        }
+        $src = ROOT_PATH . '/' . ltrim($path, '/');
+        if (!is_file($src)) {
+            return $path;
+        }
+        $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION) ?: 'jpg');
+        $ext = preg_replace('/[^a-z0-9]/', '', $ext) ?: 'jpg';
+        $destRel = 'uploads/sliders/' . uniqid('file_', true) . '.' . $ext;
+        $dest = ROOT_PATH . '/' . $destRel;
+        $dir = dirname($dest);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        copy($src, $dest);
+        return $destRel;
     }
 }

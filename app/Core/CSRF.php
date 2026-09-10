@@ -51,4 +51,13 @@ class CSRF
         }
         Session::set(self::TOKEN_KEY, bin2hex(random_bytes(32)));
     }
+
+    public static function checkApi(): bool
+    {
+        if (!self::verify()) {
+            return false;
+        }
+        Session::set(self::TOKEN_KEY, bin2hex(random_bytes(32)));
+        return true;
+    }
 }

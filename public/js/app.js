@@ -121,7 +121,8 @@ if (navbar) {
 })();
 
 // ─── Hero parallax (cinematic + legacy) ──────────────────────
-const heroParallaxImg = document.querySelector('.hq-hero__shot.is-active img, .hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
+const heroParallaxRoot = document.querySelector('#hero.hq-hero--carousel');
+const heroParallaxImg = heroParallaxRoot ? null : document.querySelector('.hq-hero__shot.is-active img, .hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
 if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   let ticking = false;
   window.addEventListener('scroll', () => {
@@ -148,6 +149,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
   const autoplay = hero.dataset.autoplay === '1' && !reduceMotion;
   const interval = parseInt(hero.dataset.interval || '6000', 10);
   const pauseOnHover = hero.dataset.pauseHover === '1';
+  const defaultTransition = hero.dataset.transition || 'kenburns';
 
   hero.style.setProperty('--hero-interval', `${interval}ms`);
 
@@ -164,8 +166,22 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
   let current = 0;
   let timer = null;
   let paused = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
 
   const pad = (n) => String(n + 1).padStart(2, '0');
+
+  const slideDuration = (index) => {
+    const pane = mediaPanes[index] || copyPanes[index];
+    const custom = parseInt(pane?.dataset.heroDuration || '0', 10);
+    return custom >= 3000 ? custom : interval;
+  };
+
+  const slideTransition = (index) => {
+    const pane = mediaPanes[index];
+    const value = pane?.dataset.heroTransition || defaultTransition;
+    return value === 'inherit' ? defaultTransition : value;
+  };
 
   const syncCopyHeight = () => {
     if (!copyWrap) return;
@@ -182,6 +198,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
       fill.style.animation = 'none';
       void fill.offsetWidth;
       if (dot.classList.contains('is-active') && autoplay && !paused) {
+        fill.style.animationDuration = `${slideDuration(current)}ms`;
         fill.style.animation = '';
       }
     });
@@ -189,6 +206,8 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
   const setSlide = (index) => {
     current = (index + count) % count;
+    hero.dataset.transition = slideTransition(current);
+    hero.style.setProperty('--hero-interval', `${slideDuration(current)}ms`);
     copyPanes.forEach((pane, i) => {
       const active = i === current;
       pane.classList.toggle('is-active', active);
@@ -213,7 +232,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
   const stop = () => {
     if (timer) {
-      clearInterval(timer);
+      clearTimeout(timer);
       timer = null;
     }
     resetDotProgress();
@@ -223,7 +242,10 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
     stop();
     if (!autoplay || paused) return;
     resetDotProgress();
-    timer = setInterval(() => setSlide(current + 1), interval);
+    timer = window.setTimeout(() => {
+      setSlide(current + 1);
+      start();
+    }, slideDuration(current));
   };
 
   dots.forEach((dot) => {
@@ -275,7 +297,9 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
     }
   });
   document.addEventListener('keydown', (event) => {
-    if (!hero.contains(document.activeElement)) return;
+    if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    const rect = hero.getBoundingClientRect();
+    if (rect.bottom < 80 || rect.top > window.innerHeight - 80) return;
     if (event.key === 'ArrowRight') {
       event.preventDefault();
       setSlide(current + 1);
@@ -286,6 +310,24 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
       start();
     }
   });
+
+  hero.addEventListener('touchstart', (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  hero.addEventListener('touchend', (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy)) return;
+    setSlide(current + (dx < 0 ? 1 : -1));
+    start();
+  }, { passive: true });
+
   setSlide(0);
   start();
 })();

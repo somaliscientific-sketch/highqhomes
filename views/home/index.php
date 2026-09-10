@@ -14,14 +14,40 @@ $aboutImg  = !empty($settings['home_about_image']) ? uploadUrl($settings['home_a
 $ctaImg    = !empty($settings['home_cta_image']) ? uploadUrl($settings['home_cta_image']) : 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80';
 
 if (empty($sliders)) {
-  $sliders = [[
-    'title' => 'We Build Spaces People Trust for Generations',
-    'subtitle' => 'Premium Construction & Architecture',
-    'description' => 'From blueprint to handover — disciplined planning, transparent timelines, and craftsmanship in every detail.',
-    'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
-    'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
-    'image' => 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80',
-  ]];
+  $sliders = [
+    [
+      'title' => 'Build Your Dream Home With HighQ Homes',
+      'subtitle' => 'Premium Construction & Architecture',
+      'description' => 'From blueprint to handover — disciplined planning, transparent timelines, and craftsmanship in every detail.',
+      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
+      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
+      'image' => 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80',
+    ],
+    [
+      'title' => 'Modern Architecture. Timeless Design.',
+      'subtitle' => 'Residential and commercial builds',
+      'description' => 'Spaces planned for how you live and work — refined, durable, and built to last.',
+      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
+      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
+      'image' => 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80',
+    ],
+    [
+      'title' => 'Built With Quality. Designed To Last.',
+      'subtitle' => 'Craftsmanship you can trust',
+      'description' => 'Materials, inspections, and finishes selected for long-term performance in local conditions.',
+      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
+      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
+      'image' => 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&q=80',
+    ],
+    [
+      'title' => 'Your Vision. Our Expertise.',
+      'subtitle' => 'From concept to handover',
+      'description' => 'One accountable team for design, construction, and finishing — with clear communication at every milestone.',
+      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
+      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
+      'image' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80',
+    ],
+  ];
 }
 
 $homeHref = static fn (string $link): string => str_starts_with($link, 'http') ? $link : url(ltrim($link, '/'));
@@ -284,6 +310,9 @@ $heroCarouselOpts = [
   'interval'    => max(3, min(15, (int)($settings['hero_carousel_interval'] ?? 6))),
   'dots'        => ($settings['hero_carousel_dots'] ?? '1') === '1',
   'pause_hover' => ($settings['hero_carousel_pause_hover'] ?? '1') === '1',
+  'transition'  => in_array(($settings['hero_carousel_transition'] ?? 'kenburns'), ['fade', 'slide', 'kenburns'], true)
+    ? ($settings['hero_carousel_transition'] ?? 'kenburns')
+    : 'kenburns',
 ];
 $heroMulti = count($sliders) > 1;
 $imageFocusMap = ['center' => 'center', 'top' => 'center top', 'bottom' => 'center bottom'];
@@ -314,6 +343,7 @@ $heroBandStats = array_map(static fn(array $stat): array => [
   data-interval="<?= (int)$heroCarouselOpts['interval'] * 1000 ?>"
   data-dots="<?= $heroCarouselOpts['dots'] ? '1' : '0' ?>"
   data-pause-hover="<?= $heroCarouselOpts['pause_hover'] ? '1' : '0' ?>"
+  data-transition="<?= e($heroCarouselOpts['transition']) ?>"
   aria-label="<?= e($siteName) ?> featured introduction"
   <?= $heroMulti ? 'aria-roledescription="carousel"' : '' ?>
 >
@@ -322,22 +352,43 @@ $heroBandStats = array_map(static fn(array $stat): array => [
       <?php foreach ($sliders as $i => $slide): ?>
       <?php
         $sImg = !empty($slide['image']) ? (str_starts_with($slide['image'], 'http') ? $slide['image'] : uploadUrl($slide['image'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
+        $sMobile = !empty($slide['mobile_image']) ? (str_starts_with($slide['mobile_image'], 'http') ? $slide['mobile_image'] : uploadUrl($slide['mobile_image'])) : '';
         $focus = $imageFocusMap[$slide['image_focus'] ?? 'center'] ?? 'center';
         $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
         $slideTitle = (string)($slide['title'] ?? $siteName);
+        $slideOverlay = min(0.4, max(0, (float)($slide['overlay_opacity'] ?? 0.6) * 0.45));
+        $slideTransition = in_array(($slide['transition_type'] ?? 'inherit'), ['fade', 'slide', 'kenburns'], true)
+          ? $slide['transition_type']
+          : $heroCarouselOpts['transition'];
+        $slideDuration = (int)($slide['autoplay_duration'] ?? 0);
+        if ($slideDuration < 3 || $slideDuration > 20) {
+          $slideDuration = (int)$heroCarouselOpts['interval'];
+        }
       ?>
-      <figure class="hq-hero__shot hq-hero__pane<?= $i === 0 ? ' is-active' : '' ?>" data-hero-pane aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>">
-        <img
-          src="<?= e($sImg) ?>"
-          alt="<?= e($slideTitle) ?>"
-          width="1920"
-          height="1080"
-          sizes="100vw"
-          loading="<?= $i === 0 ? 'eager' : 'lazy' ?>"
-          decoding="async"
-          fetchpriority="<?= $i === 0 ? 'high' : 'low' ?>"
-          style="object-position:<?= e($focus) ?>"
-        >
+      <figure
+        class="hq-hero__shot hq-hero__pane<?= $i === 0 ? ' is-active' : '' ?>"
+        data-hero-pane
+        data-hero-transition="<?= e($slideTransition) ?>"
+        data-hero-duration="<?= (int)$slideDuration * 1000 ?>"
+        aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
+      >
+        <picture>
+          <?php if ($sMobile !== ''): ?>
+          <source media="(max-width: 767px)" srcset="<?= e($sMobile) ?>">
+          <?php endif; ?>
+          <img
+            src="<?= e($sImg) ?>"
+            alt="<?= e($slideTitle) ?>"
+            width="1920"
+            height="1080"
+            sizes="100vw"
+            loading="<?= $i === 0 ? 'eager' : 'lazy' ?>"
+            decoding="async"
+            fetchpriority="<?= $i === 0 ? 'high' : 'low' ?>"
+            style="object-position:<?= e($focus) ?>"
+          >
+        </picture>
+        <span class="hq-hero__shot-dim" style="opacity:<?= e((string)$slideOverlay) ?>" aria-hidden="true"></span>
         <figcaption class="hq-hero__caption">
           <span class="hq-hero__caption-tag">Featured</span>
           <span class="hq-hero__caption-title"><?= e($badge) ?></span>
@@ -358,6 +409,10 @@ $heroBandStats = array_map(static fn(array $stat): array => [
           $style = $slide['content_style'] ?? 'standard';
           $showDesc = ($slide['show_description'] ?? 1) && !empty($slide['description']);
           $paneClass = 'hq-hero__pane' . ($style !== 'standard' ? ' hq-hero__pane--' . e($style) : '');
+          $align = $slide['text_align'] ?? 'center';
+          if (in_array($align, ['left', 'right'], true)) {
+            $paneClass .= ' hq-hero__pane--align-' . $align;
+          }
           $primaryHref = $homeHref($normalizeCta($slide['button_link'] ?? $quoteHref));
           $secondaryHref = $homeHref($normalizeCta($slide['button_link_2'] ?? '/projects'));
         ?>

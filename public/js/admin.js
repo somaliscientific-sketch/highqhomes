@@ -834,3 +834,69 @@ document.addEventListener('keydown', (event) => {
   });
 })();
 
+(function initHeroSlideSortable() {
+  const body = document.querySelector('[data-hero-sortable]');
+  const endpoint = body?.getAttribute('data-reorder-url');
+  if (!body || !endpoint) return;
+
+  const csrfInput = () => document.querySelector('input[name="_csrf_token"]');
+  const setCsrf = (token) => {
+    if (!token) return;
+    document.querySelectorAll('input[name="_csrf_token"]').forEach((input) => {
+      input.value = token;
+    });
+  };
+
+  let dragRow = null;
+
+  body.querySelectorAll('tr[data-hero-id]').forEach((row) => {
+    const handle = row.querySelector('[data-hero-handle]');
+    handle?.addEventListener('mousedown', () => {
+      row.setAttribute('draggable', 'true');
+    });
+    row.addEventListener('dragstart', (event) => {
+      dragRow = row;
+      row.classList.add('is-dragging');
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', row.dataset.heroId || '');
+    });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('is-dragging');
+      row.removeAttribute('draggable');
+      dragRow = null;
+      persist();
+    });
+  });
+
+  body.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    const over = event.target.closest('tr[data-hero-id]');
+    if (!over || !dragRow || over === dragRow) return;
+    const rect = over.getBoundingClientRect();
+    const before = event.clientY < rect.top + rect.height / 2;
+    body.insertBefore(dragRow, before ? over : over.nextSibling);
+  });
+
+  async function persist() {
+    const rows = [...body.querySelectorAll('tr[data-hero-id]')];
+    rows.forEach((row, index) => {
+      const badge = row.querySelector('[data-hero-order]');
+      if (badge) badge.textContent = String(index + 1);
+    });
+    const data = new FormData();
+    data.append('_csrf_token', csrfInput()?.value || '');
+    rows.forEach((row) => data.append('ids[]', row.dataset.heroId || ''));
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        body: data,
+        headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+      });
+      const json = await res.json();
+      if (json?.csrf) setCsrf(json.csrf);
+    } catch (err) {
+      window.location.reload();
+    }
+  }
+})();
+

@@ -38,11 +38,13 @@ $router->get('/admin/dashboard', 'Admin\DashboardController@index');
 $router->get('/admin/sliders', 'Admin\SlidersController@index');
 $router->get('/admin/sliders/create', 'Admin\SlidersController@create');
 $router->post('/admin/sliders/create', 'Admin\SlidersController@store');
+$router->post('/admin/sliders/reorder', 'Admin\SlidersController@reorder');
+$router->post('/admin/sliders/settings', 'Admin\SlidersController@updateSettings');
 $router->get('/admin/sliders/{id}/edit', 'Admin\SlidersController@edit');
 $router->post('/admin/sliders/{id}/edit', 'Admin\SlidersController@update');
 $router->post('/admin/sliders/{id}/delete', 'Admin\SlidersController@destroy');
 $router->post('/admin/sliders/{id}/toggle', 'Admin\SlidersController@toggle');
-$router->post('/admin/sliders/settings', 'Admin\SlidersController@updateSettings');
+$router->post('/admin/sliders/{id}/duplicate', 'Admin\SlidersController@duplicate');
 
 $router->get('/admin/services', 'Admin\ServicesController@index');
 $router->get('/admin/services/create', 'Admin\ServicesController@create');

@@ -77,9 +77,56 @@ class Upload
             throw new \RuntimeException('Failed to move uploaded file');
         }
 
+        self::optimizeImage($dest, $mime);
         self::writeHtaccess();
 
         return 'uploads/' . $folder . '/' . $filename;
+    }
+
+    private static function optimizeImage(string $path, string $mime): void
+    {
+        if (!function_exists('imagecreatetruecolor')) {
+            return;
+        }
+
+        $maxWidth = 1920;
+        $quality = 82;
+        $src = match ($mime) {
+            'image/jpeg', 'image/jpg' => @imagecreatefromjpeg($path),
+            'image/png'               => @imagecreatefrompng($path),
+            'image/webp'              => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : null,
+            default                   => null,
+        };
+        if (!$src) {
+            return;
+        }
+
+        $width = imagesx($src);
+        $height = imagesy($src);
+        if ($width < 1 || $height < 1) {
+            imagedestroy($src);
+            return;
+        }
+
+        if ($width > $maxWidth) {
+            $newHeight = (int)round($height * ($maxWidth / $width));
+            $canvas = imagecreatetruecolor($maxWidth, max(1, $newHeight));
+            if ($mime === 'image/png' || $mime === 'image/webp') {
+                imagealphablending($canvas, false);
+                imagesavealpha($canvas, true);
+            }
+            imagecopyresampled($canvas, $src, 0, 0, 0, 0, $maxWidth, $newHeight, $width, $height);
+            imagedestroy($src);
+            $src = $canvas;
+        }
+
+        match ($mime) {
+            'image/jpeg', 'image/jpg' => imagejpeg($src, $path, $quality),
+            'image/png'               => imagepng($src, $path, 6),
+            'image/webp'              => function_exists('imagewebp') ? imagewebp($src, $path, $quality) : null,
+            default                   => null,
+        };
+        imagedestroy($src);
     }
 
     public static function delete(string $url): void

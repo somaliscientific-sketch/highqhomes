@@ -49,7 +49,7 @@
     <div class="admin-nav-section">
       <p class="admin-nav-label sidebar-label">Website</p>
       <?php if (Auth::can('content.view') || Auth::can('content.manage')): ?>
-      <a href="<?= url('admin/sliders') ?>" class="admin-nav-link <?= active('/admin/sliders') ?>"><i class="bi bi-images"></i><span class="sidebar-label">Homepage Hero</span></a>
+      <a href="<?= url('admin/sliders') ?>" class="admin-nav-link <?= active('/admin/sliders') ?>"><i class="bi bi-images"></i><span class="sidebar-label">Hero Slider</span></a>
       <a href="<?= url('admin/services') ?>" class="admin-nav-link <?= active('/admin/services') ?>"><i class="bi bi-grid-3x3-gap"></i><span class="sidebar-label">Services</span></a>
       <a href="<?= url('admin/projects') ?>" class="admin-nav-link <?= active('/admin/projects') ?>"><i class="bi bi-building"></i><span class="sidebar-label">Projects</span></a>
       <a href="<?= url('admin/gallery') ?>" class="admin-nav-link <?= active('/admin/gallery') ?>"><i class="bi bi-image"></i><span class="sidebar-label">Gallery</span></a>
@@ -175,6 +175,7 @@
 </div>
 
 <script type="application/json" id="admin-command-extras"><?= json_encode([
+  ['label' => 'Edit hero slider', 'href' => url('admin/sliders'), 'group' => 'Content'],
   ['label' => 'Edit homepage sections', 'href' => url('admin/sections?page=home'), 'group' => 'Content'],
   ['label' => 'Edit about page sections', 'href' => url('admin/sections?page=about'), 'group' => 'Content'],
   ['label' => 'Edit services page sections', 'href' => url('admin/sections?page=services'), 'group' => 'Content'],

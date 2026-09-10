@@ -1138,6 +1138,47 @@ body.hq-menu-open {
   will-change: transform;
 }
 
+.hq-hero--cinematic .hq-hero__shot picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hq-hero--cinematic .hq-hero__shot-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #011024;
+  pointer-events: none;
+}
+
+.hq-hero--cinematic .hq-hero__caption { z-index: 2; }
+
+.hq-hero[data-transition="kenburns"] .hq-hero__shot.is-active img {
+  animation: hq-hero-kenburns 14s ease-out forwards;
+}
+
+.hq-hero[data-transition="slide"] .hq-hero__panes--media .hq-hero__pane {
+  transform: translateX(6%);
+}
+
+.hq-hero[data-transition="slide"] .hq-hero__panes--media .hq-hero__pane.is-active {
+  transform: translateX(0);
+}
+
+.hq-hero__pane--align-left { text-align: left; }
+.hq-hero__pane--align-right { text-align: right; }
+.hq-hero__pane--align-left .hq-hero__eyebrow,
+.hq-hero__pane--align-left .hq-hero__actions { justify-content: flex-start; }
+.hq-hero__pane--align-right .hq-hero__eyebrow,
+.hq-hero__pane--align-right .hq-hero__actions { justify-content: flex-end; }
+.hq-hero__pane--align-right .hq-hero__trust { justify-content: flex-end; }
+
+@keyframes hq-hero-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
 .hq-hero--cinematic .hq-hero__wash {
   position: absolute;
   inset: 0;
@@ -1687,7 +1728,7 @@ body.hq-menu-open {
   }
   .hq-hero--cinematic .hq-hero__pulse-dot,
   .hq-hero--cinematic .hq-hero__dot-fill { animation: none !important; }
-  .hq-hero--cinematic .hq-hero__shot img { transform: none !important; will-change: auto; }
+  .hq-hero--cinematic .hq-hero__shot img { transform: none !important; will-change: auto; animation: none !important; }
 }
 
 /* Legacy hero (fallback) */

@@ -181,20 +181,30 @@ CREATE TABLE IF NOT EXISTS `media` (
 
 -- ─── Sliders ───────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `sliders` (
-  `id`              INT UNSIGNED  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `title`           VARCHAR(200)  NOT NULL,
-  `subtitle`        VARCHAR(200)  DEFAULT NULL,
-  `description`     TEXT          DEFAULT NULL,
-  `button_text`     VARCHAR(80)   DEFAULT NULL,
-  `button_link`     VARCHAR(200)  DEFAULT NULL,
-  `button_text_2`   VARCHAR(80)   DEFAULT NULL,
-  `button_link_2`   VARCHAR(200)  DEFAULT NULL,
-  `image`           VARCHAR(400)  DEFAULT NULL,
-  `overlay_opacity` DECIMAL(3,2)  NOT NULL DEFAULT 0.60,
-  `text_align`      ENUM('left','center','right') NOT NULL DEFAULT 'center',
-  `is_published`    TINYINT(1)    NOT NULL DEFAULT 1,
-  `sort_order`      INT           NOT NULL DEFAULT 0,
-  `created_at`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `id`                INT UNSIGNED  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `title`             VARCHAR(200)  NOT NULL,
+  `subtitle`          VARCHAR(200)  DEFAULT NULL,
+  `description`       TEXT          DEFAULT NULL,
+  `button_text`       VARCHAR(80)   DEFAULT NULL,
+  `button_link`       VARCHAR(200)  DEFAULT NULL,
+  `button_text_2`     VARCHAR(80)   DEFAULT NULL,
+  `button_link_2`     VARCHAR(200)  DEFAULT NULL,
+  `image`             VARCHAR(400)  DEFAULT NULL,
+  `mobile_image`      VARCHAR(400)  DEFAULT NULL,
+  `overlay_opacity`   DECIMAL(3,2)  NOT NULL DEFAULT 0.60,
+  `text_align`        ENUM('left','center','right') NOT NULL DEFAULT 'center',
+  `show_description`  TINYINT(1)    NOT NULL DEFAULT 1,
+  `image_focus`       VARCHAR(20)   NOT NULL DEFAULT 'center',
+  `content_style`     VARCHAR(20)   NOT NULL DEFAULT 'standard',
+  `badge_text`        VARCHAR(80)   DEFAULT NULL,
+  `autoplay_duration` INT UNSIGNED  DEFAULT NULL,
+  `transition_type`   VARCHAR(20)   NOT NULL DEFAULT 'inherit',
+  `start_date`        DATETIME      DEFAULT NULL,
+  `end_date`          DATETIME      DEFAULT NULL,
+  `is_published`      TINYINT(1)    NOT NULL DEFAULT 1,
+  `sort_order`        INT           NOT NULL DEFAULT 0,
+  `created_at`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`        DATETIME      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT IGNORE INTO `sliders` (`id`,`title`,`subtitle`,`description`,`button_text`,`button_link`,`button_text_2`,`button_link_2`,`image`,`overlay_opacity`,`is_published`,`sort_order`) VALUES
