@@ -448,14 +448,6 @@ $heroBandStats = array_map(static fn(array $stat): array => [
       </div>
 
       <div class="hq-hero__chrome">
-        <div class="hq-hero__proof">
-        <span class="hq-hero__proof-icon" aria-hidden="true"><i class="bi bi-patch-check-fill"></i></span>
-        <div class="hq-hero__proof-text">
-          <strong><?= e(cmsText($heroSec, 'title', 'Trusted Builder')) ?></strong>
-          <span><?= e(cmsText($heroSec, 'subtitle', 'Since ' . ($settings['stat_awards'] ?? '2016'))) ?></span>
-        </div>
-      </div>
-
       <div class="hq-hero__trust">
         <?php
           $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-gem', 'bi-award', 'bi-patch-check'];
