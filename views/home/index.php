@@ -456,7 +456,10 @@ $heroBandStats = array_map(static fn(array $stat): array => [
             $tIcon = $trustIcons[$tIdx % count($trustIcons)];
             if ($tLabelText === '') continue;
         ?>
-        <div class="hq-hero__trust-item"><i class="bi <?= e($tIcon) ?>" aria-hidden="true"></i><span><?= e($tLabelText) ?></span></div>
+        <div class="hq-hero__trust-item">
+          <span class="hq-hero__trust-icon" aria-hidden="true"><i class="bi <?= e($tIcon) ?>"></i></span>
+          <span><?= e($tLabelText) ?></span>
+        </div>
         <?php endforeach; ?>
       </div>
 
