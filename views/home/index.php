@@ -291,10 +291,15 @@ $showCta          = cmsRowEnabled($cms, 'cta', ($settings['home_cta_enabled'] ??
 <!-- HERO -->
 <?php
 $heroParseTitle = static function (string $raw): array {
-  $words = preg_split('/\s+/', trim($raw)) ?: [$raw];
+  $words = preg_split('/\s+/u', trim($raw)) ?: [$raw];
+  $words = array_values(array_filter($words, static fn($w) => $w !== ''));
   if (count($words) >= 3) {
-    $accent = implode(' ', array_splice($words, -2));
-    return ['main' => implode(' ', $words), 'accent' => $accent];
+    $accentWords = array_splice($words, -2);
+    $glue = ['with', 'in', 'for', 'and', 'of', 'to', 'the', 'a', 'at', 'on', 'your'];
+    if ($words && in_array(strtolower((string) end($words)), $glue, true)) {
+      array_unshift($accentWords, (string) array_pop($words));
+    }
+    return ['main' => implode(' ', $words), 'accent' => implode(' ', $accentWords)];
   }
   if (count($words) === 2) {
     return ['main' => $words[0], 'accent' => $words[1]];
