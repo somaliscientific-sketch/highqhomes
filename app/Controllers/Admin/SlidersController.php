@@ -6,14 +6,14 @@ class AdminSlidersController extends Controller
     private const TRANSITIONS = ['inherit', 'fade', 'slide', 'kenburns'];
     private const GLOBAL_TRANSITIONS = ['fade', 'slide', 'kenburns'];
     private const EXAMPLE_TITLES = [
+        'A house you can walk at night.',
+        'The same street in daylight.',
         'Work you can inspect in Garowe.',
-        'Brickwork rising on the plot.',
-        'A house taking shape today.',
     ];
     private const EXAMPLE_SUBTITLES = [
-        'Active residential build',
-        'Masonry in progress',
-        'Two-storey structure',
+        'Finished residential build',
+        'Completed family home',
+        'Active structure on the plot',
     ];
 
     private SliderModel $model;
@@ -49,6 +49,7 @@ class AdminSlidersController extends Controller
             'button_text_2'    => $example['button_text_2'],
             'button_link_2'    => $example['button_link_2'],
             'image'            => $example['image'],
+            'video'            => $example['video'] ?? null,
             'badge_text'       => $example['badge_text'],
             'is_published'     => 1,
             'show_description' => 1,
@@ -148,6 +149,7 @@ class AdminSlidersController extends Controller
         if ($slider) {
             $this->deleteImageIfUnused((string)($slider['image'] ?? ''), (int)$slider['id']);
             $this->deleteImageIfUnused((string)($slider['mobile_image'] ?? ''), (int)$slider['id']);
+            $this->deleteImageIfUnused((string)($slider['video'] ?? ''), (int)$slider['id']);
             $this->model->delete((int)$params['id']);
             $this->audit('delete', 'sliders', 'Deleted hero slide "' . ($slider['title'] ?? '') . '"', 'slider', (int)$params['id']);
         }
@@ -184,6 +186,7 @@ class AdminSlidersController extends Controller
         $slider['sort_order'] = $this->model->nextSortOrder();
         $slider['image'] = $this->copyUpload((string)($slider['image'] ?? ''));
         $slider['mobile_image'] = $this->copyUpload((string)($slider['mobile_image'] ?? ''));
+        $slider['video'] = $this->copyUpload((string)($slider['video'] ?? ''));
 
         $id = $this->model->insert($this->model->onlyColumns($slider));
         $this->audit('create', 'sliders', 'Duplicated hero slide', 'slider', $id);
@@ -343,6 +346,16 @@ class AdminSlidersController extends Controller
         } elseif ($this->post('remove_mobile_image') && $existing) {
             $this->deleteImageIfUnused((string)($existing['mobile_image'] ?? ''), (int)$existing['id']);
             $data['mobile_image'] = null;
+        }
+
+        if (!empty($_FILES['video']['name'])) {
+            if (!empty($existing['video'])) {
+                $this->deleteImageIfUnused((string)$existing['video'], isset($existing['id']) ? (int)$existing['id'] : null);
+            }
+            $data['video'] = Upload::video($_FILES['video'], 'sliders');
+        } elseif ($this->post('remove_video') && $existing) {
+            $this->deleteImageIfUnused((string)($existing['video'] ?? ''), (int)$existing['id']);
+            $data['video'] = null;
         }
 
         return $data;

@@ -381,6 +381,7 @@ $heroBandStats = array_map(static fn(array $stat): array => [
       <?php foreach ($sliders as $i => $slide): ?>
       <?php
         $sImg = heroSlideImageUrl($slide, (int)$i);
+        $sVideo = heroSlideVideoUrl($slide);
         $sMobile = !empty($slide['mobile_image']) && !isStaleHeroSlideImage((string)$slide['mobile_image'])
           ? mediaPathUrl((string)$slide['mobile_image'])
           : '';
@@ -397,13 +398,27 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         }
       ?>
       <figure
-        class="hq-hero__shot hq-hero__pane<?= $i === 0 ? ' is-active' : '' ?>"
+        class="hq-hero__shot hq-hero__pane<?= $sVideo !== '' ? ' hq-hero__shot--video' : '' ?><?= $i === 0 ? ' is-active' : '' ?>"
         data-hero-pane
+        data-hero-media="<?= $sVideo !== '' ? 'video' : 'image' ?>"
         data-hero-transition="<?= e($slideTransition) ?>"
         data-hero-duration="<?= (int)$slideDuration * 1000 ?>"
         style="--hero-focus: <?= e($focus['desk']) ?>; --hero-focus-mobile: <?= e($focus['mobile']) ?>;"
         aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
       >
+        <?php if ($sVideo !== ''): ?>
+        <video
+          class="hq-hero__video"
+          poster="<?= e($sImg) ?>"
+          muted
+          loop
+          playsinline
+          preload="<?= $i === 0 ? 'auto' : 'metadata' ?>"
+          <?= $i === 0 ? 'autoplay' : '' ?>
+        >
+          <source src="<?= e($sVideo) ?>" type="video/mp4">
+        </video>
+        <?php else: ?>
         <picture>
           <?php if ($sMobile !== ''): ?>
           <source media="(max-width: 767px)" srcset="<?= e($sMobile) ?>">
@@ -419,9 +434,10 @@ $heroBandStats = array_map(static fn(array $stat): array => [
             fetchpriority="<?= $i === 0 ? 'high' : 'low' ?>"
           >
         </picture>
+        <?php endif; ?>
         <span class="hq-hero__shot-dim" style="opacity:<?= e((string)$slideOverlay) ?>" aria-hidden="true"></span>
         <figcaption class="hq-hero__caption">
-          <span class="hq-hero__caption-tag">Featured</span>
+          <span class="hq-hero__caption-tag"><?= $sVideo !== '' ? 'Video' : 'Featured' ?></span>
           <span class="hq-hero__caption-title"><?= e($badge) ?></span>
         </figcaption>
       </figure>

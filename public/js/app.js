@@ -186,6 +186,27 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
     return value === 'inherit' ? defaultTransition : value;
   };
 
+  const syncMedia = (index) => {
+    mediaPanes.forEach((pane, i) => {
+      const video = pane.querySelector('video');
+      if (!video) return;
+      if (i === index) {
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {});
+        }
+      } else {
+        video.pause();
+        try {
+          video.currentTime = 0;
+        } catch (err) {
+          /* ignore */
+        }
+      }
+    });
+  };
+
   const syncCopyHeight = () => {
     if (!copyWrap) return;
     const active = copyWrap.querySelector('.hq-hero__pane.is-active');
@@ -227,6 +248,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
       dot.setAttribute('aria-selected', active ? 'true' : 'false');
     });
     if (counterEl) counterEl.textContent = pad(current);
+    syncMedia(current);
     window.requestAnimationFrame(() => {
       syncCopyHeight();
       resetDotProgress();
@@ -294,8 +316,10 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
     if (document.hidden) {
       paused = true;
       stop();
+      mediaPanes.forEach((pane) => pane.querySelector('video')?.pause());
     } else {
       paused = false;
+      syncMedia(current);
       start();
     }
   });

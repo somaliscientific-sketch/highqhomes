@@ -191,6 +191,7 @@ CREATE TABLE IF NOT EXISTS `sliders` (
   `button_link_2`     VARCHAR(200)  DEFAULT NULL,
   `image`             VARCHAR(400)  DEFAULT NULL,
   `mobile_image`      VARCHAR(400)  DEFAULT NULL,
+  `video`             VARCHAR(400)  DEFAULT NULL,
   `overlay_opacity`   DECIMAL(3,2)  NOT NULL DEFAULT 0.60,
   `text_align`        ENUM('left','center','right') NOT NULL DEFAULT 'center',
   `show_description`  TINYINT(1)    NOT NULL DEFAULT 1,

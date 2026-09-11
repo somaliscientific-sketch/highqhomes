@@ -23,6 +23,7 @@ class SliderModel extends Model
             'content_style'     => "ADD COLUMN `content_style` VARCHAR(20) NOT NULL DEFAULT 'standard'",
             'badge_text'        => "ADD COLUMN `badge_text` VARCHAR(80) DEFAULT NULL",
             'mobile_image'      => "ADD COLUMN `mobile_image` VARCHAR(400) DEFAULT NULL",
+            'video'             => "ADD COLUMN `video` VARCHAR(400) DEFAULT NULL AFTER `mobile_image`",
             'autoplay_duration' => "ADD COLUMN `autoplay_duration` INT UNSIGNED DEFAULT NULL",
             'transition_type'   => "ADD COLUMN `transition_type` VARCHAR(20) NOT NULL DEFAULT 'inherit'",
             'start_date'        => "ADD COLUMN `start_date` DATETIME DEFAULT NULL",
@@ -83,7 +84,7 @@ class SliderModel extends Model
     {
         $catalog = heroSliderCatalog();
         $rows = $this->db->query('SELECT * FROM `sliders` ORDER BY `sort_order` ASC, `id` ASC')->fetchAll();
-        $version = 'site-video-8';
+        $version = 'homes-media-8';
         $current = '';
         try {
             $stmt = $this->db->prepare('SELECT `value` FROM `settings` WHERE `key` = ?');
@@ -184,13 +185,17 @@ class SliderModel extends Model
         if ($path === '') {
             return 0;
         }
+        $clauses = ['`image` = ?'];
+        $params = [$path];
         if ($this->hasColumn('mobile_image')) {
-            $sql = 'SELECT COUNT(*) FROM `sliders` WHERE (`image` = ? OR `mobile_image` = ?)';
-            $params = [$path, $path];
-        } else {
-            $sql = 'SELECT COUNT(*) FROM `sliders` WHERE `image` = ?';
-            $params = [$path];
+            $clauses[] = '`mobile_image` = ?';
+            $params[] = $path;
         }
+        if ($this->hasColumn('video')) {
+            $clauses[] = '`video` = ?';
+            $params[] = $path;
+        }
+        $sql = 'SELECT COUNT(*) FROM `sliders` WHERE (' . implode(' OR ', $clauses) . ')';
         if ($exceptId !== null) {
             $sql .= ' AND `id` <> ?';
             $params[] = $exceptId;

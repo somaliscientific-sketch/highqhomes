@@ -169,6 +169,22 @@ document.querySelectorAll('[data-preview-target]').forEach((input) => {
   });
 });
 
+document.querySelectorAll('[data-preview-video]').forEach((input) => {
+  input.addEventListener('change', () => {
+    const file = input.files?.[0];
+    if (!file || !file.type.startsWith('video/')) return;
+    const preview = document.getElementById(input.dataset.previewVideo || '');
+    const placeholder = document.getElementById(input.dataset.previewPlaceholder || '');
+    if (preview) {
+      preview.src = URL.createObjectURL(file);
+      preview.classList.remove('is-hidden');
+      preview.muted = true;
+      preview.play()?.catch(() => {});
+    }
+    placeholder?.classList.add('is-hidden');
+  });
+});
+
 const sliderForm = document.querySelector('[data-slider-form]');
 if (sliderForm) {
   const preview = sliderForm.querySelector('[data-slider-preview]');

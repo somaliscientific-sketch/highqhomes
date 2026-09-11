@@ -4,6 +4,7 @@ $pageTitle = $isEdit ? 'Edit hero slide' : 'Add hero slide';
 $slot = (int)($slider['id'] ?? 0);
 $imgSrc = !empty($slider['image']) ? mediaPathUrl((string)$slider['image']) : '';
 $mobileSrc = !empty($slider['mobile_image']) ? mediaPathUrl((string)$slider['mobile_image']) : '';
+$videoSrc = !empty($slider['video']) ? mediaPathUrl((string)$slider['video']) : '';
 $toLocal = static function (?string $value): string {
     if (!$value) {
         return '';

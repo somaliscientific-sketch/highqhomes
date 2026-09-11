@@ -31,6 +31,11 @@ class Upload
         return self::store($file, $folder, $allowed);
     }
 
+    public static function video(array $file, string $folder = 'sliders'): string
+    {
+        return self::store($file, $folder, self::$videoTypes);
+    }
+
     public static function mime(array $file): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);

@@ -30,7 +30,7 @@ $slideState = static function (array $slide) use ($now): string {
     <div class="admin-hero-manager__intro">
       <span class="admin-report-kicker">Website content</span>
       <h2>Hero Slider</h2>
-      <p>The homepage hero uses three Garowe project photos. Edit copy, replace an image, reorder, or add another slide — published slides appear on the public site in this order.</p>
+      <p>The homepage hero can mix photos and muted video. Published slides appear on the public site in this order — upload an image, a short MP4, or both (image is the poster).</p>
     </div>
     <div class="admin-hero-manager__stats">
       <div class="admin-hero-stat">
@@ -178,6 +178,9 @@ $slideState = static function (array $slide) use ($now): string {
               <img src="<?= e($img) ?>" alt="">
               <?php else: ?>
               <i class="bi bi-image" aria-hidden="true"></i>
+              <?php endif; ?>
+              <?php if (!empty($slide['video'])): ?>
+              <i class="bi bi-play-circle-fill admin-hero-thumb__video" aria-hidden="true"></i>
               <?php endif; ?>
             </span>
           </td>

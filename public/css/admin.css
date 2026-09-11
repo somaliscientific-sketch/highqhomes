@@ -6630,6 +6630,7 @@ body.admin-sidebar-collapsed .admin-sidebar-search { display: none; }
 .admin-hero-drag:active { cursor: grabbing; }
 .admin-hero-thumb {
   display: block;
+  position: relative;
   width: 72px;
   height: 46px;
   overflow: hidden;
@@ -6642,6 +6643,16 @@ body.admin-sidebar-collapsed .admin-sidebar-search { display: none; }
   height: 100%;
   object-fit: cover;
   display: block;
+}
+.admin-hero-thumb__video {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: auto !important;
+  height: auto !important;
+  font-size: 0.95rem !important;
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
 }
 .admin-hero-thumb i {
   display: flex;

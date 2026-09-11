@@ -6,6 +6,7 @@ $slot = (int)($slider['id'] ?? 0);
 $formId = 'hero-form-' . ($slot ?: 'new');
 $imgSrc = $imgSrc ?? '';
 $mobileSrc = $mobileSrc ?? '';
+$videoSrc = $videoSrc ?? '';
 $toLocal = $toLocal ?? static fn (?string $value): string => '';
 ?>
 
@@ -60,12 +61,12 @@ $toLocal = $toLocal ?? static fn (?string $value): string => '';
 
       <div class="admin-card admin-hero-section-card">
         <div class="admin-card-header admin-hero-section-card__header">
-          <h4 class="admin-card-title"><i class="bi bi-image"></i> Images</h4>
+          <h4 class="admin-card-title"><i class="bi bi-image"></i> Image &amp; video</h4>
         </div>
         <div class="admin-card-body admin-stack">
           <div class="admin-form-group">
             <label class="admin-label">Desktop image</label>
-            <p class="admin-table-desc">JPG, PNG or WebP · recommended 1920×1080 · max <?= (int)(UPLOAD_MAX_SIZE / 1048576) ?>MB. Images are compressed on upload.</p>
+            <p class="admin-table-desc">JPG, PNG or WebP · recommended 1920×1080 · max <?= (int)(UPLOAD_MAX_SIZE / 1048576) ?>MB. Used as the photo, or as the poster if you add a video.</p>
             <label class="admin-image-zone admin-slider-upload admin-hero-upload" for="slider-image-file">
               <img id="slider-img-preview" src="<?= e($imgSrc) ?>" alt="" class="admin-image-preview<?= $imgSrc ? '' : ' is-hidden' ?>">
               <span id="slider-img-placeholder" class="admin-hero-upload__placeholder<?= $imgSrc ? ' is-hidden' : '' ?>">
@@ -78,7 +79,7 @@ $toLocal = $toLocal ?? static fn (?string $value): string => '';
             <?php if ($imgSrc): ?>
             <label class="admin-hero-remove"><input type="checkbox" name="remove_image" value="1"> Remove unused desktop image</label>
             <?php endif; ?>
-            <?php $libraryPhotos = heroSliderCatalog(); $currentImage = (string)($slider['image'] ?? ''); ?>
+            <?php $libraryPhotos = array_values(array_filter(heroSliderCatalog(), static fn(array $photo): bool => !empty($photo['image']))); $currentImage = (string)($slider['image'] ?? ''); ?>
             <p class="admin-label" style="margin-top:1rem">Or use a Garowe site photo</p>
             <div class="admin-hero-library" role="group" aria-label="Site photos">
               <?php foreach ($libraryPhotos as $photo): ?>
@@ -89,6 +90,23 @@ $toLocal = $toLocal ?? static fn (?string $value): string => '';
               </label>
               <?php endforeach; ?>
             </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label class="admin-label">Hero video <span class="admin-label-optional">(optional)</span></label>
+            <p class="admin-table-desc">MP4 or WebM · muted looping background · max <?= (int)(UPLOAD_MAX_SIZE / 1048576) ?>MB. The desktop image is the poster while the clip loads.</p>
+            <label class="admin-image-zone admin-slider-upload admin-hero-upload" for="slider-video-file">
+              <video id="slider-video-preview" class="admin-image-preview<?= $videoSrc ? '' : ' is-hidden' ?>" src="<?= e($videoSrc) ?>" muted loop playsinline></video>
+              <span id="slider-video-placeholder" class="admin-hero-upload__placeholder<?= $videoSrc ? ' is-hidden' : '' ?>">
+                <i class="bi bi-camera-video"></i>
+                <strong>Upload hero video</strong>
+                <span>MP4 recommended · short clip</span>
+              </span>
+            </label>
+            <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime" class="admin-file-input" id="slider-video-file" data-preview-video="slider-video-preview" data-preview-placeholder="slider-video-placeholder">
+            <?php if ($videoSrc): ?>
+            <label class="admin-hero-remove"><input type="checkbox" name="remove_video" value="1"> Remove video (keep the photo)</label>
+            <?php endif; ?>
           </div>
 
           <div class="admin-form-group">

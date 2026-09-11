@@ -470,7 +470,7 @@ function isStaleGalleryImage(?string $image): bool
 }
 
 /**
- * Eight on-site frames from the current Garowe build video for the homepage hero.
+ * Eight homepage hero slides: seven site photos plus the on-plot video.
  *
  * @return list<array<string, mixed>>
  */
@@ -481,68 +481,76 @@ function heroSliderCatalog(): array
         'button_link' => '/contact',
         'button_text_2' => 'View our work',
         'button_link_2' => '/projects',
-        'image_focus' => 'right',
+        'image_focus' => 'center',
         'overlay_opacity' => 0.48,
         'is_published' => 1,
         'show_description' => 1,
+        'transition_type' => 'inherit',
+        'video' => null,
     ];
 
     $slides = [
         [
             'title' => 'Work you can inspect in Garowe.',
-            'subtitle' => 'Active residential build',
-            'description' => 'Shot on a HighQ Homes plot — brickwork and openings going up under a Garowe sky, not a stock library.',
-            'image' => 'images/builds/hero-site-01.jpg',
-            'badge_text' => 'Garowe · Active build',
+            'subtitle' => 'Active structure on the plot',
+            'description' => 'On-site video of brickwork and openings going up — honest progress before paint and fittings.',
+            'image' => 'images/builds/hero-site-poster.jpg',
+            'video' => 'images/builds/hero-site-reel.mp4',
+            'badge_text' => 'Garowe · On-site video',
+            'image_focus' => 'right',
+            'autoplay_duration' => 8,
+            'transition_type' => 'fade',
         ],
         [
-            'title' => 'Brickwork rising on the plot.',
-            'subtitle' => 'Masonry in progress',
-            'description' => 'The structure you can walk before paint and fittings. One team from drawings to handover.',
-            'image' => 'images/builds/hero-site-02.jpg',
-            'badge_text' => 'Garowe · Masonry',
+            'title' => 'A house you can walk at night.',
+            'subtitle' => 'Finished residential build',
+            'description' => 'Warm balcony light on a completed HighQ Homes street front — visit the work before you decide.',
+            'image' => 'images/builds/hero-night-front.jpg',
+            'badge_text' => 'Garowe · Night',
+            'image_focus' => 'center',
         ],
         [
-            'title' => 'A house taking shape today.',
-            'subtitle' => 'Two-storey structure',
-            'description' => 'Two-storey brickwork in progress — the same street, the same crew, progress you can see.',
-            'image' => 'images/builds/hero-site-03.jpg',
-            'badge_text' => 'Garowe · Structure',
+            'title' => 'The same street in daylight.',
+            'subtitle' => 'Completed family home',
+            'description' => 'Gate, balcony, and finish you can inspect on the plot — not a stock library.',
+            'image' => 'images/builds/hero-amber-villa.jpg',
+            'badge_text' => 'Garowe · Street villa',
         ],
         [
-            'title' => 'See the walls before the paint.',
-            'subtitle' => 'On-site progress',
-            'description' => 'Visit the plot. Check the masonry. Decide from the work itself.',
-            'image' => 'images/builds/hero-site-04.jpg',
-            'badge_text' => 'Garowe · On site',
+            'title' => 'A compound that reads as one home.',
+            'subtitle' => 'Residential compound',
+            'description' => 'Stone wall, courtyard, and a house planned for the plot and the climate.',
+            'image' => 'images/builds/hero-stone-home.jpg',
+            'badge_text' => 'Garowe · Compound',
         ],
         [
-            'title' => 'Built on this street, not stock.',
-            'subtitle' => 'Garowe construction',
-            'description' => 'Residential construction photographed on the job — honest progress, local accountability.',
-            'image' => 'images/builds/hero-site-05.jpg',
-            'badge_text' => 'Garowe · Construction',
+            'title' => 'Built for the plot and the climate.',
+            'subtitle' => 'Family residence',
+            'description' => 'A cream two-storey home with a walled yard — photographed on a HighQ Homes street.',
+            'image' => 'images/builds/hero-cream-house.jpg',
+            'badge_text' => 'Garowe · Residence',
         ],
         [
-            'title' => 'Openings, masonry, and clear progress.',
-            'subtitle' => 'Residential brickwork',
-            'description' => 'Window openings and brick elevations you can inspect before the finish goes on.',
-            'image' => 'images/builds/hero-site-06.jpg',
-            'badge_text' => 'Garowe · Brickwork',
-        ],
-        [
-            'title' => 'The same plot, a closer look.',
-            'subtitle' => 'Current project',
-            'description' => 'A closer pass along the elevation — structure first, finish when the shell is right.',
-            'image' => 'images/builds/hero-site-07.jpg',
+            'title' => 'Clean lines. A finish you can see.',
+            'subtitle' => 'Modern villa elevation',
+            'description' => 'A composed street elevation with a courtyard wall — one team from drawings to the gate.',
+            'image' => 'images/builds/hero-courtyard-villa.jpg',
             'badge_text' => 'Garowe · Elevation',
+            'image_focus' => 'bottom',
         ],
         [
-            'title' => 'From the ground up in Garowe.',
-            'subtitle' => 'Structure before finish',
-            'description' => 'From blockwork to a home you can walk. Get a quote while the crew is on the plot.',
-            'image' => 'images/builds/hero-site-08.jpg',
-            'badge_text' => 'Garowe · Ground up',
+            'title' => 'Progress you can walk on site.',
+            'subtitle' => 'Residential build in progress',
+            'description' => 'Roof, openings, and finishing underway — the crew on the plot, not a sales desk.',
+            'image' => 'images/builds/hero-green-roof.jpg',
+            'badge_text' => 'Garowe · In progress',
+        ],
+        [
+            'title' => 'Two homes, one standard.',
+            'subtitle' => 'Paired family residences',
+            'description' => 'Twin street frontage with a shared compound — the same craft on both plots.',
+            'image' => 'images/builds/hero-twin-homes.jpg',
+            'badge_text' => 'Garowe · Twin homes',
         ],
     ];
 
@@ -558,13 +566,22 @@ function isStaleHeroSlideImage(?string $image): bool
 function heroSlideImageUrl(array $slide, int $index = 0): string
 {
     $catalog = heroSliderCatalog();
-    $fallbackPath = $catalog[$index % count($catalog)]['image'] ?? 'images/builds/hero-site-01.jpg';
+    $fallbackPath = $catalog[$index % count($catalog)]['image'] ?? 'images/builds/hero-night-front.jpg';
     $fallback = asset($fallbackPath);
     $image = trim((string)($slide['image'] ?? ''));
     if (isStaleHeroSlideImage($image)) {
         return $fallback;
     }
     return mediaPathUrl($image, $fallback);
+}
+
+function heroSlideVideoUrl(array $slide): string
+{
+    $video = trim((string)($slide['video'] ?? ''));
+    if ($video === '') {
+        return '';
+    }
+    return mediaPathUrl($video);
 }
 
 /**
@@ -574,14 +591,15 @@ function heroSlideFocus(array $slide, int $index = 0): array
 {
     $image = strtolower((string)($slide['image'] ?? ''));
     $framed = [
+        'hero-night-front' => ['desk' => '50% 42%', 'mobile' => '50% 38%'],
+        'hero-amber-villa' => ['desk' => '46% 48%', 'mobile' => '48% 42%'],
+        'hero-stone-home' => ['desk' => '48% 58%', 'mobile' => '50% 52%'],
+        'hero-cream-house' => ['desk' => '42% 46%', 'mobile' => '48% 42%'],
+        'hero-courtyard-villa' => ['desk' => '50% 72%', 'mobile' => '50% 68%'],
+        'hero-green-roof' => ['desk' => '48% 52%', 'mobile' => '50% 48%'],
+        'hero-twin-homes' => ['desk' => '50% 55%', 'mobile' => '50% 48%'],
+        'hero-site-poster' => ['desk' => '78% 44%', 'mobile' => '72% 40%'],
         'hero-site-01' => ['desk' => '82% 48%', 'mobile' => '78% 40%'],
-        'hero-site-02' => ['desk' => '80% 46%', 'mobile' => '76% 40%'],
-        'hero-site-03' => ['desk' => '78% 44%', 'mobile' => '74% 40%'],
-        'hero-site-04' => ['desk' => '76% 42%', 'mobile' => '72% 38%'],
-        'hero-site-05' => ['desk' => '72% 42%', 'mobile' => '68% 38%'],
-        'hero-site-06' => ['desk' => '68% 40%', 'mobile' => '64% 36%'],
-        'hero-site-07' => ['desk' => '62% 38%', 'mobile' => '58% 36%'],
-        'hero-site-08' => ['desk' => '48% 38%', 'mobile' => '50% 34%'],
         'hero-street-villa' => ['desk' => '76% 54%', 'mobile' => '50% 42%'],
         'hero-night-villa' => ['desk' => '62% 32%', 'mobile' => '54% 28%'],
         'hero-compound-villa' => ['desk' => '68% 40%', 'mobile' => '50% 36%'],
@@ -630,6 +648,14 @@ function isStaleHeroSlideCopy(string $title): bool
         'a house you can walk in garowe.',
         'the same craft, after dark.',
         'a compound that reads as one home.',
+        'work you can inspect in garowe.',
+        'brickwork rising on the plot.',
+        'a house taking shape today.',
+        'see the walls before the paint.',
+        'built on this street, not stock.',
+        'openings, masonry, and clear progress.',
+        'the same plot, a closer look.',
+        'from the ground up in garowe.',
     ];
     return in_array($title, $stale, true);
 }
