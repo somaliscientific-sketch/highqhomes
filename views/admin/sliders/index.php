@@ -7,7 +7,7 @@ $slideImg = static function (?string $path): string {
     if ($path === '') {
         return '';
     }
-    return str_starts_with($path, 'http') ? $path : uploadUrl($path);
+    return $path === '' ? '' : mediaPathUrl($path);
 };
 $slideState = static function (array $slide) use ($now): string {
     if (empty($slide['is_published'])) {
@@ -30,7 +30,7 @@ $slideState = static function (array $slide) use ($now): string {
     <div class="admin-hero-manager__intro">
       <span class="admin-report-kicker">Website content</span>
       <h2>Hero Slider</h2>
-      <p>Add, edit, reorder, and publish homepage slides. The public site shows only active slides, in this order.</p>
+      <p>The homepage hero uses three Garowe project photos. Edit copy, replace an image, reorder, or add another slide — published slides appear on the public site in this order.</p>
     </div>
     <div class="admin-hero-manager__stats">
       <div class="admin-hero-stat">

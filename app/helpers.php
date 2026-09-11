@@ -470,6 +470,95 @@ function isStaleGalleryImage(?string $image): bool
 }
 
 /**
+ * Three Garowe project photos for the homepage hero.
+ *
+ * @return list<array<string, mixed>>
+ */
+function heroSliderCatalog(): array
+{
+    return [
+        [
+            'title' => 'A house you can walk in Garowe.',
+            'subtitle' => 'Finished residential build',
+            'description' => 'Photographed on a HighQ Homes street — not a stock library. One team from drawings to the gate.',
+            'button_text' => 'Get a quote',
+            'button_link' => '/contact',
+            'button_text_2' => 'View our work',
+            'button_link_2' => '/projects',
+            'image' => 'images/builds/hero-street-villa.jpg',
+            'badge_text' => 'Garowe · Street villa',
+            'image_focus' => 'center',
+            'overlay_opacity' => 0.55,
+            'is_published' => 1,
+            'show_description' => 1,
+        ],
+        [
+            'title' => 'The same craft, after dark.',
+            'subtitle' => 'Completed family home',
+            'description' => 'Warm light on a finished HighQ Homes residence. Visit the work before you decide.',
+            'button_text' => 'Get a quote',
+            'button_link' => '/contact',
+            'button_text_2' => 'View our work',
+            'button_link_2' => '/projects',
+            'image' => 'images/builds/hero-night-villa.jpg',
+            'badge_text' => 'Garowe · Night',
+            'image_focus' => 'center',
+            'overlay_opacity' => 0.5,
+            'is_published' => 1,
+            'show_description' => 1,
+        ],
+        [
+            'title' => 'A compound that reads as one home.',
+            'subtitle' => 'Residential compound',
+            'description' => 'Planned for the plot, the climate, and daily family use — with a finish you can inspect.',
+            'button_text' => 'Get a quote',
+            'button_link' => '/contact',
+            'button_text_2' => 'View our work',
+            'button_link_2' => '/projects',
+            'image' => 'images/builds/hero-compound-villa.jpg',
+            'badge_text' => 'Garowe · Compound',
+            'image_focus' => 'center',
+            'overlay_opacity' => 0.55,
+            'is_published' => 1,
+            'show_description' => 1,
+        ],
+    ];
+}
+
+function isStaleHeroSlideImage(?string $image): bool
+{
+    $image = trim((string)$image);
+    return $image === '' || str_contains($image, 'unsplash.com');
+}
+
+function heroSlideImageUrl(array $slide, int $index = 0): string
+{
+    $catalog = heroSliderCatalog();
+    $fallbackPath = $catalog[$index % count($catalog)]['image'] ?? 'images/builds/hero-street-villa.jpg';
+    $fallback = asset($fallbackPath);
+    $image = trim((string)($slide['image'] ?? ''));
+    if (isStaleHeroSlideImage($image)) {
+        return $fallback;
+    }
+    return mediaPathUrl($image, $fallback);
+}
+
+function isStaleHeroSlideCopy(string $title): bool
+{
+    $title = strtolower(trim($title));
+    $stale = [
+        'build your dream home with highq homes',
+        'modern architecture. timeless design.',
+        'built with quality. designed to last.',
+        'your vision. our expertise.',
+        'innovative homes built for garowe',
+        'quality that lasts',
+        'built with integrity',
+    ];
+    return in_array($title, $stale, true);
+}
+
+/**
  * On-site HighQ Homes photos used when the gallery table is empty or still stock.
  *
  * @return list<array<string, mixed>>

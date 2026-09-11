@@ -78,6 +78,17 @@ $toLocal = $toLocal ?? static fn (?string $value): string => '';
             <?php if ($imgSrc): ?>
             <label class="admin-hero-remove"><input type="checkbox" name="remove_image" value="1"> Remove unused desktop image</label>
             <?php endif; ?>
+            <?php $libraryPhotos = heroSliderCatalog(); $currentImage = (string)($slider['image'] ?? ''); ?>
+            <p class="admin-label" style="margin-top:1rem">Or use a Garowe site photo</p>
+            <div class="admin-hero-library" role="group" aria-label="Site photos">
+              <?php foreach ($libraryPhotos as $photo): ?>
+              <label class="admin-hero-library__item">
+                <input type="radio" name="library_image" value="<?= e($photo['image']) ?>" <?= $currentImage === $photo['image'] ? 'checked' : '' ?>>
+                <img src="<?= e(asset($photo['image'])) ?>" alt="<?= e($photo['badge_text'] ?? $photo['title']) ?>">
+                <span><?= e($photo['badge_text'] ?? 'Site photo') ?></span>
+              </label>
+              <?php endforeach; ?>
+            </div>
           </div>
 
           <div class="admin-form-group">

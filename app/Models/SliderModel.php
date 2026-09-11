@@ -61,6 +61,90 @@ class SliderModel extends Model
         self::$schemaReady = true;
     }
 
+    public function ensureShowcase(): void
+    {
+        static $ready = false;
+        if ($ready) {
+            return;
+        }
+        $ready = true;
+        $this->ensureSchema();
+
+        try {
+            $this->syncShowcaseSlides();
+        } catch (\Throwable $e) {
+            if (class_exists('Production')) {
+                Production::log('Hero slides: ' . $e->getMessage());
+            }
+        }
+    }
+
+    private function syncShowcaseSlides(): void
+    {
+        $catalog = heroSliderCatalog();
+        $rows = $this->db->query('SELECT * FROM `sliders` ORDER BY `sort_order` ASC, `id` ASC')->fetchAll();
+
+        if ($rows === []) {
+            foreach ($catalog as $i => $slide) {
+                $slide['sort_order'] = $i;
+                $this->insert($this->onlyColumns($slide));
+            }
+            return;
+        }
+
+        $customKept = 0;
+        foreach ($rows as $row) {
+            if (!isStaleHeroSlideImage((string)($row['image'] ?? ''))) {
+                $customKept++;
+            }
+        }
+
+        if ($customKept === 0) {
+            foreach ($catalog as $i => $slide) {
+                $slide['sort_order'] = $i;
+                if (isset($rows[$i])) {
+                    $existing = $rows[$i];
+                    $payload = [
+                        'image' => $slide['image'],
+                        'sort_order' => $i,
+                        'is_published' => 1,
+                    ];
+                    if (isStaleHeroSlideCopy((string)($existing['title'] ?? ''))) {
+                        $payload = array_merge($payload, [
+                            'title' => $slide['title'],
+                            'subtitle' => $slide['subtitle'],
+                            'description' => $slide['description'],
+                            'button_text' => $slide['button_text'],
+                            'button_link' => $slide['button_link'],
+                            'button_text_2' => $slide['button_text_2'],
+                            'button_link_2' => $slide['button_link_2'],
+                            'badge_text' => $slide['badge_text'],
+                            'overlay_opacity' => $slide['overlay_opacity'],
+                            'image_focus' => $slide['image_focus'],
+                        ]);
+                    }
+                    $this->update((int)$existing['id'], $this->onlyColumns($payload));
+                } else {
+                    $this->insert($this->onlyColumns($slide));
+                }
+            }
+            for ($i = count($catalog); $i < count($rows); $i++) {
+                $this->update((int)$rows[$i]['id'], $this->onlyColumns([
+                    'is_published' => 0,
+                    'sort_order' => $i,
+                ]));
+            }
+            return;
+        }
+
+        foreach ($rows as $i => $row) {
+            if (isStaleHeroSlideImage((string)($row['image'] ?? ''))) {
+                $fallback = $catalog[$i % count($catalog)]['image'];
+                $this->update((int)$row['id'], $this->onlyColumns(['image' => $fallback]));
+            }
+        }
+    }
+
     public function hasColumn(string $name): bool
     {
         return in_array($name, $this->columnNames(), true);

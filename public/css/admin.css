@@ -4359,6 +4359,52 @@ body.admin-nav-open { overflow: hidden; }
   color: var(--admin-muted);
 }
 
+.admin-hero-library {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.admin-hero-library__item {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.admin-hero-library__item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-hero-library__item img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  display: block;
+}
+
+.admin-hero-library__item span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--admin-muted);
+}
+
+.admin-hero-library__item:has(input:checked) img,
+.admin-hero-library__item:has(input:focus-visible) img {
+  border-color: var(--admin-gold);
+  box-shadow: 0 0 0 3px rgba(232, 139, 9, 0.18);
+}
+
+@media (max-width: 720px) {
+  .admin-hero-library {
+    grid-template-columns: 1fr;
+  }
+}
+
 .admin-hero-preview-card .admin-slider-preview {
   border-radius: 12px;
   overflow: hidden;

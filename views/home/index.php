@@ -14,41 +14,12 @@ $aboutImgDefault = asset('images/builds/about-residence.jpg');
 $aboutImg  = !empty($settings['home_about_image']) ? uploadUrl($settings['home_about_image']) : $aboutImgDefault;
 $ctaImg    = !empty($settings['home_cta_image']) ? uploadUrl($settings['home_cta_image']) : 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80';
 
+$heroDefaults = array_map(static function (array $slide) use ($quoteHref): array {
+  $slide['button_link'] = $quoteHref;
+  return $slide;
+}, heroSliderCatalog());
 if (empty($sliders)) {
-  $sliders = [
-    [
-      'title' => 'Build Your Dream Home With HighQ Homes',
-      'subtitle' => 'Premium Construction & Architecture',
-      'description' => 'From blueprint to handover — disciplined planning, transparent timelines, and craftsmanship in every detail.',
-      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
-      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
-      'image' => 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80',
-    ],
-    [
-      'title' => 'Modern Architecture. Timeless Design.',
-      'subtitle' => 'Residential and commercial builds',
-      'description' => 'Spaces planned for how you live and work — refined, durable, and built to last.',
-      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
-      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
-      'image' => 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80',
-    ],
-    [
-      'title' => 'Built With Quality. Designed To Last.',
-      'subtitle' => 'Craftsmanship you can trust',
-      'description' => 'Materials, inspections, and finishes selected for long-term performance in local conditions.',
-      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
-      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
-      'image' => 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&q=80',
-    ],
-    [
-      'title' => 'Your Vision. Our Expertise.',
-      'subtitle' => 'From concept to handover',
-      'description' => 'One accountable team for design, construction, and finishing — with clear communication at every milestone.',
-      'button_text' => 'Get a Free Quote', 'button_link' => $quoteHref,
-      'button_text_2' => 'View Our Work', 'button_link_2' => '/projects',
-      'image' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80',
-    ],
-  ];
+  $sliders = $heroDefaults;
 }
 
 $homeHref = static fn (string $link): string => str_starts_with($link, 'http') ? $link : url(ltrim($link, '/'));
@@ -59,7 +30,7 @@ $normalizeCta = static function (?string $link) use ($quoteHref): string {
 };
 
 $hero = $sliders[0] ?? [];
-$heroImg = !empty($hero['image']) ? (str_starts_with($hero['image'], 'http') ? $hero['image'] : uploadUrl($hero['image'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
+$heroImg = heroSlideImageUrl($hero, 0);
 
 $statItems = [
   ['value' => $settings['stat_years'] ?? '10', 'num' => statNumber((string)($settings['stat_years'] ?? '10')), 'suffix' => '+', 'label' => 'Years Operating', 'icon' => 'bi-award'],
@@ -410,8 +381,10 @@ $heroBandStats = array_map(static fn(array $stat): array => [
     <div class="hq-hero__panes hq-hero__panes--media">
       <?php foreach ($sliders as $i => $slide): ?>
       <?php
-        $sImg = !empty($slide['image']) ? (str_starts_with($slide['image'], 'http') ? $slide['image'] : uploadUrl($slide['image'])) : 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80';
-        $sMobile = !empty($slide['mobile_image']) ? (str_starts_with($slide['mobile_image'], 'http') ? $slide['mobile_image'] : uploadUrl($slide['mobile_image'])) : '';
+        $sImg = heroSlideImageUrl($slide, (int)$i);
+        $sMobile = !empty($slide['mobile_image']) && !isStaleHeroSlideImage((string)$slide['mobile_image'])
+          ? mediaPathUrl((string)$slide['mobile_image'])
+          : '';
         $focus = $imageFocusMap[$slide['image_focus'] ?? 'center'] ?? 'center';
         $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
         $slideTitle = (string)($slide['title'] ?? $siteName);

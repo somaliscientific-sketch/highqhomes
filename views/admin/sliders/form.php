@@ -2,12 +2,8 @@
 $isEdit = $isEdit ?? !empty($slider['id']);
 $pageTitle = $isEdit ? 'Edit hero slide' : 'Add hero slide';
 $slot = (int)($slider['id'] ?? 0);
-$imgSrc = !empty($slider['image'])
-  ? (str_starts_with((string)$slider['image'], 'http') ? $slider['image'] : uploadUrl($slider['image']))
-  : '';
-$mobileSrc = !empty($slider['mobile_image'])
-  ? (str_starts_with((string)$slider['mobile_image'], 'http') ? $slider['mobile_image'] : uploadUrl($slider['mobile_image']))
-  : '';
+$imgSrc = !empty($slider['image']) ? mediaPathUrl((string)$slider['image']) : '';
+$mobileSrc = !empty($slider['mobile_image']) ? mediaPathUrl((string)$slider['mobile_image']) : '';
 $toLocal = static function (?string $value): string {
     if (!$value) {
         return '';

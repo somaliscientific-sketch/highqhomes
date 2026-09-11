@@ -22,7 +22,9 @@ class HomeController extends Controller
                 $latestProjects = $projectModel->getLatest(6, false);
             }
 
-            $sliders      = (new SliderModel())->getPublished();
+            $sliderModel  = new SliderModel();
+            $sliderModel->ensureShowcase();
+            $sliders      = $sliderModel->getPublished();
             $testimonials = (new TestimonialModel())->getFeatured(6);
             $settings     = (new SettingModel())->getAllAsMap();
             $seo          = (new SeoModel())->findBySlug('home');

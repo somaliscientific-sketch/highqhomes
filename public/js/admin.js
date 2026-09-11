@@ -217,6 +217,24 @@ if (sliderForm) {
   opacityRange?.addEventListener('input', () => syncOpacity(opacityRange.value));
   opacityInput?.addEventListener('input', () => syncOpacity(opacityInput.value));
 
+  sliderForm.querySelectorAll('input[name="library_image"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      const thumb = radio.closest('.admin-hero-library__item')?.querySelector('img');
+      const img = document.getElementById('slider-img-preview');
+      const placeholder = document.getElementById('slider-img-placeholder');
+      const previewBg = preview?.querySelector('[data-slider-preview-image], .admin-slider-preview img');
+      if (thumb && img) {
+        img.src = thumb.src;
+        img.classList.remove('is-hidden');
+        placeholder?.classList.add('is-hidden');
+      }
+      if (thumb && previewBg) {
+        previewBg.src = thumb.src;
+      }
+    });
+  });
+
   syncPreview();
   alignSelect?.dispatchEvent(new Event('change'));
 }

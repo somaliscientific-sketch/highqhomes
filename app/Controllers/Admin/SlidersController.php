@@ -6,16 +6,14 @@ class AdminSlidersController extends Controller
     private const TRANSITIONS = ['inherit', 'fade', 'slide', 'kenburns'];
     private const GLOBAL_TRANSITIONS = ['fade', 'slide', 'kenburns'];
     private const EXAMPLE_TITLES = [
-        'Build Your Dream Home With HighQ Homes',
-        'Modern Architecture. Timeless Design.',
-        'Built With Quality. Designed To Last.',
-        'Your Vision. Our Expertise.',
+        'A house you can walk in Garowe.',
+        'The same craft, after dark.',
+        'A compound that reads as one home.',
     ];
     private const EXAMPLE_SUBTITLES = [
-        'Premium Construction & Architecture',
-        'Residential and commercial builds',
-        'Craftsmanship you can trust',
-        'From concept to handover',
+        'Finished residential build',
+        'Completed family home',
+        'Residential compound',
     ];
 
     private SliderModel $model;
@@ -29,6 +27,7 @@ class AdminSlidersController extends Controller
     public function index(array $params = []): void
     {
         $this->requireView();
+        $this->model->ensureShowcase();
         $sliders = $this->model->findAll('sort_order', 'ASC');
         $settings = (new SettingModel())->getAllAsMap();
         $heroOptions = $this->carouselOptions($settings);
@@ -38,21 +37,25 @@ class AdminSlidersController extends Controller
     public function create(array $params = []): void
     {
         $this->requireManage();
-        $index = $this->model->count() % 4;
+        $index = $this->model->count() % 3;
+        $catalog = heroSliderCatalog();
+        $example = $catalog[$index];
         $slider = [
-            'title'            => self::EXAMPLE_TITLES[$index],
-            'subtitle'         => self::EXAMPLE_SUBTITLES[$index],
-            'description'      => 'From blueprint to handover — disciplined planning, transparent timelines, and craftsmanship in every detail.',
-            'button_text'      => 'Get a Free Quote',
-            'button_link'      => '/contact',
-            'button_text_2'    => 'View Our Work',
-            'button_link_2'    => '/projects',
+            'title'            => $example['title'],
+            'subtitle'         => $example['subtitle'],
+            'description'      => $example['description'],
+            'button_text'      => $example['button_text'],
+            'button_link'      => $example['button_link'],
+            'button_text_2'    => $example['button_text_2'],
+            'button_link_2'    => $example['button_link_2'],
+            'image'            => $example['image'],
+            'badge_text'       => $example['badge_text'],
             'is_published'     => 1,
             'show_description' => 1,
             'image_focus'      => 'center',
             'content_style'    => 'standard',
             'text_align'       => 'center',
-            'overlay_opacity'  => 0.6,
+            'overlay_opacity'  => 0.55,
             'transition_type'  => 'inherit',
         ];
         $this->render('admin/sliders/form', [
@@ -79,6 +82,9 @@ class AdminSlidersController extends Controller
         } catch (\Throwable $e) {
             Session::flash('error', $e->getMessage());
             $this->redirect('/admin/sliders/create');
+        }
+        if (empty($data['image'])) {
+            $data['image'] = heroSliderCatalog()[0]['image'];
         }
 
         $id = $this->model->insert($this->model->onlyColumns($data));
@@ -322,6 +328,11 @@ class AdminSlidersController extends Controller
         } elseif ($this->post('remove_image') && $existing) {
             $this->deleteImageIfUnused((string)($existing['image'] ?? ''), (int)$existing['id']);
             $data['image'] = null;
+        } else {
+            $library = $this->libraryImagePath();
+            if ($library !== null) {
+                $data['image'] = $library;
+            }
         }
 
         if (!empty($_FILES['mobile_image']['name'])) {
@@ -339,7 +350,7 @@ class AdminSlidersController extends Controller
 
     private function deleteImageIfUnused(string $path, ?int $exceptId = null): void
     {
-        if ($path === '' || str_starts_with($path, 'http')) {
+        if ($path === '' || str_starts_with($path, 'http') || str_starts_with($path, 'images/')) {
             return;
         }
         if ($this->model->hasColumn('mobile_image') && $this->model->countUsingImage($path, $exceptId) > 0) {
@@ -353,7 +364,7 @@ class AdminSlidersController extends Controller
         if ($path === '') {
             return null;
         }
-        if (str_starts_with($path, 'http')) {
+        if (str_starts_with($path, 'http') || str_starts_with($path, 'images/')) {
             return $path;
         }
         $src = ROOT_PATH . '/' . ltrim($path, '/');
@@ -370,5 +381,15 @@ class AdminSlidersController extends Controller
         }
         copy($src, $dest);
         return $destRel;
+    }
+
+    private function libraryImagePath(): ?string
+    {
+        $path = trim((string)$this->post('library_image', ''));
+        if ($path === '') {
+            return null;
+        }
+        $allowed = array_map(static fn(array $row): string => (string)$row['image'], heroSliderCatalog());
+        return in_array($path, $allowed, true) ? $path : null;
     }
 }
