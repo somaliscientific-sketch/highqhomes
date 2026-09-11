@@ -427,6 +427,8 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
     </div>
   </div>
 </section>
+<?php endif; ?>
+
 <?php if ($showAboutFaq && !empty($aboutFaqItems)): ?>
 <section class="hq-section hq-about-faq" id="about-faq" aria-labelledby="about-faq-title">
   <div class="container-site">
