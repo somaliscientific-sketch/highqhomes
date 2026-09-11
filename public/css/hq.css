@@ -6713,6 +6713,126 @@ body.hq-menu-open {
   color: #fff;
 }
 
+.hq-about-pro-hero--split {
+  min-height: 0;
+  display: block;
+  padding: 2rem 0 2.25rem;
+  overflow: visible;
+  text-align: left;
+  background: var(--hq-navy);
+  color: var(--hq-white);
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-bottom: 0;
+  text-align: left;
+}
+
+.hq-about-pro-hero--split .hq-breadcrumb {
+  justify-content: flex-start;
+  margin: 0 0 1.35rem;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(1.5rem, 4vw, 3.25rem);
+  align-items: center;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__content {
+  max-width: 36rem;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__title {
+  font-size: clamp(2rem, 4.2vw, 3.15rem);
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__lead {
+  margin: 0 0 1.35rem;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__actions,
+.hq-about-pro-hero--split .hq-about-pro-hero__chips {
+  justify-content: flex-start;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__anchors {
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+  padding-top: 1.15rem;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__media {
+  margin: 0;
+  min-width: 0;
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__media img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(72vh, 680px);
+  margin-inline: auto;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 20px;
+  background: rgba(1, 15, 36, 0.28);
+  box-shadow: 0 24px 56px rgba(1, 15, 36, 0.32);
+}
+
+.hq-about-pro-hero--split .hq-about-pro-hero__media figcaption {
+  margin-top: 0.75rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .hq-about-pro-hero--split {
+    text-align: center;
+  }
+
+  .hq-about-pro-hero--split .hq-about-pro-hero__layout {
+    grid-template-columns: 1fr;
+    gap: 1.35rem;
+  }
+
+  .hq-about-pro-hero--split .hq-about-pro-hero__media {
+    order: -1;
+  }
+
+  .hq-about-pro-hero--split .hq-about-pro-hero__content {
+    max-width: 40rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .hq-about-pro-hero--split .hq-about-pro-hero__lead {
+    margin-inline: auto;
+  }
+
+  .hq-about-pro-hero--split .hq-about-pro-hero__actions,
+  .hq-about-pro-hero--split .hq-about-pro-hero__chips,
+  .hq-about-pro-hero--split .hq-about-pro-hero__anchors,
+  .hq-about-pro-hero--split .hq-breadcrumb {
+    justify-content: center;
+  }
+
+  .hq-about-pro-hero--split .hq-about-pro-hero__media img {
+    max-height: min(62vh, 540px);
+  }
+}
+
 .hq-about-pro-story { padding: var(--hq-section-y) 0; background: var(--hq-bg-soft); }
 
 .hq-about-pro-story__shell {
@@ -11701,39 +11821,25 @@ body.hq-menu-open {
   .hq-projects-pro-hero__chips { gap: 0.4rem; }
 }
 
-.hq-about-pro-hero.hq-about-pro-hero--cinematic {
-  min-height: clamp(560px, 82svh, 760px);
-  align-items: center;
-  padding-top: clamp(2rem, 4vw, 3rem);
+.hq-about-pro-hero.hq-about-pro-hero--split {
+  min-height: 0;
+  padding-top: clamp(1.75rem, 3.5vw, 2.5rem);
   padding-bottom: 2.25rem;
-  text-align: center;
-}
-
-.hq-about-pro-hero--cinematic .hq-about-pro-hero__photo,
-.hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img:not(.hq-about-pro-hero__bg-fill) {
-  object-fit: contain;
-  object-position: center center;
-}
-
-.hq-about-pro-hero--cinematic .hq-breadcrumb {
-  justify-content: center;
+  background: var(--hq-navy);
+  align-items: stretch;
+  text-align: left;
 }
 
 @media (max-width: 768px) {
-  .hq-about-pro-hero.hq-about-pro-hero--cinematic {
-    min-height: min(86svh, 720px);
-  }
-
-  .hq-about-pro-hero--cinematic .hq-about-pro-hero__photo,
-  .hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img:not(.hq-about-pro-hero__bg-fill) {
-    object-position: center center;
+  .hq-about-pro-hero.hq-about-pro-hero--split {
+    min-height: 0;
   }
 }
 
 @media (max-width: 640px) {
-  .hq-about-pro-hero.hq-about-pro-hero--cinematic {
-    min-height: min(88svh, 680px);
-    padding-top: 1.75rem;
+  .hq-about-pro-hero.hq-about-pro-hero--split {
+    min-height: 0;
+    padding-top: 1.5rem;
     padding-bottom: 1.75rem;
   }
 }
