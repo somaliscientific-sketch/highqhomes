@@ -34,27 +34,23 @@ class AdminAuthController extends Controller
 
         if ($this->post('website', '') !== '') {
             http_response_code(403);
-            Session::flash('error', 'Unable to sign in.');
-            $this->redirect(adminLoginPath());
+            $this->failSignIn('Unable to sign in.');
         }
 
         $email    = strtolower(trim($this->post('email', '')));
         $password = (string)$this->post('password', '');
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 190) {
-            Session::flash('error', 'Invalid email or password.');
-            $this->redirect(adminLoginPath());
+            $this->failSignIn('Invalid email or password.', $email);
         }
 
         if ($password === '' || strlen($password) > 128) {
-            Session::flash('error', 'Invalid email or password.');
-            $this->redirect(adminLoginPath());
+            $this->failSignIn('Invalid email or password.', $email);
         }
 
         if (!Security::loginAllowed($email)) {
             $mins = max(1, (int)ceil(Security::loginLockRemaining($email) / 60));
-            Session::flash('error', "Too many failed attempts. Try again in {$mins} minute(s).");
-            $this->redirect(adminLoginPath());
+            $this->failSignIn("Too many failed attempts. Try again in {$mins} minute(s).", $email);
         }
 
         $model = new UserModel();
@@ -64,8 +60,7 @@ class AdminAuthController extends Controller
             Security::recordFailedLogin($email);
             Audit::log('login_failed', 'auth', "Failed login attempt for {$email}");
             usleep(random_int(200000, 600000));
-            Session::flash('error', 'Invalid email or password.');
-            $this->redirect(adminLoginPath());
+            $this->failSignIn('Invalid email or password.', $email);
         }
 
         Security::clearLoginAttempts($email);
@@ -95,6 +90,15 @@ class AdminAuthController extends Controller
         }
         Session::flash('success', 'You have been signed out securely.');
         Auth::logout();
+        $this->redirect(adminLoginPath());
+    }
+
+    private function failSignIn(string $message, string $email = ''): void
+    {
+        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Session::flash('login_email', $email);
+        }
+        Session::flash('error', $message);
         $this->redirect(adminLoginPath());
     }
 }
