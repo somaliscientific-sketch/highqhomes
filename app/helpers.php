@@ -584,6 +584,20 @@ function heroSlideVideoUrl(array $slide): string
     return mediaPathUrl($video);
 }
 
+function heroSlideAspect(array $slide): string
+{
+    if (trim((string)($slide['video'] ?? '')) !== '') {
+        return 'landscape';
+    }
+    $image = strtolower((string)($slide['image'] ?? ''));
+    foreach (['hero-night-front', 'hero-courtyard-villa'] as $key) {
+        if (str_contains($image, $key)) {
+            return 'portrait';
+        }
+    }
+    return 'landscape';
+}
+
 /**
  * @return array{desk: string, mobile: string}
  */

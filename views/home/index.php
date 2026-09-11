@@ -382,13 +382,14 @@ $heroBandStats = array_map(static fn(array $stat): array => [
       <?php
         $sImg = heroSlideImageUrl($slide, (int)$i);
         $sVideo = heroSlideVideoUrl($slide);
+        $sAspect = heroSlideAspect($slide);
         $sMobile = !empty($slide['mobile_image']) && !isStaleHeroSlideImage((string)$slide['mobile_image'])
           ? mediaPathUrl((string)$slide['mobile_image'])
           : '';
         $focus = heroSlideFocus($slide, (int)$i);
         $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
         $slideTitle = (string)($slide['title'] ?? $siteName);
-        $slideOverlay = min(0.4, max(0, (float)($slide['overlay_opacity'] ?? 0.6) * 0.45));
+        $slideOverlay = min(0.18, max(0, (float)($slide['overlay_opacity'] ?? 0.6) * 0.28));
         $slideTransition = in_array(($slide['transition_type'] ?? 'inherit'), ['fade', 'slide', 'kenburns'], true)
           ? $slide['transition_type']
           : $heroCarouselOpts['transition'];
@@ -398,17 +399,21 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         }
       ?>
       <figure
-        class="hq-hero__shot hq-hero__pane<?= $sVideo !== '' ? ' hq-hero__shot--video' : '' ?><?= $i === 0 ? ' is-active' : '' ?>"
+        class="hq-hero__shot hq-hero__pane hq-hero__shot--fit<?= $sVideo !== '' ? ' hq-hero__shot--video' : '' ?><?= $i === 0 ? ' is-active' : '' ?>"
         data-hero-pane
         data-hero-media="<?= $sVideo !== '' ? 'video' : 'image' ?>"
+        data-hero-aspect="<?= e($sAspect) ?>"
         data-hero-transition="<?= e($slideTransition) ?>"
         data-hero-duration="<?= (int)$slideDuration * 1000 ?>"
         style="--hero-focus: <?= e($focus['desk']) ?>; --hero-focus-mobile: <?= e($focus['mobile']) ?>;"
         aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
       >
+        <span class="hq-hero__media-fill" aria-hidden="true">
+          <img src="<?= e($sImg) ?>" alt="" width="1920" height="1080" decoding="async">
+        </span>
         <?php if ($sVideo !== ''): ?>
         <video
-          class="hq-hero__video"
+          class="hq-hero__video hq-hero__media-fit"
           poster="<?= e($sImg) ?>"
           muted
           loop
@@ -419,7 +424,7 @@ $heroBandStats = array_map(static fn(array $stat): array => [
           <source src="<?= e($sVideo) ?>" type="video/mp4">
         </video>
         <?php else: ?>
-        <picture>
+        <picture class="hq-hero__media-fit">
           <?php if ($sMobile !== ''): ?>
           <source media="(max-width: 767px)" srcset="<?= e($sMobile) ?>">
           <?php endif; ?>

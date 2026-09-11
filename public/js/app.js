@@ -188,7 +188,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
   const syncMedia = (index) => {
     mediaPanes.forEach((pane, i) => {
-      const video = pane.querySelector('video');
+      const video = pane.querySelector('video.hq-hero__video');
       if (!video) return;
       if (i === index) {
         video.muted = true;
@@ -316,7 +316,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
     if (document.hidden) {
       paused = true;
       stop();
-      mediaPanes.forEach((pane) => pane.querySelector('video')?.pause());
+      mediaPanes.forEach((pane) => pane.querySelector('video.hq-hero__video')?.pause());
     } else {
       paused = false;
       syncMedia(current);
