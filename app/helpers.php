@@ -557,7 +557,7 @@ function heroSlideFocus(array $slide, int $index = 0): array
     foreach ($framed as $key => $pos) {
         if (str_contains($image, $key)) {
             $raw = trim((string)($slide['image_focus'] ?? ''));
-            if ($raw !== '' && !in_array($raw, ['center', 'top', 'bottom'], true)) {
+            if (str_contains($raw, '%')) {
                 return ['desk' => $raw, 'mobile' => $pos['mobile']];
             }
             if ($raw === 'top') {
