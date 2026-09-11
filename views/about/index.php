@@ -9,7 +9,20 @@ $aboutText = $settings['about_text'] ?? '';
 $phone     = $settings['phone'] ?? '+252 907 734 667';
 $phoneHref = preg_replace('/\s+/', '', $phone);
 $wa        = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $settings['phone'] ?? '252907734667');
-$quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20to%20learn%20more%20about%20your%20services';
+$quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20to%20learn%20more%20about%20your%20company';
+
+$copyIf = static function (string $current, array $stale, string $fresh): string {
+    $norm = strtolower(trim($current));
+    if ($norm === '') {
+        return $fresh;
+    }
+    foreach ($stale as $old) {
+        if ($norm === strtolower($old)) {
+            return $fresh;
+        }
+    }
+    return $current;
+};
 
 $cms           = $sections ?? [];
 $heroSec       = cmsRow($cms, 'hero');
@@ -26,97 +39,117 @@ $heroMeta      = cmsMap($heroSec);
 $historyMeta   = cmsMap($historySec);
 $ctaMeta       = cmsMap($ctaSec);
 
-$heroKicker = cmsText($heroSec, 'title', 'Who We Are');
-$heroTitle  = cmsText($heroSec, 'subtitle', 'Built on integrity. Delivered with precision.');
-$heroLead   = cmsText($heroSec, 'content', $settings['tagline'] ?? 'Premium construction across Puntland, Somalia.');
-$heroImage  = cmsMediaUrl($heroSec['image_url'] ?? '', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80');
+$heroImageDefault = asset('images/builds/grey-villa-evening.jpg');
+$storyImageDefault = asset('images/builds/about-residence.jpg');
 
-$historyTitle    = cmsText($historySec, 'title', 'Our History');
-$historySubtitle = cmsText($historySec, 'subtitle', 'The HighQ Homes story');
-$historyContent  = cmsText($historySec, 'content', $aboutText ?: 'HighQ Homes was founded in Garowe with a clear purpose — deliver world-class residential and commercial construction with honest service, broad vision, and great value.');
-$historyImage    = cmsMediaUrl(
-    $historySec['image_url'] ?? '',
-    !empty($settings['home_about_image']) ? uploadUrl($settings['home_about_image']) : 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80'
-);
+$heroKicker = $copyIf(cmsText($heroSec, 'title', ''), ['Who We Are', 'About Us', 'About'], 'Who we are');
+$heroTitle  = $copyIf(cmsText($heroSec, 'subtitle', ''), [
+    'Built on integrity. Delivered with precision.',
+    'Built on Integrity. Delivered with Precision.',
+], 'A trusted builder for homes that last.');
+$heroLead   = $copyIf(cmsText($heroSec, 'content', ''), [
+    'Premium construction across Puntland, Somalia.',
+    $settings['tagline'] ?? '',
+], 'HighQ Homes plans, builds, and finishes residential and commercial spaces in Garowe and across Puntland — one accountable team from first site visit to handover.');
+$heroImage  = cmsMediaUrl($heroSec['image_url'] ?? '', $heroImageDefault);
+if ($heroImage === '' || str_contains($heroImage, 'unsplash.com')) {
+    $heroImage = $heroImageDefault;
+}
+
+$historyTitle    = $copyIf(cmsText($historySec, 'title', ''), ['Our History', 'Our story'], 'Our story');
+$historySubtitle = $copyIf(cmsText($historySec, 'subtitle', ''), ['The HighQ Homes story'], 'Built in Garowe since 2016.');
+$historyContent  = $copyIf(cmsText($historySec, 'content', ''), [
+    'HighQ Homes was founded in Garowe with a clear purpose — deliver world-class residential and commercial construction with honest service, broad vision, and great value.',
+    $aboutText,
+], 'We started in Garowe with a simple brief: deliver homes and commercial spaces people can trust. We still work that way — written scope, visible progress, and a finish you can inspect before the keys are handed over.');
+$historyImage    = cmsMediaUrl($historySec['image_url'] ?? '', $storyImageDefault);
+if ($historyImage === '' || str_contains($historyImage, 'unsplash.com')) {
+    $historyImage = $storyImageDefault;
+}
 
 $historyFacts = $historyMeta['facts'] ?? [
   ['label' => 'Founded', 'value' => '2016'],
   ['label' => 'Headquarters', 'value' => 'Garowe, Puntland'],
-  ['label' => 'Focus', 'value' => 'Residential & Commercial'],
+  ['label' => 'Focus', 'value' => 'Homes & commercial'],
 ];
 $historyFactList = cmsList($historySec);
 if ($historyFactList !== [] && isset($historyFactList[0]) && is_array($historyFactList[0]) && isset($historyFactList[0]['label'])) {
   $historyFacts = $historyFactList;
 }
 
-$historyTimeline = $historyMeta['timeline'] ?? [
-  ['year' => '2016', 'text' => 'HighQ Homes established in Garowe with a mission to raise construction standards across Puntland.'],
-  ['year' => '2021', 'text' => 'First residential and commercial projects delivered with structured quality control.'],
-  ['year' => '2023', 'text' => 'Expanded integrated design, construction, and finishing services under one team.'],
-  ['year' => 'Today', 'text' => 'Trusted partner for premium builds — from planning to handover.'],
+$historyTimeline = [
+  ['year' => '2016', 'text' => 'HighQ Homes established in Garowe to raise the standard of residential and commercial construction in Puntland.'],
+  ['year' => '2021', 'text' => 'Structured delivery in place — milestone plans, quality checks, and one team accountable for the finish.'],
+  ['year' => '2023', 'text' => 'Design, construction, and finishing integrated so nothing is lost between drawings and handover.'],
+  ['year' => 'Today', 'text' => 'Homes on this site were photographed on location — family villas, compounds, and active builds in Garowe.'],
 ];
 $timelineList = cmsList($timelineSec);
+$staleTimeline = [
+    'HighQ Homes established in Garowe with a mission to raise construction standards across Puntland.',
+    'First residential and commercial projects delivered with structured quality control.',
+    'Expanded integrated design, construction, and finishing services under one team.',
+    'Trusted partner for premium builds — from planning to handover.',
+];
 if ($timelineList !== []) {
-  $historyTimeline = $timelineList;
+    $texts = array_map(static fn(array $row): string => (string)($row['text'] ?? $row['content'] ?? ''), $timelineList);
+    $historyTimeline = array_intersect($staleTimeline, $texts) !== [] ? $historyTimeline : $timelineList;
 }
 
-$valueItems = cmsList($valuesSec);
-if ($valueItems === []) {
-  $valueItems = [
-    ['icon' => 'bi-shield-check', 'title' => 'Integrity First', 'text' => 'Honest timelines, transparent pricing, and accountable communication.'],
-    ['icon' => 'bi-gem', 'title' => 'Premium Quality', 'text' => 'Materials and workmanship held to standards you can measure.'],
-    ['icon' => 'bi-people', 'title' => 'Client Partnership', 'text' => 'Responsive support before, during, and after handover.'],
-    ['icon' => 'bi-compass', 'title' => 'Local Expertise', 'text' => 'Deep knowledge of Puntland sites, regulations, and community needs.'],
-  ];
+$valueItems = [
+    ['icon' => 'bi-geo-alt', 'title' => 'Based in Garowe', 'text' => 'We build for Puntland sites, climate, and family living — with local accountability from first meeting to handover.'],
+    ['icon' => 'bi-people', 'title' => 'One accountable team', 'text' => 'Design, construction, and finishing stay under one standard so nothing is lost between trades.'],
+    ['icon' => 'bi-clipboard-check', 'title' => 'Clear scope & timeline', 'text' => 'Transparent quotes, milestone updates, and a finish you can inspect before the keys are handed over.'],
+    ['icon' => 'bi-house-heart', 'title' => 'Homes built to last', 'text' => 'Durable materials and careful workmanship chosen for long-term performance, not a short-lived look.'],
+];
+$cmsValues = cmsList($valuesSec);
+if ($cmsValues !== []) {
+    $titles = array_map(static fn(array $row): string => (string)($row['title'] ?? ''), $cmsValues);
+    $seedTitles = ['Integrity First', 'Premium Quality', 'Client Partnership', 'Local Expertise'];
+    $valueItems = array_intersect($seedTitles, $titles) === $seedTitles ? $valueItems : $cmsValues;
 }
 
-$processSteps = cmsList($processSec);
-if ($processSteps === []) {
-  $processSteps = [
-    ['num' => '01', 'title' => 'Consultation', 'text' => 'Goals, site conditions, and budget expectations.'],
-    ['num' => '02', 'title' => 'Planning', 'text' => 'Drawings, materials, and a milestone schedule.'],
-    ['num' => '03', 'title' => 'Construction', 'text' => 'Disciplined execution with quality checks.'],
-    ['num' => '04', 'title' => 'Handover', 'text' => 'Final walkthrough and after-care support.'],
-  ];
+$processSteps = [
+    ['num' => '01', 'title' => 'Discovery', 'text' => 'We walk the site, confirm your goals, and test what the plot can support before design begins.'],
+    ['num' => '02', 'title' => 'Design & planning', 'text' => 'Drawings, approvals, and a milestone schedule with checkpoints you can follow.'],
+    ['num' => '03', 'title' => 'Build execution', 'text' => 'Disciplined site work with inspections before each stage is signed off.'],
+    ['num' => '04', 'title' => 'Handover', 'text' => 'Final walkthrough, documentation, and after-care when you move in.'],
+];
+$cmsProcess = cmsList($processSec);
+if ($cmsProcess !== []) {
+    $titles = array_map(static fn(array $row): string => (string)($row['title'] ?? ''), $cmsProcess);
+    $seedTitles = ['Consultation', 'Planning', 'Construction', 'Handover'];
+    $processSteps = array_intersect($seedTitles, $titles) === $seedTitles ? $processSteps : $cmsProcess;
 }
 
-$mvCards = cmsList($missionSec);
-if ($mvCards === []) {
-  $mvCards = [
-    ['icon' => 'bi-bullseye', 'eyebrow' => 'Purpose', 'title' => 'Our mission', 'text' => $mission ?: 'Deliver exceptional construction with premium materials, skilled craftsmanship, and unwavering integrity.', 'mod' => 'mission'],
-    ['icon' => 'bi-compass', 'eyebrow' => 'Direction', 'title' => 'Our vision', 'text' => $vision ?: 'Lead East Africa in sustainable, innovative construction that transforms communities.', 'mod' => 'vision'],
-  ];
+$mvCards = [
+    ['icon' => 'bi-bullseye', 'eyebrow' => 'Mission', 'title' => 'What we deliver', 'text' => $mission ?: 'Plan, build, and finish spaces in Puntland with a written scope, durable materials, and craftsmanship you can inspect at handover.', 'mod' => 'mission'],
+    ['icon' => 'bi-compass', 'eyebrow' => 'Vision', 'title' => 'Where we are going', 'text' => $vision ?: 'Be the builder families and businesses in Garowe call first — honest timelines, local knowledge, and homes that last.', 'mod' => 'vision'],
+];
+$cmsMission = cmsList($missionSec);
+if ($cmsMission !== []) {
+    $staleMission = ['Deliver exceptional construction with premium materials, skilled craftsmanship, and unwavering integrity.', 'Lead East Africa in sustainable, innovative construction that transforms communities.'];
+    $texts = array_map(static fn(array $row): string => (string)($row['text'] ?? $row['content'] ?? ''), $cmsMission);
+    $mvCards = array_intersect($staleMission, $texts) !== [] ? $mvCards : $cmsMission;
 }
 
-$statsList = cmsList($statsSec);
-if ($statsList !== []) {
-  $mappedStats = [];
-  foreach ($statsList as $row) {
-    if (!is_array($row)) continue;
-    $value = (string)($row['value'] ?? $row['num'] ?? '');
-    $label = (string)($row['label'] ?? $row['title'] ?? $row['text'] ?? '');
-    if ($value === '' && $label === '') continue;
-    $mappedStats[] = [
-      'num'    => statNumber((string)($row['num'] ?? $value)),
-      'suffix' => (string)($row['suffix'] ?? ''),
-      'label'  => $label !== '' ? $label : $value,
-      'icon'   => (string)($row['icon'] ?? 'bi-award'),
-    ];
-  }
-  if ($mappedStats !== []) {
-    $statItems = $mappedStats;
-  }
+$statLabels = array_map(static fn(array $row): string => strtolower((string)($row['label'] ?? '')), $statItems ?? []);
+$staleStat = ['profiled projects', 'current projects', 'years operating', 'completed projects'];
+if (array_intersect($staleStat, $statLabels) !== []) {
+    // Controller already supplies portfolio stats; CMS seed numbers are ignored.
 }
 
-$heroChips = $heroMeta['chips'] ?? [];
-$foundedYear = $historyFacts[0]['value'] ?? '2016';
-$hqLocation  = $historyFacts[1]['value'] ?? 'Garowe, Puntland';
-if ($heroChips === []) {
-  $heroChips = [
-    ['icon' => 'bi-calendar2-check', 'label' => 'Established ' . $foundedYear],
-    ['icon' => 'bi-geo-alt', 'label' => $hqLocation],
-    ['icon' => 'bi-award', 'label' => $historyFacts[2]['value'] ?? 'Residential & commercial'],
-  ];
+$heroChips = [
+    ['icon' => 'bi-calendar2-check', 'label' => 'Established 2016'],
+    ['icon' => 'bi-geo-alt', 'label' => 'Garowe, Puntland'],
+    ['icon' => 'bi-house-heart', 'label' => 'Residential & commercial'],
+];
+if (!empty($heroMeta['chips']) && is_array($heroMeta['chips'])) {
+    $chipLabels = array_map(static function ($chip): string {
+        return strtolower(is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? '') : (string)$chip);
+    }, $heroMeta['chips']);
+    if (!in_array('established 2016', $chipLabels, true)) {
+        $heroChips = $heroMeta['chips'];
+    }
 }
 
 $clientMeta = static function (array $t): string {
@@ -126,6 +159,8 @@ $clientMeta = static function (array $t): string {
 $valueIcons = ['bi-heart', 'bi-gem', 'bi-clipboard-check', 'bi-shield-check', 'bi-people', 'bi-compass'];
 $teamCount = is_array($team ?? null) ? count($team) : 0;
 $timelineCount = count($historyTimeline);
+$foundedYear = $historyFacts[0]['value'] ?? '2016';
+$hqLocation  = $historyFacts[1]['value'] ?? 'Garowe, Puntland';
 
 $showHero         = cmsRowEnabled($cms, 'hero', true);
 $showHistory      = cmsRowEnabled($cms, 'history', true);
@@ -137,16 +172,31 @@ $showProcess      = cmsRowEnabled($cms, 'process', true) && !empty($processSteps
 $showTeam         = cmsRowEnabled($cms, 'team', true) && !empty($team);
 $showTestimonials = cmsRowEnabled($cms, 'testimonials', true) && !empty($testimonials);
 $showCta          = cmsRowEnabled($cms, 'cta', true);
+
+$valuesKicker = $copyIf(cmsText($valuesSec, 'title', ''), ['Our Values'], 'What we stand for');
+$valuesTitle  = $copyIf(cmsText($valuesSec, 'subtitle', ''), ['What guides every project'], 'How we work with clients');
+$valuesLead   = $copyIf(cmsText($valuesSec, 'content', ''), ['Principles that shape how we plan, build, and support every client relationship.'], 'Four commitments that show up on site — not only on a values page.');
+
+$processKicker = $copyIf(cmsText($processSec, 'title', ''), ['How We Work'], 'How we deliver');
+$processTitle  = $copyIf(cmsText($processSec, 'subtitle', ''), ['Simple steps, clear delivery'], 'From first site visit to the keys');
+$processLead   = $copyIf(cmsText($processSec, 'content', ''), [
+    'A structured path that keeps your project transparent, controlled, and on schedule.',
+], 'A clear path that keeps the build on schedule and the finish on standard.');
+
+$ctaKicker = $copyIf(cmsText($ctaSec, 'title', ''), ['Start your project'], 'Start your build');
+$ctaTitle  = $copyIf(cmsText($ctaSec, 'subtitle', ''), ['Ready to build with HighQ Homes?', 'Ready to build with ' . $siteName . '?'], 'Ready to plan a home with HighQ Homes?');
+$ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
+    'Share your vision — we\'ll guide you from planning to handover with clarity, quality, and care.',
+    'Share your vision — we’ll guide you from planning to handover with clarity, quality, and care.',
+], 'Tell us about your plot. We will come back with a clear plan, an honest timeline, and a quote you can trust.');
 ?>
 
 <?php if ($showHero): ?>
-<section class="hq-about-pro-hero">
+<section class="hq-about-pro-hero hq-about-pro-hero--cinematic">
   <div class="hq-about-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
   </div>
   <div class="hq-about-pro-hero__overlay" aria-hidden="true"></div>
-  <div class="hq-about-pro-hero__mesh" aria-hidden="true"></div>
-
   <div class="container-site hq-about-pro-hero__inner">
     <nav class="hq-breadcrumb hq-breadcrumb--light" aria-label="Breadcrumb">
       <a href="<?= url() ?>">Home</a>
@@ -154,39 +204,24 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
       <span class="current">About</span>
     </nav>
 
-    <div class="hq-about-pro-hero__layout">
-      <div class="hq-about-pro-hero__content" data-anim="up">
-        <p class="hq-about-pro-hero__kicker"><?= e($heroKicker) ?></p>
-        <h1 class="hq-about-pro-hero__title"><?= e($heroTitle) ?></h1>
-        <p class="hq-about-pro-hero__lead"><?= e($heroLead) ?></p>
-        <ul class="hq-about-pro-hero__chips">
-          <?php foreach (array_slice($heroChips, 0, 4) as $chip): ?>
-          <?php
-            $chipLabel = is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? $chip['text'] ?? '') : (string)$chip;
-            $chipIcon  = is_array($chip) ? (string)($chip['icon'] ?? 'bi-check2') : 'bi-check2';
-            if ($chipLabel === '') continue;
-          ?>
-          <li><i class="bi <?= e($chipIcon) ?>"></i> <?= e($chipLabel) ?></li>
-          <?php endforeach; ?>
-        </ul>
-        <div class="hq-about-pro-hero__actions">
-          <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($heroMeta['button_text'] ?? 'View our work') ?> <i class="bi bi-arrow-up-right"></i></a>
-          <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($heroMeta['button_text_2'] ?? 'Get a quote') ?></a>
-        </div>
+    <div class="hq-about-pro-hero__content" data-anim="up">
+      <p class="hq-about-pro-hero__kicker"><?= e($heroKicker) ?></p>
+      <h1 class="hq-about-pro-hero__title"><?= e($heroTitle) ?></h1>
+      <p class="hq-about-pro-hero__lead"><?= e($heroLead) ?></p>
+      <div class="hq-about-pro-hero__actions">
+        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($heroMeta['button_text'] ?? 'View our work') ?> <i class="bi bi-arrow-up-right"></i></a>
+        <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($heroMeta['button_text_2'] ?? 'Get a quote') ?></a>
       </div>
-
-      <aside class="hq-about-pro-hero__panel" data-anim="up" data-delay="80" aria-label="<?= e($heroMeta['snapshot_title'] ?? 'Company snapshot') ?>">
-        <p><?= e($heroMeta['snapshot_title'] ?? 'Company snapshot') ?></p>
-        <dl>
-          <?php foreach (array_slice($historyFacts, 0, 3) as $fact): ?>
-          <div>
-            <dt><?= e($fact['label'] ?? '') ?></dt>
-            <dd><?= e($fact['value'] ?? '') ?></dd>
-          </div>
-          <?php endforeach; ?>
-        </dl>
-        <a href="#our-story" class="hq-about-pro-hero__panel-link"><?= e($heroMeta['snapshot_link'] ?? 'Read our story') ?> <i class="bi bi-arrow-down"></i></a>
-      </aside>
+      <ul class="hq-about-pro-hero__chips">
+        <?php foreach (array_slice($heroChips, 0, 4) as $chip): ?>
+        <?php
+          $chipLabel = is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? $chip['text'] ?? '') : (string)$chip;
+          $chipIcon  = is_array($chip) ? (string)($chip['icon'] ?? 'bi-check2') : 'bi-check2';
+          if ($chipLabel === '') continue;
+        ?>
+        <li><i class="bi <?= e($chipIcon) ?>"></i> <?= e($chipLabel) ?></li>
+        <?php endforeach; ?>
+      </ul>
     </div>
 
     <nav class="hq-about-pro-hero__anchors" aria-label="About page sections">
@@ -206,10 +241,10 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
     <div class="hq-about-pro-story__shell">
       <div class="hq-about-pro-story__media" data-anim="left">
         <div class="hq-about-pro-story__frame">
-          <img src="<?= e($historyImage) ?>" alt="<?= e($siteName) ?> — our story" loading="eager">
+          <img src="<?= e($historyImage) ?>" alt="<?= e($siteName) ?> completed residence in Garowe" loading="eager">
         </div>
         <div class="hq-about-pro-story__badge">
-          <strong><?= e($historyFacts[0]['value'] ?? '2016') ?></strong>
+          <strong><?= e($foundedYear) ?></strong>
           <span><?= e($historyMeta['badge_label'] ?? 'Established') ?></span>
         </div>
         <div class="hq-about-pro-story__chip">
@@ -232,7 +267,7 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
         </ul>
 
         <div class="hq-about-pro-story__actions">
-          <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline"><?= e($historyMeta['cta_label'] ?? 'Talk to our team') ?></a>
+          <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange"><?= e($historyMeta['cta_label'] ?? 'See our projects') ?> <i class="bi bi-arrow-up-right"></i></a>
           <a href="tel:<?= e($phoneHref) ?>" class="hq-about-pro-link"><i class="bi bi-telephone-fill"></i> <?= e($phone) ?></a>
         </div>
       </div>
@@ -242,7 +277,6 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
     <ol class="hq-about-pro-timeline" data-count="<?= (int)$timelineCount ?>">
       <?php foreach ($historyTimeline as $i => $item): ?>
       <li data-anim="up" data-delay="<?= $i * 50 ?>">
-        <span class="hq-about-pro-timeline__dot" aria-hidden="true"></span>
         <span class="hq-about-pro-timeline__year"><?= e($item['year'] ?? $item['title'] ?? '') ?></span>
         <p><?= e($item['text'] ?? $item['content'] ?? '') ?></p>
       </li>
@@ -279,7 +313,7 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
     ?>
     <article class="hq-about-pro-mv__card hq-about-pro-mv__card--<?= e($cardMod) ?>" data-anim="up"<?= $i > 0 ? ' data-delay="70"' : '' ?>>
       <span class="hq-about-pro-mv__icon"><i class="bi <?= e($card['icon'] ?? ($i === 0 ? 'bi-bullseye' : 'bi-compass')) ?>"></i></span>
-      <p class="hq-about-pro-eyebrow"><?= e($card['eyebrow'] ?? ($i === 0 ? 'Purpose' : 'Direction')) ?></p>
+      <p class="hq-about-pro-eyebrow"><?= e($card['eyebrow'] ?? ($i === 0 ? 'Mission' : 'Vision')) ?></p>
       <h3><?= e($card['title'] ?? '') ?></h3>
       <p><?= e($card['text'] ?? $card['content'] ?? '') ?></p>
     </article>
@@ -290,12 +324,11 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
 
 <?php if ($showValues): ?>
 <section class="hq-about-pro-values" id="our-values">
-  <div class="hq-about-pro-values__bg" aria-hidden="true"></div>
   <div class="container-site">
     <header class="hq-about-pro-section-head" data-anim="up">
-      <p class="hq-about-pro-eyebrow"><?= e(cmsText($valuesSec, 'title', 'Our Values')) ?></p>
-      <h2 class="hq-about-pro-title"><?= e(cmsText($valuesSec, 'subtitle', 'What guides every project')) ?></h2>
-      <p class="hq-about-pro-lead hq-about-pro-section-head__lead"><?= e(cmsText($valuesSec, 'content', 'Principles that shape how we plan, build, and support every client relationship.')) ?></p>
+      <p class="hq-about-pro-eyebrow"><?= e($valuesKicker) ?></p>
+      <h2 class="hq-about-pro-title"><?= e($valuesTitle) ?></h2>
+      <p class="hq-about-pro-lead hq-about-pro-section-head__lead"><?= e($valuesLead) ?></p>
     </header>
     <div class="hq-about-pro-values__grid">
       <?php foreach ($valueItems as $i => $val): ?>
@@ -306,7 +339,6 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
         if ($valueTitle === '' && $valueText === '') continue;
       ?>
       <article class="hq-about-pro-value" data-anim="up" data-delay="<?= $i * 55 ?>">
-        <span class="hq-about-pro-value__index"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
         <span class="hq-about-pro-value__icon"><i class="bi <?= e($val['icon'] ?? $valueIcons[$i % count($valueIcons)]) ?>"></i></span>
         <h3><?= e($valueTitle) ?></h3>
         <p><?= e($valueText) ?></p>
@@ -320,24 +352,24 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
 <?php if ($showProcess): ?>
 <section class="hq-about-pro-process" id="our-process">
   <div class="container-site">
-    <header class="hq-about-pro-section-head" data-anim="up">
-      <p class="hq-about-pro-eyebrow"><?= e(cmsText($processSec, 'title', 'How We Work')) ?></p>
-      <h2 class="hq-about-pro-title"><?= e(cmsText($processSec, 'subtitle', 'Simple steps, clear delivery')) ?></h2>
-      <?php if (cmsText($processSec, 'content') !== ''): ?>
-      <p class="hq-about-pro-lead hq-about-pro-section-head__lead"><?= e(cmsText($processSec, 'content')) ?></p>
-      <?php endif; ?>
-    </header>
-    <ol class="hq-about-pro-process__steps">
-      <?php foreach ($processSteps as $i => $step): ?>
-      <li data-anim="up" data-delay="<?= $i * 55 ?>">
-        <span class="hq-about-pro-process__num"><?= e($step['num'] ?? str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT)) ?></span>
-        <div>
-          <h3><?= e($step['title'] ?? '') ?></h3>
-          <p><?= e($step['text'] ?? '') ?></p>
-        </div>
-      </li>
-      <?php endforeach; ?>
-    </ol>
+    <div class="hq-about-pro-process__shell">
+      <header class="hq-about-pro-process__head" data-anim="left">
+        <p class="hq-about-pro-eyebrow"><?= e($processKicker) ?></p>
+        <h2 class="hq-about-pro-title"><?= e($processTitle) ?></h2>
+        <p class="hq-about-pro-lead"><?= e($processLead) ?></p>
+      </header>
+      <ol class="hq-about-pro-process__steps" data-anim="right">
+        <?php foreach ($processSteps as $i => $step): ?>
+        <li>
+          <span class="hq-about-pro-process__num"><?= e($step['num'] ?? str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT)) ?></span>
+          <div>
+            <h3><?= e($step['title'] ?? '') ?></h3>
+            <p><?= e($step['text'] ?? '') ?></p>
+          </div>
+        </li>
+        <?php endforeach; ?>
+      </ol>
+    </div>
   </div>
 </section>
 <?php endif; ?>
@@ -397,9 +429,9 @@ $showCta          = cmsRowEnabled($cms, 'cta', true);
   <div class="hq-about-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-about-pro-cta__box" data-anim="up">
     <div class="hq-about-pro-cta__copy">
-      <p class="hq-about-pro-eyebrow hq-about-pro-eyebrow--light"><?= e(cmsText($ctaSec, 'title', 'Start your project')) ?></p>
-      <h2 id="about-cta-title" class="hq-about-pro-cta__title"><?= e(cmsText($ctaSec, 'subtitle', 'Ready to build with ' . $siteName . '?')) ?></h2>
-      <p class="hq-about-pro-cta__lead"><?= e(cmsText($ctaSec, 'content', 'Share your vision — we\'ll guide you from planning to handover with clarity, quality, and care.')) ?></p>
+      <p class="hq-about-pro-eyebrow hq-about-pro-eyebrow--light"><?= e($ctaKicker) ?></p>
+      <h2 id="about-cta-title" class="hq-about-pro-cta__title"><?= e($ctaTitle) ?></h2>
+      <p class="hq-about-pro-cta__lead"><?= e($ctaLead) ?></p>
     </div>
     <div class="hq-about-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMeta['button_text'] ?? 'Get a quote') ?></a>
