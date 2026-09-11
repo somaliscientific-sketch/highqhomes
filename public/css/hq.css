@@ -6477,24 +6477,44 @@ body.hq-menu-open {
   text-align: center;
 }
 
-.hq-about-pro-hero__bg { position: absolute; inset: 0; }
-.hq-about-pro-hero__bg img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 32%;
+.hq-about-pro-hero__bg {
+  position: absolute;
+  inset: 0;
+  background: var(--hq-navy-deep);
+  overflow: hidden;
 }
 
-.hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img {
+.hq-about-pro-hero__bg img,
+.hq-about-pro-hero__bg-fill,
+.hq-about-pro-hero__photo {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hq-about-pro-hero__bg-fill {
+  object-fit: cover;
   object-position: 50% 32%;
+  filter: blur(28px) saturate(1.05) brightness(0.42);
+  transform: scale(1.12);
+}
+
+.hq-about-pro-hero__photo,
+.hq-about-pro-hero--cinematic .hq-about-pro-hero__photo,
+.hq-about-pro-hero__bg img:not(.hq-about-pro-hero__bg-fill) {
+  object-fit: contain;
+  object-position: center center;
+  filter: none;
+  transform: none;
 }
 
 .hq-about-pro-hero__overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(1, 15, 36, 0.34) 0%, rgba(2, 29, 69, 0.48) 42%, rgba(2, 29, 69, 0.86) 100%);
+    linear-gradient(180deg, rgba(1, 15, 36, 0.18) 0%, rgba(2, 29, 69, 0.28) 46%, rgba(2, 29, 69, 0.58) 100%);
 }
 
 .hq-about-pro-hero__mesh {
@@ -11689,9 +11709,10 @@ body.hq-menu-open {
   text-align: center;
 }
 
-.hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img {
-  object-fit: cover;
-  object-position: 50% 32%;
+.hq-about-pro-hero--cinematic .hq-about-pro-hero__photo,
+.hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img:not(.hq-about-pro-hero__bg-fill) {
+  object-fit: contain;
+  object-position: center center;
 }
 
 .hq-about-pro-hero--cinematic .hq-breadcrumb {
@@ -11703,8 +11724,9 @@ body.hq-menu-open {
     min-height: min(86svh, 720px);
   }
 
-  .hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img {
-    object-position: 50% 28%;
+  .hq-about-pro-hero--cinematic .hq-about-pro-hero__photo,
+  .hq-about-pro-hero--cinematic .hq-about-pro-hero__bg img:not(.hq-about-pro-hero__bg-fill) {
+    object-position: center center;
   }
 }
 
