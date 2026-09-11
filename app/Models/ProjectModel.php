@@ -43,9 +43,9 @@ class ProjectModel extends Model
         try {
             $stmt = $this->db->prepare(
                 "SELECT * FROM projects WHERE is_published = 1 AND is_featured = 1
-                 ORDER BY sort_order ASC, created_at DESC LIMIT ?"
+                 ORDER BY sort_order ASC, created_at DESC LIMIT " . (int)$limit
             );
-            $stmt->execute([$limit]);
+            $stmt->execute();
             $rows = array_map([$this, 'decode'], $stmt->fetchAll());
             if ($rows !== []) {
                 return $rows;
@@ -71,10 +71,10 @@ class ProjectModel extends Model
             if ($excludeFeatured) {
                 $sql .= " AND is_featured = 0";
             }
-            $sql .= " ORDER BY sort_order ASC, created_at DESC LIMIT ?";
+            $sql .= " ORDER BY sort_order ASC, created_at DESC LIMIT " . (int)$limit;
 
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([$limit]);
+            $stmt->execute();
             $rows = array_map([$this, 'decode'], $stmt->fetchAll());
             if ($rows !== []) {
                 return $rows;
@@ -261,8 +261,7 @@ class ProjectModel extends Model
                     $params[] = $category;
                 }
 
-                $sql .= ' ORDER BY sort_order ASC, is_featured DESC, created_at DESC LIMIT ?';
-                $params[] = $limit;
+                $sql .= ' ORDER BY sort_order ASC, is_featured DESC, created_at DESC LIMIT ' . (int)$limit;
 
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute($params);

@@ -47,13 +47,27 @@ class ProjectsController extends Controller
 
     public function show(array $params = []): void
     {
-        $model   = new ProjectModel();
-        $model->ensureShowcase();
-        $project = $model->findBySlug($params['slug'] ?? '');
+        $slug     = (string)($params['slug'] ?? '');
+        $project  = null;
+        $related  = [];
+        $settings = [];
+        $seo      = null;
+
+        $this->tryLoad(function () use ($slug, &$project, &$related, &$settings, &$seo): void {
+            $model   = new ProjectModel();
+            $model->ensureShowcase();
+            $found   = $model->findBySlug($slug);
+            if ($found && !empty($found['is_published'])) {
+                $project = $found;
+                $related = $model->getRelated((int)$project['id'], $project['category'] ?? null, 3, $slug);
+            }
+            $settings = (new SettingModel())->getAllAsMap();
+            if ($project) {
+                $seo = (new SeoModel())->findBySlug('project-' . $project['slug']);
+            }
+        });
 
         if (!$project || empty($project['is_published'])) {
-            $slug = (string)($params['slug'] ?? '');
-            $project = null;
             foreach (projectShowcaseItems() as $item) {
                 if (($item['slug'] ?? '') === $slug) {
                     $project = $item;
@@ -66,9 +80,12 @@ class ProjectsController extends Controller
             $this->abort(404);
         }
 
-        $related  = $model->getRelated((int)$project['id'], $project['category'] ?? null, 3, (string)($project['slug'] ?? ''));
-        $settings = (new SettingModel())->getAllAsMap();
-        $seo      = (new SeoModel())->findBySlug('project-' . $project['slug']);
+        if ($related === []) {
+            $related = array_slice(array_values(array_filter(
+                projectShowcaseItems(),
+                static fn(array $row): bool => ($row['slug'] ?? '') !== $slug
+            )), 0, 3);
+        }
 
         $this->render('projects/show', compact('project', 'related', 'settings', 'seo'));
     }
