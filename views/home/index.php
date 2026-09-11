@@ -10,7 +10,8 @@ $address   = $settings['address'] ?? '';
 $phoneHref = preg_replace('/\s+/', '', $phone);
 $wa        = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $phone);
 $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20a%20construction%20quote';
-$aboutImg  = !empty($settings['home_about_image']) ? uploadUrl($settings['home_about_image']) : 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80';
+$aboutImgDefault = asset('images/builds/about-residence.jpg');
+$aboutImg  = !empty($settings['home_about_image']) ? uploadUrl($settings['home_about_image']) : $aboutImgDefault;
 $ctaImg    = !empty($settings['home_cta_image']) ? uploadUrl($settings['home_cta_image']) : 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80';
 
 if (empty($sliders)) {
@@ -137,10 +138,10 @@ $trustBarItems = [
 ];
 
 $aboutHighlights = [
-  ['icon' => 'bi-award', 'title' => 'Proven Track Record', 'text' => 'Years of successful residential and commercial delivery across Somalia.'],
-  ['icon' => 'bi-people', 'title' => 'One Accountable Team', 'text' => 'Design, construction, and finishing coordinated under one roof.'],
-  ['icon' => 'bi-graph-up-arrow', 'title' => 'Value-Driven Builds', 'text' => 'Durable materials and smart planning that protect your investment.'],
-  ['icon' => 'bi-hand-thumbs-up', 'title' => 'Client-First Approach', 'text' => 'Clear communication from first meeting through final handover.'],
+  ['icon' => 'bi-geo-alt', 'title' => 'Based in Garowe', 'text' => 'We build for Puntland sites, climate, and family living — with local accountability from first meeting to handover.'],
+  ['icon' => 'bi-people', 'title' => 'One Accountable Team', 'text' => 'Design, construction, and finishing stay under one standard so nothing is lost between trades.'],
+  ['icon' => 'bi-clipboard-check', 'title' => 'Clear Scope & Timeline', 'text' => 'Transparent quotes, milestone updates, and a finish you can inspect before the keys are handed over.'],
+  ['icon' => 'bi-house-heart', 'title' => 'Homes Built to Last', 'text' => 'Durable materials and careful workmanship chosen for long-term performance, not a short-lived look.'],
 ];
 
 $excellencePillars = [
@@ -282,8 +283,36 @@ if ($heroList !== []) {
   }
 }
 
-$aboutImg = cmsMediaUrl($aboutSec['image_url'] ?? '', $aboutImg);
+$aboutImg = $aboutImgDefault;
 $ctaImg   = cmsMediaUrl($ctaSec['image_url'] ?? '', $ctaImg);
+
+$aboutTitle = cmsText($aboutSec, 'title', 'Who We Are');
+$aboutSubtitle = cmsText($aboutSec, 'subtitle', 'A Trusted Builder for Homes That Last.');
+$aboutLead = cmsText($aboutSec, 'content', $aboutText ?: 'HighQ Homes plans, builds, and finishes residential and commercial spaces in Garowe and across Puntland. Clients work with one accountable team — clear scope, honest timelines, and craftsmanship you can see in the completed home.');
+$oldAboutSubtitles = [
+  'Built on Integrity. Delivered with Precision.',
+  'Built on integrity. Delivered with precision.',
+];
+$oldAboutLeads = [
+  'HighQ Homes is a full-service construction partner turning ambitious plans into durable, beautifully finished spaces.',
+  'HighQ Homes is a full-service construction partner turning ambitious plans into durable, beautifully finished spaces — with disciplined planning and craftsmanship you can see in every detail.',
+];
+if (in_array($aboutSubtitle, $oldAboutSubtitles, true)) {
+  $aboutSubtitle = 'A Trusted Builder for Homes That Last.';
+}
+if (in_array($aboutLead, $oldAboutLeads, true) || $aboutLead === '') {
+  $aboutLead = 'HighQ Homes plans, builds, and finishes residential and commercial spaces in Garowe and across Puntland. Clients work with one accountable team — clear scope, honest timelines, and craftsmanship you can see in the completed home.';
+}
+$oldAboutTitles = ['Proven Track Record', 'Value-Driven Builds', 'Client-First Approach'];
+$aboutHighlightTitles = array_map(static fn($row) => (string)($row['title'] ?? ''), $aboutHighlights);
+if (array_intersect($oldAboutTitles, $aboutHighlightTitles) !== []) {
+  $aboutHighlights = [
+    ['icon' => 'bi-geo-alt', 'title' => 'Based in Garowe', 'text' => 'We build for Puntland sites, climate, and family living — with local accountability from first meeting to handover.'],
+    ['icon' => 'bi-people', 'title' => 'One Accountable Team', 'text' => 'Design, construction, and finishing stay under one standard so nothing is lost between trades.'],
+    ['icon' => 'bi-clipboard-check', 'title' => 'Clear Scope & Timeline', 'text' => 'Transparent quotes, milestone updates, and a finish you can inspect before the keys are handed over.'],
+    ['icon' => 'bi-house-heart', 'title' => 'Homes Built to Last', 'text' => 'Durable materials and careful workmanship chosen for long-term performance, not a short-lived look.'],
+  ];
+}
 
 $showHero         = cmsRowEnabled($cms, 'hero', true);
 $showHeroTrust    = cmsRowEnabled($cms, 'hero_trust', true);
@@ -544,19 +573,19 @@ $heroBandStats = array_map(static fn(array $stat): array => [
     <div class="hq-about-premium__shell">
       <div class="hq-about-premium__media" data-anim="left">
         <div class="hq-about-premium__frame">
-          <img src="<?= e($aboutImg) ?>" alt="<?= e($siteName) ?> team at work" loading="lazy">
+          <img src="<?= e($aboutImg) ?>" alt="Completed HighQ Homes residence in Garowe, Puntland" loading="lazy">
           <div class="hq-about-premium__badge">
             <strong><?= e($settings['stat_years'] ?? '4') ?>+</strong>
             <span>Years Building<br>With Excellence</span>
           </div>
         </div>
-        <div class="hq-about-premium__chip"><i class="bi bi-shield-check"></i> Trusted Construction Partner</div>
+        <div class="hq-about-premium__chip"><i class="bi bi-house-check"></i> Completed Residential Project</div>
       </div>
 
       <div class="hq-about-premium__content" data-anim="right">
-        <p class="hq-eyebrow hq-about-premium__eyebrow"><?= e(cmsText($aboutSec, 'title', 'Who We Are')) ?></p>
-        <h2 class="hq-title hq-about-premium__title"><?= e(cmsText($aboutSec, 'subtitle', 'Built on Integrity. Delivered with Precision.')) ?></h2>
-        <p class="hq-lead hq-about-premium__lead"><?= e(cmsText($aboutSec, 'content', $aboutText ?: 'HighQ Homes is a full-service construction partner turning ambitious plans into durable, beautifully finished spaces — with disciplined planning and craftsmanship you can see in every detail.')) ?></p>
+        <p class="hq-eyebrow hq-about-premium__eyebrow"><?= e($aboutTitle) ?></p>
+        <h2 class="hq-title hq-about-premium__title"><?= e($aboutSubtitle) ?></h2>
+        <p class="hq-lead hq-about-premium__lead"><?= e($aboutLead) ?></p>
 
         <div class="hq-about-premium__highlights">
           <?php foreach ($aboutHighlights as $i => $h): ?>

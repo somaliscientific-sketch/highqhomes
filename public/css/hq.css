@@ -3909,6 +3909,7 @@ body.hq-menu-open {
   width: 100%;
   aspect-ratio: 4/5;
   object-fit: cover;
+  object-position: center 62%;
   display: block;
 }
 
@@ -3961,7 +3962,7 @@ body.hq-menu-open {
 .hq-about-premium__title,
 .hq-about-premium__lead { text-align: left; margin-left: 0; }
 
-.hq-about-premium__title { max-width: 16ch; margin-bottom: 1rem; }
+.hq-about-premium__title { max-width: 18ch; margin-bottom: 1rem; }
 
 .hq-about-premium__lead { max-width: 52ch; margin-bottom: 1.75rem; }
 
