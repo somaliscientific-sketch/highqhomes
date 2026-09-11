@@ -300,10 +300,10 @@ if (array_intersect($oldAboutTitles, $aboutHighlightTitles) !== []) {
 
 $showHero         = cmsRowEnabled($cms, 'hero', true);
 $showHeroTrust    = cmsRowEnabled($cms, 'hero_trust', true);
-$showCapabilities = cmsRowEnabled($cms, 'capabilities', true);
+$showCapabilities = false;
 $showAbout        = cmsRowEnabled($cms, 'about_highlights', ($settings['home_about_enabled'] ?? '1') === '1');
 $showProjects     = cmsRowEnabled($cms, 'projects', ($settings['home_projects_enabled'] ?? '1') === '1');
-$showWhyUs        = cmsRowEnabled($cms, 'why_us', true);
+$showWhyUs        = false;
 $showProcess      = cmsRowEnabled($cms, 'process', true);
 $showExcellence   = false;
 $showConnect      = false;
