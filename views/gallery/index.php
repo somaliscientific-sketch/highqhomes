@@ -6,40 +6,113 @@ $wa        = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $settings['ph
 $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20to%20discuss%20a%20project';
 $phone     = $settings['phone'] ?? '';
 $phoneHref = preg_replace('/\s+/', '', $phone);
-$heroImage = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
+
+$copyIf = static function (string $current, array $stale, string $fresh): string {
+    $norm = strtolower(trim($current));
+    if ($norm === '') {
+        return $fresh;
+    }
+    foreach ($stale as $old) {
+        if ($norm === strtolower($old)) {
+            return $fresh;
+        }
+    }
+    return $current;
+};
+
+if (empty($items)) {
+    $items = galleryShowcaseItems(($category ?? '') ?: null);
+    $allShowcase = galleryShowcaseItems();
+    $stats['showing'] = count($items);
+    $stats['total'] = count($allShowcase);
+    $stats['categories'] = count(array_unique(array_map(
+        static fn(array $row): string => (string)($row['category'] ?? ''),
+        $allShowcase
+    )));
+    $stats['completed'] = count(array_filter(
+        $allShowcase,
+        static fn(array $row): bool => ($row['category'] ?? '') !== 'construction'
+    ));
+    if (empty($categories)) {
+        $categories = array_values(array_unique(array_map(
+            static fn(array $row): string => (string)($row['category'] ?? ''),
+            $allShowcase
+        )));
+    }
+}
 
 $cms = $sections ?? [];
 $hero = cmsRow($cms, 'hero');
 $intro = cmsRow($cms, 'intro');
-$highlightsSec = cmsRow($cms, 'highlights');
 $catalogSec = cmsRow($cms, 'catalog');
 $ctaSec = cmsRow($cms, 'cta');
 $ctaMap = cmsMap($ctaSec);
 
 $showHero = cmsRowEnabled($cms, 'hero', true);
 $showIntro = cmsRowEnabled($cms, 'intro', true);
-$showHighlights = cmsRowEnabled($cms, 'highlights', true);
 $showCatalog = cmsRowEnabled($cms, 'catalog', true);
 $showCta = cmsRowEnabled($cms, 'cta', true);
 
-$heroKicker = cmsText($hero, 'title', 'Our work');
-$heroTitle  = cmsText($hero, 'subtitle', 'Project gallery');
-$heroLead   = cmsText($hero, 'content', 'Photos from residential, commercial, and community projects across Puntland — structure, finishes, and handover.');
-$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80');
+$heroImageDefault = asset('images/builds/twin-residences.jpg');
+$heroKicker = $copyIf(cmsText($hero, 'title', ''), ['Our work', 'Our Work', 'Gallery'], 'On site');
+$heroTitle  = $copyIf(cmsText($hero, 'subtitle', ''), ['Project gallery', 'Project Gallery'], 'Photographed in Garowe.');
+$heroLead   = $copyIf(cmsText($hero, 'content', ''), [
+    'Photos from residential, commercial, and community projects across Puntland — structure, finishes, and handover.',
+], 'Real HighQ Homes builds — villas, compounds, and an active site — not stock photography.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', $heroImageDefault);
+if ($heroImage === '' || str_contains($heroImage, 'unsplash.com')) {
+    $heroImage = $heroImageDefault;
+}
 
-$introEyebrow = cmsText($intro, 'title', 'Visual portfolio');
-$introTitle   = cmsText($intro, 'subtitle', 'Craftsmanship in every frame');
-$introLead    = cmsText($intro, 'content', 'Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.');
+$introEyebrow = $copyIf(cmsText($intro, 'title', ''), ['Visual portfolio', 'Visual Portfolio'], 'The work');
+$introTitle   = $copyIf(cmsText($intro, 'subtitle', ''), ['Craftsmanship in every frame', 'Craftsmanship in Every Frame'], 'Homes you can walk up to.');
+$introLead    = $copyIf(cmsText($intro, 'content', ''), [
+    'Browse real project imagery — from structural milestones to final finishes — and see the quality HighQ Homes delivers.',
+], 'Every photo on this page was taken on a HighQ Homes site in Garowe. Open one for a closer look, or go through to the project stories.');
 
-$highlights = cmsList($highlightsSec) ?: [
-    ['icon' => 'bi-house-heart', 'title' => 'Residential', 'text' => 'Homes and villas finished to live-in quality.'],
-    ['icon' => 'bi-building', 'title' => 'Commercial', 'text' => 'Workspaces and retail built for daily use.'],
-    ['icon' => 'bi-brush', 'title' => 'Finishes', 'text' => 'Detail shots of coatings, interiors, and handover.'],
-];
+$catalogKicker = $copyIf(cmsText($catalogSec, 'title', ''), ['Photo collection', 'Photo Collection'], 'Gallery');
+$catalogTitle  = $copyIf(cmsText($catalogSec, 'subtitle', ''), ['Explore by category', 'Explore By Category'], 'Browse the photos');
+$catalogLead   = $copyIf(cmsText($catalogSec, 'content', ''), [
+    'Filter images by project type — click any photo to view full size.',
+], 'Filter by type, then click a photo to view it full size.');
+
+$ctaKicker = $copyIf((string)($ctaSec['title'] ?? ''), ['Start your build', 'Start Your Build'], 'Start a project');
+$ctaTitle  = $copyIf((string)($ctaSec['subtitle'] ?? ''), [
+    'Want results like these on your site?',
+    'Want Results Like These On Your Site?',
+], 'Want a home that photographs like these?');
+$ctaLead   = $copyIf((string)($ctaSec['content'] ?? ''), [
+    'Share your project vision — we\'ll plan scope, timeline, and premium delivery from day one.',
+    "Share your project vision — we'll plan scope, timeline, and premium delivery from day one.",
+], 'Share the plot. We will come back with a clear plan, an honest timeline, and a quote you can trust.');
+
+$filterUrl = static function (?string $cat): string {
+    if ($cat === null || $cat === '') {
+        return url('gallery');
+    }
+    return url('gallery') . '?category=' . rawurlencode($cat);
+};
+
+$schemaImages = array_map(static fn(array $item): array => [
+    '@type'      => 'ImageObject',
+    'name'       => $item['title'] ?? 'HighQ Homes project',
+    'contentUrl' => galleryImageUrl($item),
+    'caption'    => $item['description'] ?? ($item['alt_text'] ?? ''),
+], $items);
+
+$schemaJson = json_encode([
+    '@context'        => 'https://schema.org',
+    '@type'           => 'ImageGallery',
+    'name'            => 'HighQ Homes Project Gallery',
+    'url'             => url('gallery'),
+    'image'           => array_values($schemaImages),
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 ?>
 
+<script type="application/ld+json"><?= $schemaJson ?></script>
+
 <?php if ($showHero): ?>
-<section class="hq-gallery-pro-hero">
+<section class="hq-gallery-pro-hero hq-gallery-pro-hero--cinematic">
   <div class="hq-gallery-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
   </div>
@@ -58,6 +131,11 @@ $highlights = cmsList($highlightsSec) ?: [
         <a href="#gallery-grid" class="hq-btn hq-btn--orange hq-btn--lg">Browse photos <i class="bi bi-arrow-down"></i></a>
         <a href="<?= url('projects') ?>" class="hq-btn hq-btn--ghost hq-btn--lg">View projects</a>
       </div>
+      <ul class="hq-gallery-pro-hero__chips">
+        <li><i class="bi bi-camera-fill"></i> Photographed on site</li>
+        <li><i class="bi bi-geo-alt-fill"></i> Garowe, Puntland</li>
+        <li><i class="bi bi-house-heart"></i> Residential builds</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -74,34 +152,18 @@ $highlights = cmsList($highlightsSec) ?: [
       </div>
       <div class="hq-gallery-pro-intro__stats">
         <div class="hq-gallery-pro-stat">
-          <strong><?= number_format($stats['showing']) ?></strong>
-          <span><?= $category ? 'In category' : 'Photos' ?></span>
+          <strong><?= number_format((int)($stats['total'] ?? count($items))) ?></strong>
+          <span>Photos</span>
         </div>
         <div class="hq-gallery-pro-stat">
-          <strong><?= number_format($stats['total']) ?></strong>
-          <span>Total images</span>
+          <strong><?= number_format((int)($stats['completed'] ?? 0)) ?></strong>
+          <span>Finished builds</span>
         </div>
         <div class="hq-gallery-pro-stat">
-          <strong><?= number_format($stats['categories']) ?></strong>
+          <strong><?= number_format((int)($stats['categories'] ?? 0)) ?></strong>
           <span>Categories</span>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
-<?php if ($showHighlights && !empty($highlights)): ?>
-<section class="hq-gallery-pro-highlights">
-  <div class="container-site">
-    <div class="hq-gallery-pro-highlights__grid">
-      <?php foreach ($highlights as $i => $item): ?>
-      <article class="hq-gallery-pro-highlight" data-anim="up" data-delay="<?= $i * 45 ?>">
-        <span class="hq-gallery-pro-highlight__icon"><i class="bi <?= e($item['icon'] ?? 'bi-image') ?>"></i></span>
-        <h3><?= e($item['title'] ?? '') ?></h3>
-        <p><?= e($item['text'] ?? '') ?></p>
-      </article>
-      <?php endforeach; ?>
     </div>
   </div>
 </section>
@@ -111,44 +173,34 @@ $highlights = cmsList($highlightsSec) ?: [
 <section class="hq-gallery-pro-catalog" id="gallery-grid">
   <div class="container-site">
     <header class="hq-gallery-pro-section-head" data-anim="up">
-      <p class="hq-gallery-pro-eyebrow"><?= e(cmsText($catalogSec, 'title', 'Photo collection')) ?></p>
-      <h2 class="hq-gallery-pro-title"><?= e(cmsText($catalogSec, 'subtitle', 'Explore by category')) ?></h2>
-      <p class="hq-gallery-pro-lead hq-gallery-pro-section-head__lead"><?= e(cmsText($catalogSec, 'content', 'Filter images by project type — click any photo to view full size.')) ?></p>
+      <p class="hq-gallery-pro-eyebrow"><?= e($catalogKicker) ?></p>
+      <h2 class="hq-gallery-pro-title"><?= e($catalogTitle) ?></h2>
+      <p class="hq-gallery-pro-lead hq-gallery-pro-section-head__lead"><?= e($catalogLead) ?></p>
     </header>
 
     <?php if (!empty($categories)): ?>
     <div class="hq-gallery-pro-toolbar" data-anim="up" data-delay="50">
       <span class="hq-gallery-pro-toolbar__label">Filter</span>
       <div class="hq-gallery-pro-filters">
-        <button type="button" data-filter-btn="all" class="hq-gallery-pro-filter active">All</button>
+        <a href="<?= e($filterUrl(null)) ?>" class="hq-gallery-pro-filter<?= ($category ?? '') === '' ? ' active' : '' ?>">All</a>
         <?php foreach ($categories as $cat): ?>
-        <button type="button" data-filter-btn="<?= e($cat) ?>" class="hq-gallery-pro-filter"><?= e(galleryCategoryLabel($cat)) ?></button>
+        <a href="<?= e($filterUrl($cat)) ?>" class="hq-gallery-pro-filter<?= ($category ?? '') === $cat ? ' active' : '' ?>"><?= e(galleryCategoryLabel($cat)) ?></a>
         <?php endforeach; ?>
       </div>
     </div>
     <?php endif; ?>
 
-    <?php if (empty($items)): ?>
-    <div class="hq-gallery-pro-empty" data-anim="up">
-      <span class="hq-gallery-pro-empty__icon"><i class="bi bi-images"></i></span>
-      <h3>No gallery images yet</h3>
-      <p>Photos will appear here once published from the admin gallery.</p>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline">Contact us</a>
-    </div>
-    <?php else: ?>
-    <p class="hq-gallery-pro-count" data-anim="up" data-delay="60">
-      <?= $stats['showing'] === 1 ? '1 photo' : number_format($stats['showing']) . ' photos' ?>
-    </p>
     <div class="hq-gallery-pro-grid">
       <?php foreach ($items as $i => $item): ?>
       <?php
         $imgSrc = galleryImageUrl($item);
-        $alt    = $item['alt_text'] ?: ($item['title'] ?: 'Gallery');
+        $alt    = $item['alt_text'] ?: ($item['title'] ?: 'HighQ Homes project');
         $cat    = $item['category'] ?? '';
+        $featured = $i === 0 && ($category ?? '') === '';
       ?>
       <button
         type="button"
-        class="hq-gallery-pro-item lightbox-trigger hq-gallery-trigger"
+        class="hq-gallery-pro-item lightbox-trigger hq-gallery-trigger<?= $featured ? ' hq-gallery-pro-item--featured' : '' ?>"
         data-lightbox="gallery"
         data-src="<?= e($imgSrc) ?>"
         data-alt="<?= e($alt) ?>"
@@ -156,7 +208,7 @@ $highlights = cmsList($highlightsSec) ?: [
         data-anim="up"
         data-delay="<?= ($i % 12) * 35 ?>"
       >
-        <img src="<?= e($imgSrc) ?>" alt="<?= e($alt) ?>" loading="<?= $i < 6 ? 'eager' : 'lazy' ?>">
+        <img src="<?= e($imgSrc) ?>" alt="<?= e($alt) ?>" loading="<?= $i < 4 ? 'eager' : 'lazy' ?>">
         <span class="hq-gallery-pro-item__overlay">
           <?php if ($cat !== ''): ?>
           <span class="hq-gallery-pro-item__cat"><?= e(galleryCategoryLabel($cat)) ?></span>
@@ -169,7 +221,6 @@ $highlights = cmsList($highlightsSec) ?: [
       </button>
       <?php endforeach; ?>
     </div>
-    <?php endif; ?>
   </div>
 </section>
 <?php endif; ?>
@@ -179,9 +230,9 @@ $highlights = cmsList($highlightsSec) ?: [
   <div class="hq-gallery-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-gallery-pro-cta__box" data-anim="up">
     <div class="hq-gallery-pro-cta__copy">
-      <p class="hq-gallery-pro-eyebrow hq-gallery-pro-eyebrow--light"><?= e($ctaSec['title'] ?? 'Start your build') ?></p>
-      <h2 id="gallery-cta-title" class="hq-gallery-pro-cta__title"><?= e($ctaSec['subtitle'] ?? 'Want results like these on your site?') ?></h2>
-      <p class="hq-gallery-pro-cta__lead"><?= e($ctaSec['content'] ?? 'Share your project vision — we\'ll plan scope, timeline, and premium delivery from day one.') ?></p>
+      <p class="hq-gallery-pro-eyebrow hq-gallery-pro-eyebrow--light"><?= e($ctaKicker) ?></p>
+      <h2 id="gallery-cta-title" class="hq-gallery-pro-cta__title"><?= e($ctaTitle) ?></h2>
+      <p class="hq-gallery-pro-cta__lead"><?= e($ctaLead) ?></p>
     </div>
     <div class="hq-gallery-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'Get a quote') ?></a>

@@ -455,12 +455,128 @@ function serviceShowcaseItems(): array
 
 function galleryImageUrl(array $item, string $fallback = ''): string
 {
-    $fallback = $fallback ?: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80';
-    if (empty($item['image'])) {
+    $fallback = $fallback ?: asset('images/builds/grey-villa-evening.jpg');
+    $image = (string)($item['image'] ?? '');
+    if ($image === '' || str_contains($image, 'unsplash.com')) {
         return $fallback;
     }
-    $image = $item['image'];
-    return str_starts_with($image, 'http') ? $image : uploadUrl($image);
+    return mediaPathUrl($image, $fallback);
+}
+
+function isStaleGalleryImage(?string $image): bool
+{
+    $image = trim((string)$image);
+    return $image === '' || str_contains($image, 'unsplash.com');
+}
+
+/**
+ * On-site HighQ Homes photos used when the gallery table is empty or still stock.
+ *
+ * @return list<array<string, mixed>>
+ */
+function galleryShowcaseItems(?string $category = null): array
+{
+    $rows = [
+        [
+            'id' => 201,
+            'title' => 'Evening family villa',
+            'description' => 'Two-storey gated villa photographed at dusk in Garowe.',
+            'image' => 'images/builds/grey-villa-evening.jpg',
+            'category' => 'residential',
+            'alt_text' => 'Grey two-storey family villa with evening lighting in Garowe',
+            'is_published' => 1,
+            'sort_order' => 1,
+        ],
+        [
+            'id' => 202,
+            'title' => 'Twin family residences',
+            'description' => 'Paired two-storey homes sharing a composed street frontage.',
+            'image' => 'images/builds/twin-residences.jpg',
+            'category' => 'residential',
+            'alt_text' => 'Twin two-storey residences in Garowe',
+            'is_published' => 1,
+            'sort_order' => 2,
+        ],
+        [
+            'id' => 203,
+            'title' => 'Modern courtyard villa',
+            'description' => 'Contemporary elevation with deep openings and a courtyard plan.',
+            'image' => 'images/builds/modern-villa.jpg',
+            'category' => 'residential',
+            'alt_text' => 'Modern two-storey courtyard villa in Garowe',
+            'is_published' => 1,
+            'sort_order' => 3,
+        ],
+        [
+            'id' => 204,
+            'title' => 'Stone compound residence',
+            'description' => 'Family home behind a stone wall, gate, and landscaped approach.',
+            'image' => 'images/builds/stone-residence.jpg',
+            'category' => 'exterior',
+            'alt_text' => 'Stone compound wall and residence in Garowe',
+            'is_published' => 1,
+            'sort_order' => 4,
+        ],
+        [
+            'id' => 205,
+            'title' => 'Two-storey family home',
+            'description' => 'Warm rendered façade and balanced openings on a finished plot.',
+            'image' => 'images/builds/yellow-residence.jpg',
+            'category' => 'residential',
+            'alt_text' => 'Two-storey family residence with warm render in Garowe',
+            'is_published' => 1,
+            'sort_order' => 5,
+        ],
+        [
+            'id' => 206,
+            'title' => 'Green roof family home',
+            'description' => 'Distinctive green roof, deep eaves, and a finished compound.',
+            'image' => 'images/builds/green-roof-residence.jpg',
+            'category' => 'residential',
+            'alt_text' => 'Two-storey home with green roof in Garowe',
+            'is_published' => 1,
+            'sort_order' => 6,
+        ],
+        [
+            'id' => 207,
+            'title' => 'Gated villa entrance',
+            'description' => 'Custom gate and compound wall built with the house.',
+            'image' => 'images/builds/grey-villa.jpg',
+            'category' => 'exterior',
+            'alt_text' => 'Gated entrance and compound wall of a villa in Garowe',
+            'is_published' => 1,
+            'sort_order' => 7,
+        ],
+        [
+            'id' => 208,
+            'title' => 'Build in progress',
+            'description' => 'Active residential site with inspections before each stage.',
+            'image' => 'images/builds/active-build.jpg',
+            'category' => 'construction',
+            'alt_text' => 'HighQ Homes residential construction site in Garowe',
+            'is_published' => 1,
+            'sort_order' => 8,
+        ],
+        [
+            'id' => 209,
+            'title' => 'Street family residence',
+            'description' => 'Completed home photographed from the street in Garowe.',
+            'image' => 'images/builds/about-residence.jpg',
+            'category' => 'residential',
+            'alt_text' => 'Completed family residence photographed from the street in Garowe',
+            'is_published' => 1,
+            'sort_order' => 9,
+        ],
+    ];
+
+    if ($category) {
+        $rows = array_values(array_filter(
+            $rows,
+            static fn(array $row): bool => ($row['category'] ?? '') === $category
+        ));
+    }
+
+    return $rows;
 }
 
 function galleryCategoryLabel(?string $category): string
