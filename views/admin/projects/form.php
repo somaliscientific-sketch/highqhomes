@@ -39,7 +39,7 @@
             <div>
               <label class="admin-label">Status</label>
               <select name="status" class="admin-input">
-                <?php foreach (['completed'=>'Completed','in_progress'=>'In Progress','planned'=>'Planned'] as $val=>$lbl): ?>
+                <?php foreach (['completed'=>'Completed','in_progress'=>'In Progress','planned'=>'Upcoming'] as $val=>$lbl): ?>
                 <option value="<?= $val ?>" <?= ($project['status'] ?? 'completed') === $val ? 'selected' : '' ?>><?= $lbl ?></option>
                 <?php endforeach; ?>
               </select>

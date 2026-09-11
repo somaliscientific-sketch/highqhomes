@@ -17,6 +17,7 @@ class ProjectsController extends Controller
             'total'       => 0,
             'completed'   => 0,
             'in_progress' => 0,
+            'planned'     => 0,
             'categories'  => 0,
             'years'       => '',
         ];
@@ -37,6 +38,7 @@ class ProjectsController extends Controller
                 'total'       => $model->countPublished(),
                 'completed'   => $model->countByStatus('completed'),
                 'in_progress' => $model->countByStatus('in_progress'),
+                'planned'     => $model->countByStatus('planned'),
                 'categories'  => count($categories),
                 'years'       => $model->yearSpan(),
             ];

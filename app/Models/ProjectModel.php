@@ -42,7 +42,7 @@ class ProjectModel extends Model
     {
         try {
             $stmt = $this->db->prepare(
-                "SELECT * FROM projects WHERE is_published = 1 AND is_featured = 1
+                "SELECT * FROM projects WHERE is_published = 1 AND is_featured = 1 AND status <> 'planned'
                  ORDER BY sort_order ASC, created_at DESC LIMIT " . (int)$limit
             );
             $stmt->execute();
@@ -58,7 +58,7 @@ class ProjectModel extends Model
 
         $rows = array_values(array_filter(
             $this->filterShowcase(null, null),
-            static fn(array $row): bool => !empty($row['is_featured'])
+            static fn(array $row): bool => !empty($row['is_featured']) && !isUpcomingProject($row)
         ));
 
         return array_slice($rows, 0, $limit);
@@ -67,7 +67,7 @@ class ProjectModel extends Model
     public function getLatest(int $limit = 6, bool $excludeFeatured = true): array
     {
         try {
-            $sql = "SELECT * FROM projects WHERE is_published = 1";
+            $sql = "SELECT * FROM projects WHERE is_published = 1 AND status <> 'planned'";
             if ($excludeFeatured) {
                 $sql .= " AND is_featured = 0";
             }
@@ -85,7 +85,10 @@ class ProjectModel extends Model
             }
         }
 
-        $rows = $this->filterShowcase(null, null);
+        $rows = array_values(array_filter(
+            $this->filterShowcase(null, null),
+            static fn(array $row): bool => !isUpcomingProject($row)
+        ));
         if ($excludeFeatured) {
             $rows = array_values(array_filter(
                 $rows,
@@ -159,7 +162,7 @@ class ProjectModel extends Model
             )));
         }
 
-        $order = ['completed' => 0, 'in_progress' => 1, 'planned' => 2];
+        $order = ['planned' => 0, 'in_progress' => 1, 'completed' => 2];
         usort($rows, static function (string $a, string $b) use ($order): int {
             return ($order[$a] ?? 9) <=> ($order[$b] ?? 9);
         });
@@ -205,6 +208,9 @@ class ProjectModel extends Model
             );
             $stmt->execute([$status]);
             $count = (int)$stmt->fetchColumn();
+            if ($this->countPublishedFromDb() > 0) {
+                return $count;
+            }
             if ($count > 0) {
                 return $count;
             }
@@ -290,8 +296,8 @@ class ProjectModel extends Model
     }
 
     /**
-     * Seed a real-photo portfolio when the live table has no published projects.
-     * Does not overwrite projects created in admin.
+     * Seed the portfolio when the live table is empty, and insert catalog
+     * additions (such as the upcoming villa) without overwriting admin projects.
      */
     public function ensureShowcase(): void
     {
@@ -301,32 +307,53 @@ class ProjectModel extends Model
         self::$showcaseReady = true;
 
         try {
-            if ($this->countPublishedFromDb() > 0) {
+            if ($this->countPublishedFromDb() === 0) {
+                foreach ($this->showcaseCatalog() as $row) {
+                    $this->insertCatalogRowIfMissing($row);
+                }
                 return;
             }
 
-            foreach ($this->showcaseCatalog() as $row) {
-                if ($this->findBy('slug', (string)$row['slug'])) {
-                    continue;
-                }
-                unset($row['id']);
-                if (isset($row['gallery_images']) && is_array($row['gallery_images'])) {
-                    if ($row['gallery_images'] === []) {
-                        unset($row['gallery_images']);
-                    } else {
-                        $row['gallery_images'] = json_encode($row['gallery_images']);
-                    }
-                }
-                if (($row['gallery_images'] ?? null) === null) {
-                    unset($row['gallery_images']);
-                }
-                $this->insert($row);
-            }
+            $this->syncUpcomingCatalog();
         } catch (\Throwable $e) {
             if (class_exists('Production')) {
                 Production::log('Project showcase: ' . $e->getMessage());
             }
         }
+    }
+
+    private function syncUpcomingCatalog(): void
+    {
+        foreach ($this->showcaseCatalog() as $row) {
+            if (($row['slug'] ?? '') !== 'desert-courtyard-villa') {
+                continue;
+            }
+            $this->insertCatalogRowIfMissing($row);
+            return;
+        }
+    }
+
+    /** @param array<string, mixed> $row */
+    private function insertCatalogRowIfMissing(array $row): void
+    {
+        $slug = (string)($row['slug'] ?? '');
+        if ($slug === '' || $this->findBy('slug', $slug)) {
+            return;
+        }
+
+        unset($row['id']);
+        if (isset($row['gallery_images']) && is_array($row['gallery_images'])) {
+            if ($row['gallery_images'] === []) {
+                unset($row['gallery_images']);
+            } else {
+                $row['gallery_images'] = json_encode($row['gallery_images']);
+            }
+        }
+        if (($row['gallery_images'] ?? null) === null) {
+            unset($row['gallery_images']);
+        }
+
+        $this->insert($row);
     }
 
     /** @return list<array<string, mixed>> */

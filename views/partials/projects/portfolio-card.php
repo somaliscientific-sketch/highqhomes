@@ -31,8 +31,11 @@ $statusLabel = projectStatusLabel($project['status'] ?? null);
           <span class="hq-tag hq-tag--cat"><?= e($pCat) ?></span>
           <span class="hq-tag hq-tag--<?= e($statusClass) ?>"><?= e($statusLabel) ?></span>
         </div>
-        <?php if ($isFeatured): ?>
+        <?php if ($isFeatured && !isUpcomingProject($project)): ?>
         <span class="hq-projects-pro-card__featured"><i class="bi bi-star-fill"></i> Featured</span>
+        <?php endif; ?>
+        <?php if (isUpcomingProject($project)): ?>
+        <span class="hq-projects-pro-card__viz"><i class="bi bi-easel2"></i> Design visualization</span>
         <?php endif; ?>
         <span class="hq-projects-pro-card__view">View project <i class="bi bi-arrow-up-right"></i></span>
       </figcaption>

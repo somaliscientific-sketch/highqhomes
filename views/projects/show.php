@@ -10,6 +10,7 @@ $pImg      = projectImageUrl($project);
 $gallery   = $project['gallery_images'] ?? [];
 $pCat      = projectCategoryLabel($project['category'] ?? null);
 $pStatus   = projectStatusLabel($project['status'] ?? null);
+$isUpcoming = isUpcomingProject($project);
 $statusClass = match ($project['status'] ?? '') {
     'completed'   => 'done',
     'in_progress' => 'active',
@@ -30,7 +31,7 @@ $scopeMap = [
 $scopeItems = $scopeMap[$project['category'] ?? ''] ?? $scopeMap['other'];
 ?>
 
-<section class="hq-projects-pro-hero hq-projects-pro-hero--project">
+<section class="hq-projects-pro-hero hq-projects-pro-hero--project<?= $isUpcoming ? ' hq-projects-pro-hero--upcoming' : '' ?>">
   <div class="hq-projects-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($pImg) ?>" alt="" loading="eager">
   </div>
@@ -68,14 +69,23 @@ $scopeItems = $scopeMap[$project['category'] ?? ''] ?? $scopeMap['other'];
         </figure>
 
         <div class="hq-projects-pro-detail__content" data-anim="up" data-delay="50">
-          <h2 class="hq-projects-pro-detail__heading">Project overview</h2>
+          <?php if ($isUpcoming): ?>
+          <aside class="hq-upcoming-note" role="note">
+            <i class="bi bi-easel2"></i>
+            <div>
+              <strong>Design visualization</strong>
+              <p>This is the proposed architecture for an upcoming HighQ Homes residence — not a photograph of a finished site. Construction follows a written programme after the plot is confirmed.</p>
+            </div>
+          </aside>
+          <?php endif; ?>
+          <h2 class="hq-projects-pro-detail__heading"><?= $isUpcoming ? 'The design' : 'Project overview' ?></h2>
           <div class="hq-cms-content hq-projects-pro-detail__prose">
             <?= $project['description'] ?: '<p>' . e($shortDesc) . '</p>' ?>
           </div>
         </div>
 
         <section class="hq-projects-pro-detail__scope" data-anim="up" data-delay="70">
-          <h2 class="hq-projects-pro-detail__heading">Scope of work</h2>
+          <h2 class="hq-projects-pro-detail__heading"><?= $isUpcoming ? 'Intended scope' : 'Scope of work' ?></h2>
           <ul class="hq-projects-pro-scope-list">
             <?php foreach ($scopeItems as $item): ?>
             <li><i class="bi bi-check-circle-fill"></i><span><?= e($item) ?></span></li>
@@ -116,14 +126,14 @@ $scopeItems = $scopeMap[$project['category'] ?? ''] ?? $scopeMap['other'];
             <div><dt>Client</dt><dd><?= e($project['client_name']) ?></dd></div>
             <?php endif; ?>
             <?php if (!empty($project['project_year'])): ?>
-            <div><dt>Year</dt><dd><?= e((string)$project['project_year']) ?></dd></div>
+            <div><dt><?= $isUpcoming ? 'Target year' : 'Year' ?></dt><dd><?= e((string)$project['project_year']) ?></dd></div>
             <?php endif; ?>
             <?php if (!empty($project['project_area'])): ?>
             <div><dt>Area</dt><dd><?= e($project['project_area']) ?></dd></div>
             <?php endif; ?>
           </dl>
           <div class="hq-projects-pro-meta-card__actions">
-            <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block"><i class="bi bi-whatsapp"></i> Discuss this project</a>
+            <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block"><i class="bi bi-whatsapp"></i> <?= $isUpcoming ? 'Discuss this design' : 'Discuss this project' ?></a>
             <a href="<?= url('projects') ?>" class="hq-projects-pro-meta-card__back"><i class="bi bi-arrow-left"></i> Back to portfolio</a>
           </div>
         </div>
@@ -166,8 +176,10 @@ $scopeItems = $scopeMap[$project['category'] ?? ''] ?? $scopeMap['other'];
   <div class="container-site hq-projects-pro-cta__box" data-anim="up">
     <div class="hq-projects-pro-cta__copy">
       <p class="hq-projects-pro-eyebrow hq-projects-pro-eyebrow--light">Your project next</p>
-      <h2 id="project-cta-title" class="hq-projects-pro-cta__title">Ready to build something like this?</h2>
-      <p class="hq-projects-pro-cta__lead">Talk to our team for planning, pricing guidance, and premium delivery from start to handover.</p>
+      <h2 id="project-cta-title" class="hq-projects-pro-cta__title"><?= $isUpcoming ? 'Want a home in this language?' : 'Ready to build something like this?' ?></h2>
+      <p class="hq-projects-pro-cta__lead"><?= $isUpcoming
+        ? 'Share your plot in Garowe. We will confirm what it can support and turn this design into a clear programme and quote.'
+        : 'Talk to our team for planning, pricing guidance, and premium delivery from start to handover.' ?></p>
     </div>
     <div class="hq-projects-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>

@@ -5,7 +5,7 @@ $bodyPage  = 'projects';
 $hasFilters = (bool)($category || $status);
 $statuses   = $statuses ?? [];
 $projects   = $projects ?? [];
-$stats      = $stats ?? ['showing' => 0, 'total' => 0, 'completed' => 0, 'in_progress' => 0, 'categories' => 0, 'years' => ''];
+$stats      = $stats ?? ['showing' => 0, 'total' => 0, 'completed' => 0, 'in_progress' => 0, 'planned' => 0, 'categories' => 0, 'years' => ''];
 
 if ($projects === []) {
     $projects = projectShowcaseItems(($category ?? '') ?: null, ($status ?? '') ?: null);
@@ -15,11 +15,19 @@ if ($projects === []) {
     $stats['total'] = count($allShowcase);
     $stats['completed'] = count(array_filter($allShowcase, static fn(array $row): bool => ($row['status'] ?? '') === 'completed'));
     $stats['in_progress'] = count(array_filter($allShowcase, static fn(array $row): bool => ($row['status'] ?? '') === 'in_progress'));
+    $stats['planned'] = count(array_filter($allShowcase, static fn(array $row): bool => ($row['status'] ?? '') === 'planned'));
     $stats['categories'] = count(array_unique(array_map(static fn(array $row): string => (string)($row['category'] ?? ''), $allShowcase)));
     $stats['years'] = $years === [] ? '' : (min($years) === max($years) ? (string) min($years) : min($years) . '–' . max($years));
     $statuses = array_values(array_unique(array_map(static fn(array $row): string => (string)($row['status'] ?? ''), $allShowcase)));
     $categories = array_values(array_unique(array_map(static fn(array $row): string => (string)($row['category'] ?? ''), $allShowcase)));
 }
+
+$upcomingProjects = array_values(array_filter($projects, 'isUpcomingProject'));
+$showUpcomingBand = $upcomingProjects !== [] && (($status ?? '') === '' || ($status ?? '') === 'planned');
+$gridProjects = $showUpcomingBand
+    ? array_values(array_filter($projects, static fn(array $row): bool => !isUpcomingProject($row)))
+    : $projects;
+$upcomingHero = $upcomingProjects[0] ?? null;
 
 $wa        = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $settings['phone'] ?? '252907734667');
 $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20to%20discuss%20a%20project';
@@ -47,6 +55,8 @@ $filterUrl = static function (?string $cat, ?string $st) use ($category, $status
     $qs = http_build_query($params);
     return url('projects') . ($qs !== '' ? '?' . $qs : '');
 };
+
+$upcomingHref = $showUpcomingBand ? '#upcoming' : $filterUrl(null, 'planned');
 
 $cardSize = static function (int $i, int $total): string {
     if ($total === 1) {
@@ -110,10 +120,10 @@ $introEyebrow = $copyIf(cmsText($intro, 'title', ''), ['Our work', 'Our Work'], 
 $introTitle   = $copyIf(cmsText($intro, 'subtitle', ''), [
     'Built to last. Designed to impress.',
     'Built to Last. Designed to Impress.',
-], 'Homes people live in — not catalogue renders.');
+], 'Homes people live in — and the next one on the board.');
 $introLead    = $copyIf(cmsText($intro, 'content', ''), [
     'Every project reflects our commitment to transparent delivery, disciplined craftsmanship, and spaces people trust for generations.',
-], 'Each project on this page is a HighQ Homes build. Filter by status, then open a card for location, year, and how we delivered it.');
+], 'Each project on this page is a HighQ Homes build. The upcoming villa is a design visualization — completed homes and the active site are photographed in Garowe.');
 
 $cmsPillars = cmsList($pillarsSec);
 if ($cmsPillars !== []) {
@@ -133,7 +143,7 @@ $catalogKicker = $copyIf(cmsText($catalogSec, 'title', ''), ['Project portfolio'
 $catalogTitle  = $copyIf(cmsText($catalogSec, 'subtitle', ''), ['Explore our builds'], 'Explore the builds');
 $catalogLead   = $copyIf(cmsText($catalogSec, 'content', ''), [
     'Filter by category or status to find projects similar to yours.',
-], 'Completed homes and active sites. Open any card for the full story.');
+], 'Upcoming design first, then completed homes and the active site. Open any card for the full story.');
 
 $approachKicker = $copyIf((string)($approachSec['title'] ?? ''), ['Our approach', 'Approach', 'Our Approach'], 'Our approach');
 $approachTitle  = $copyIf((string)($approachSec['subtitle'] ?? ''), [
@@ -158,9 +168,9 @@ $ctaLead   = $copyIf((string)($ctaSec['content'] ?? ''), [
 ], 'Tell us about your plot. We will come back with a clear plan, an honest timeline, and a quote you can trust.');
 
 $statusLabels = [
-    'completed'   => 'Completed',
+    'planned'     => 'Upcoming',
     'in_progress' => 'In progress',
-    'planned'     => 'Planned',
+    'completed'   => 'Completed',
 ];
 
 $schemaProjects = array_map(static fn(array $p): array => [
@@ -202,13 +212,13 @@ $schemaJson = json_encode([
       <h1 class="hq-projects-pro-hero__title"><?= e($heroTitle) ?></h1>
       <p class="hq-projects-pro-hero__lead"><?= e($heroLead) ?></p>
       <div class="hq-projects-pro-hero__actions">
-        <a href="#portfolio" class="hq-btn hq-btn--orange hq-btn--lg">Browse portfolio <i class="bi bi-arrow-down"></i></a>
+        <a href="<?= e($upcomingHref) ?>" class="hq-btn hq-btn--orange hq-btn--lg">See upcoming <i class="bi bi-arrow-down"></i></a>
         <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> Discuss a project</a>
       </div>
       <ul class="hq-projects-pro-hero__chips">
         <li><i class="bi bi-house-heart"></i> Residential portfolio</li>
         <li><i class="bi bi-geo-alt-fill"></i> Garowe, Puntland</li>
-        <li><i class="bi bi-camera-fill"></i> Photographed on site</li>
+        <li><i class="bi bi-stars"></i> Next villa in design</li>
       </ul>
     </div>
   </div>
@@ -238,13 +248,8 @@ $schemaJson = json_encode([
           <span>In progress</span>
         </div>
         <div class="hq-projects-pro-stat">
-          <?php if (!empty($stats['years'])): ?>
-          <strong><?= e((string)$stats['years']) ?></strong>
-          <span>Delivery years</span>
-          <?php else: ?>
-          <strong>Garowe</strong>
-          <span>Based in Puntland</span>
-          <?php endif; ?>
+          <strong><?= number_format((int)($stats['planned'] ?? 0)) ?></strong>
+          <span>Upcoming</span>
         </div>
       </div>
     </div>
@@ -266,6 +271,13 @@ $schemaJson = json_encode([
     </div>
   </div>
 </section>
+<?php endif; ?>
+
+<?php if ($showUpcomingBand && $upcomingHero): ?>
+<?php View::partial('projects/upcoming-spotlight', [
+  'project' => $upcomingHero,
+  'wa'      => $wa,
+]); ?>
 <?php endif; ?>
 
 <?php if ($showCatalog): ?>
@@ -309,26 +321,30 @@ $schemaJson = json_encode([
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($gridProjects)): ?>
     <p class="hq-projects-pro-count" data-anim="up" data-delay="60">
-      <?= $stats['showing'] === 1 ? '1 project' : number_format($stats['showing']) . ' projects' ?>
+      <?= count($gridProjects) === 1 ? '1 project' : number_format(count($gridProjects)) . ' projects' ?>
       <?= $hasFilters ? ' matching your filters' : ' from Garowe, Puntland' ?>
     </p>
+    <?php endif; ?>
 
-    <?php if (empty($projects)): ?>
+    <?php if (empty($gridProjects)): ?>
+      <?php if (!$showUpcomingBand): ?>
     <div class="hq-projects-pro-empty" data-anim="up">
       <span class="hq-projects-pro-empty__icon"><i class="bi bi-buildings"></i></span>
       <h3>No projects match these filters</h3>
       <p>Clear the filters to see the full HighQ Homes portfolio.</p>
       <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline">View all projects</a>
     </div>
+      <?php endif; ?>
     <?php else: ?>
     <div class="hq-projects-pro-grid">
-      <?php foreach ($projects as $i => $proj): ?>
+      <?php foreach ($gridProjects as $i => $proj): ?>
         <?php View::partial('projects/portfolio-card', [
           'project' => $proj,
           'index'   => $i,
           'delay'   => ($i % 9) * 45,
-          'size'    => $cardSize($i, count($projects)),
+          'size'    => $cardSize($i, count($gridProjects)),
         ]); ?>
       <?php endforeach; ?>
     </div>

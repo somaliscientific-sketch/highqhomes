@@ -240,7 +240,17 @@ function projectCategoryLabel(?string $category): string
 
 function projectStatusLabel(?string $status): string
 {
-    return ucwords(str_replace('_', ' ', (string)($status ?: 'completed')));
+    return match ((string)($status ?: 'completed')) {
+        'in_progress' => 'In progress',
+        'planned'     => 'Upcoming',
+        'completed'   => 'Completed',
+        default       => ucwords(str_replace('_', ' ', (string)$status)),
+    };
+}
+
+function isUpcomingProject(array $project): bool
+{
+    return ($project['status'] ?? '') === 'planned';
 }
 
 /**
@@ -251,6 +261,16 @@ function projectStatusLabel(?string $status): string
 function projectShowcaseItems(?string $category = null, ?string $status = null): array
 {
     $rows = [
+        [
+            'id' => 0, 'title' => 'Desert Courtyard Villa', 'slug' => 'desert-courtyard-villa',
+            'category' => 'residential', 'status' => 'planned', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Two-storey courtyard villa', 'project_year' => 2026,
+            'short_description' => 'A forthcoming two-storey villa for Garowe — terracotta, board-formed concrete, and deep shade — shown here as the design visualization before construction.',
+            'description' => '<p>This is the next HighQ Homes residential design: a two-storey courtyard villa composed in terracotta, board-formed concrete, and white cantilevered volumes, with a vertical light slot and shaded balconies.</p><p>The image on this page is a design visualization, not a completed site photograph. It shows the architecture we are preparing to deliver in Garowe — climate-aware openings, a clear entrance sequence, and a finish palette that holds in Puntland sun and dust.</p><p>If you are planning a home like this, we will walk the plot, confirm what the land can support, and turn this language of form into a written programme — structure, envelope, and finishing under one team.</p>',
+            'featured_image' => 'images/builds/upcoming-desert-villa.jpg',
+            'gallery_images' => [],
+            'is_featured' => 0, 'is_published' => 1, 'sort_order' => 0,
+        ],
         [
             'id' => 0, 'title' => 'Evening Family Villa', 'slug' => 'evening-family-villa',
             'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
