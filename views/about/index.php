@@ -192,48 +192,27 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
 ?>
 
 <?php if ($showHero): ?>
-<section class="hq-about-pro-hero hq-about-pro-hero--split">
+<section class="hq-about-pro-hero hq-about-pro-hero--simple">
   <div class="container-site hq-about-pro-hero__inner">
-    <nav class="hq-breadcrumb hq-breadcrumb--light" aria-label="Breadcrumb">
+    <nav class="hq-breadcrumb" aria-label="Breadcrumb">
       <a href="<?= url() ?>">Home</a>
       <span class="sep"><i class="bi bi-chevron-right"></i></span>
       <span class="current">About</span>
     </nav>
 
-    <div class="hq-about-pro-hero__layout">
-      <div class="hq-about-pro-hero__content" data-anim="up">
-        <p class="hq-about-pro-hero__kicker"><?= e($heroKicker) ?></p>
-        <h1 class="hq-about-pro-hero__title"><?= e($heroTitle) ?></h1>
-        <p class="hq-about-pro-hero__lead"><?= e($heroLead) ?></p>
-        <div class="hq-about-pro-hero__actions">
-          <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($heroMeta['button_text'] ?? 'View our work') ?> <i class="bi bi-arrow-up-right"></i></a>
-          <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($heroMeta['button_text_2'] ?? 'Get a quote') ?></a>
-        </div>
-        <ul class="hq-about-pro-hero__chips">
-          <?php foreach (array_slice($heroChips, 0, 4) as $chip): ?>
-          <?php
-            $chipLabel = is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? $chip['text'] ?? '') : (string)$chip;
-            $chipIcon  = is_array($chip) ? (string)($chip['icon'] ?? 'bi-check2') : 'bi-check2';
-            if ($chipLabel === '') continue;
-          ?>
-          <li><i class="bi <?= e($chipIcon) ?>"></i> <?= e($chipLabel) ?></li>
-          <?php endforeach; ?>
-        </ul>
+    <div class="hq-about-pro-hero__content" data-anim="up">
+      <p class="hq-about-pro-hero__kicker"><?= e($heroKicker) ?></p>
+      <h1 class="hq-about-pro-hero__title"><?= e($heroTitle) ?></h1>
+      <p class="hq-about-pro-hero__lead"><?= e($heroLead) ?></p>
+      <div class="hq-about-pro-hero__actions">
+        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange"><?= e($heroMeta['button_text'] ?? 'View our work') ?></a>
+        <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--outline"><i class="bi bi-whatsapp"></i> <?= e($heroMeta['button_text_2'] ?? 'Get a quote') ?></a>
       </div>
-
-      <figure class="hq-about-pro-hero__media" data-anim="up">
-        <img src="<?= e($heroImage) ?>" alt="<?= e($siteName) ?> completed residence in Garowe" loading="eager" decoding="async">
-        <figcaption>Completed residence · Garowe, Puntland</figcaption>
-      </figure>
     </div>
 
-    <nav class="hq-about-pro-hero__anchors" aria-label="About page sections">
-      <?php if ($showHistory): ?><a href="#our-story"><i class="bi bi-book"></i> Our story</a><?php endif; ?>
-      <?php if ($showMission): ?><a href="#about-purpose"><i class="bi bi-bullseye"></i> Mission</a><?php endif; ?>
-      <?php if ($showValues): ?><a href="#our-values"><i class="bi bi-heart"></i> Values</a><?php endif; ?>
-      <?php if ($showProcess): ?><a href="#our-process"><i class="bi bi-diagram-3"></i> Process</a><?php endif; ?>
-      <?php if ($showTeam): ?><a href="#our-team"><i class="bi bi-people"></i> Team</a><?php endif; ?>
-    </nav>
+    <figure class="hq-about-pro-hero__media" data-anim="up">
+      <img src="<?= e($heroImage) ?>" alt="<?= e($siteName) ?> completed residence in Garowe" loading="eager" decoding="async">
+    </figure>
   </div>
 </section>
 <?php endif; ?>
