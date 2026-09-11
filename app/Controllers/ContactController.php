@@ -28,7 +28,7 @@ class ContactController extends Controller
         $name    = $this->sanitize($this->post('name', ''));
         $email   = filter_var((string)$this->post('email', ''), FILTER_VALIDATE_EMAIL);
         $phone   = $this->sanitize($this->post('phone', ''));
-        $subject = $this->sanitize($this->post('subject', 'Project Consultation'));
+        $subject = $this->sanitize($this->post('subject', 'General enquiry'));
         $message = trim(strip_tags((string)$this->post('message', '')));
         $trap    = trim((string)$this->post('website', ''));
 
@@ -59,11 +59,11 @@ class ContactController extends Controller
             ]);
         } catch (\Throwable $e) {
             Production::log('contact submit: ' . $e->getMessage());
-            Session::flash('error', 'We could not save your message right now. Please try WhatsApp or email.');
+            Session::flash('error', 'We could not save your message just now. Please try WhatsApp or email.');
             $this->redirect('/contact');
         }
 
-        Session::flash('success', 'Thank you. Your message has been sent to our team.');
+        Session::flash('success', 'Thank you. We have your message and will reply shortly. WhatsApp is fastest if you need us today.');
         $this->redirect('/contact');
     }
 }
