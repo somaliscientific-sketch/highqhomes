@@ -2,9 +2,12 @@
 
 // ─── Navbar scroll effect ────────────────────────────────────
 const navbar = document.getElementById('main-navbar');
-if (navbar) {
+const headerWrap = document.getElementById('main-header-wrapper');
+if (navbar || headerWrap) {
   const updateNav = () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 8);
+    const on = window.scrollY > 12;
+    navbar?.classList.toggle('scrolled', on);
+    headerWrap?.classList.toggle('is-scrolled', on);
   };
   window.addEventListener('scroll', updateNav, { passive: true });
   updateNav();
