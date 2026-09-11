@@ -333,7 +333,6 @@ $heroParseTitle = static function (string $raw): array {
 };
 
 $heroLocation = trim((string)($settings['address'] ?? ''));
-$defaultHeroTag = $heroLocation !== '' ? $heroLocation : 'Somalia · Premium Build';
 
 $heroCarouselOpts = [
   'autoplay'    => ($settings['hero_carousel_autoplay'] ?? '1') === '1',
@@ -387,7 +386,6 @@ $heroBandStats = array_map(static fn(array $stat): array => [
           ? mediaPathUrl((string)$slide['mobile_image'])
           : '';
         $focus = heroSlideFocus($slide, (int)$i);
-        $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
         $slideTitle = (string)($slide['title'] ?? $siteName);
         $slideOverlay = min(0.18, max(0, (float)($slide['overlay_opacity'] ?? 0.6) * 0.28));
         $slideTransition = in_array(($slide['transition_type'] ?? 'inherit'), ['fade', 'slide', 'kenburns'], true)
@@ -441,10 +439,6 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         </picture>
         <?php endif; ?>
         <span class="hq-hero__shot-dim" style="opacity:<?= e((string)$slideOverlay) ?>" aria-hidden="true"></span>
-        <figcaption class="hq-hero__caption">
-          <span class="hq-hero__caption-tag"><?= $sVideo !== '' ? 'Video' : 'Featured' ?></span>
-          <span class="hq-hero__caption-title"><?= e($badge) ?></span>
-        </figcaption>
       </figure>
       <?php endforeach; ?>
     </div>
