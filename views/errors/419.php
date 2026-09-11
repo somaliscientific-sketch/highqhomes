@@ -14,7 +14,7 @@
     <p class="hq-lead">Your security token expired. Refresh the page and submit the form again.</p>
     <div class="hq-actions">
       <a href="<?= defined('APP_URL') ? htmlspecialchars(APP_URL, ENT_QUOTES, 'UTF-8') : '/' ?>" class="hq-btn hq-btn--navy">Back to Home</a>
-      <a href="<?= defined('APP_URL') ? htmlspecialchars(APP_URL . '/contact', ENT_QUOTES, 'UTF-8') : '/contact' ?>" class="hq-btn hq-btn--outline">Contact Us</a>
+      <a href="<?= e(siteQuoteHref()) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--outline">WhatsApp Us</a>
     </div>
   </main>
 </body>

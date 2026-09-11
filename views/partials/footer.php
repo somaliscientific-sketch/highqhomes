@@ -14,7 +14,8 @@ $footerCtaKicker   = cmsSectionTitle('footer', 'cta', 'Start Your Build');
 $footerCtaHeading  = cmsSectionSubtitle('footer', 'cta', 'Ready to create something exceptional?');
 $footerCtaBtnText  = cmsSectionContent('footer', 'cta', ($settings['contact_cta_label'] ?? 'Get a Quote'));
 $footerCtaData     = is_array($footerCtaSec['data'] ?? null) ? $footerCtaSec['data'] : [];
-$footerCtaHref     = menuUrl($footerCtaData['button_link'] ?? url('contact'));
+$footerCtaHref     = remapHiddenPublicHref((string)($footerCtaData['button_link'] ?? '/contact'), $settings ?? []);
+$footerCtaExternal = str_starts_with($footerCtaHref, 'http');
 
 $footerAboutSec    = cmsSection('footer', 'about');
 $footerAboutEnabled = cmsSectionEnabled('footer', 'about', true);
@@ -30,7 +31,7 @@ $footerMenus = navMenus('footer');
         <p class="hq-eyebrow hq-eyebrow--light"><?= e($footerCtaKicker) ?></p>
         <h2><?= e($footerCtaHeading) ?></h2>
       </div>
-      <a href="<?= e($footerCtaHref) ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($footerCtaBtnText) ?></a>
+      <a href="<?= e($footerCtaHref) ?>" class="hq-btn hq-btn--orange hq-btn--lg"<?= $footerCtaExternal ? ' target="_blank" rel="noopener"' : '' ?>><?= e($footerCtaBtnText) ?></a>
     </div>
     <?php endif; ?>
 

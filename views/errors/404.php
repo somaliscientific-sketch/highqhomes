@@ -18,7 +18,7 @@
     <p class="hq-lead">The page you're looking for doesn't exist or may have been moved.</p>
     <div class="hq-actions">
       <a href="<?= url() ?>" class="hq-btn hq-btn--navy"><i class="bi bi-house-fill"></i> Back to Home</a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline">Contact Us</a>
+      <a href="<?= e(siteQuoteHref()) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--outline"><i class="bi bi-whatsapp"></i> WhatsApp Us</a>
     </div>
   </main>
 </body>

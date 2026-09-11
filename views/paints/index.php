@@ -187,7 +187,7 @@ $guideCards = (isset($guideMap['cards']) && is_array($guideMap['cards'])) ? $gui
       <span class="hq-paints-pro-empty__icon"><i class="bi bi-palette"></i></span>
       <h3>No products found</h3>
       <p>Try adjusting your filters or contact us for custom product sourcing.</p>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline">Contact us</a>
+      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--outline">WhatsApp us</a>
     </div>
     <?php else: ?>
     <div class="hq-paints-pro-grid">
@@ -267,7 +267,6 @@ $guideCards = (isset($guideMap['cards']) && is_array($guideMap['cards'])) ? $gui
     </div>
     <div class="hq-paints-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'WhatsApp enquiry') ?></a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMap['cta_secondary'] ?? 'Contact form') ?></a>
     </div>
   </div>
 </section>

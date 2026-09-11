@@ -373,7 +373,6 @@ $schemaJson = json_encode([
     </div>
     <div class="hq-projects-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'Get a quote') ?></a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMap['cta_secondary'] ?? 'Contact us') ?></a>
       <?php if ($phone !== ''): ?>
       <a href="tel:<?= e($phoneHref) ?>" class="hq-projects-pro-cta__phone"><i class="bi bi-telephone-fill"></i> <?= e($phone) ?></a>
       <?php endif; ?>

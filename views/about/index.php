@@ -426,7 +426,6 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
     </div>
     <div class="hq-about-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMeta['button_text'] ?? 'Get a quote') ?></a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMeta['button_text_2'] ?? 'Contact us') ?></a>
     </div>
   </div>
 </section>

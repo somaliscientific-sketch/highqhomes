@@ -143,7 +143,6 @@ $processSteps = [
           <p>Tell us about the plot and the brief — we will come back with a clear plan and an honest quote.</p>
           <div class="hq-services-pro-enquiry__actions">
             <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block"><i class="bi bi-whatsapp"></i> WhatsApp enquiry</a>
-            <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline hq-btn--block">Contact form</a>
             <?php if ($phone !== ''): ?>
             <a href="tel:<?= e($phoneHref) ?>" class="hq-services-pro-enquiry__phone"><i class="bi bi-telephone-fill"></i> <?= e($phone) ?></a>
             <?php endif; ?>

@@ -13,6 +13,8 @@ class SeoPublicController extends Controller
         echo "Disallow: /admin\n";
         echo "Disallow: /admin/\n";
         echo "Disallow: /{$login}\n";
+        echo "Disallow: /gallery\n";
+        echo "Disallow: /contact\n";
         echo "Sitemap: " . APP_URL . "/sitemap.xml\n";
         exit;
     }
@@ -28,8 +30,6 @@ class SeoPublicController extends Controller
             ['loc' => APP_URL . '/services', 'priority' => '0.8', 'changefreq' => 'weekly'],
             ['loc' => APP_URL . '/projects', 'priority' => '0.8', 'changefreq' => 'weekly'],
             ['loc' => APP_URL . '/paints', 'priority' => '0.7', 'changefreq' => 'weekly'],
-            ['loc' => APP_URL . '/gallery', 'priority' => '0.6', 'changefreq' => 'weekly'],
-            ['loc' => APP_URL . '/contact', 'priority' => '0.7', 'changefreq' => 'monthly'],
         ];
 
         try {
@@ -49,7 +49,7 @@ class SeoPublicController extends Controller
                 }
             }
             foreach ((new PageModel())->getPublished(50) as $row) {
-                if (!empty($row['slug'])) {
+                if (!empty($row['slug']) && !isHiddenPublicPage((string)$row['slug'])) {
                     $urls[] = ['loc' => APP_URL . '/' . $row['slug'], 'priority' => '0.4', 'changefreq' => 'monthly'];
                 }
             }

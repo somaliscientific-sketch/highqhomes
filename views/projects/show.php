@@ -124,7 +124,6 @@ $scopeItems = $scopeMap[$project['category'] ?? ''] ?? $scopeMap['other'];
           </dl>
           <div class="hq-projects-pro-meta-card__actions">
             <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block"><i class="bi bi-whatsapp"></i> Discuss this project</a>
-            <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline hq-btn--block"><i class="bi bi-send-fill"></i> Send inquiry</a>
             <a href="<?= url('projects') ?>" class="hq-projects-pro-meta-card__back"><i class="bi bi-arrow-left"></i> Back to portfolio</a>
           </div>
         </div>

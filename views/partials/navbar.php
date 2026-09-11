@@ -17,7 +17,7 @@ $quoteHref     = 'https://wa.me/' . $waNum . '?text=Hello%20HighQ%20Homes,%20I%2
 $headerCtaSec     = cmsSection('header', 'cta');
 $headerCtaEnabled = cmsSectionEnabled('header', 'cta', true);
 $headerCtaLabel   = cmsSectionTitle('header', 'cta', 'Get a Free Quote');
-$headerCtaHref    = menuUrl(cmsSectionSubtitle('header', 'cta', '/contact'));
+$headerCtaHref    = remapHiddenPublicHref(cmsSectionSubtitle('header', 'cta', '/contact'), $settings ?? []);
 $ctaIsExternal    = str_starts_with($headerCtaHref, 'http');
 $ctaIsWhatsApp    = str_contains($headerCtaHref, 'wa.me') || str_contains(strtolower($headerCtaHref), 'whatsapp');
 $ctaIcon          = $ctaIsWhatsApp ? 'bi-whatsapp' : 'bi-chat-dots-fill';

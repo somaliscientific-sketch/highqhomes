@@ -902,6 +902,37 @@ function menuUrl(string $url): string
     return str_starts_with($url, 'http') ? $url : url(ltrim($url, '/'));
 }
 
+function publicPagePath(string $url): string
+{
+    $path = parse_url($url, PHP_URL_PATH);
+    $path = strtolower(trim((string)($path !== null && $path !== '' ? $path : $url), '/'));
+    return $path === '' ? '/' : $path;
+}
+
+function isHiddenPublicPage(string $url): bool
+{
+    return in_array(publicPagePath($url), ['gallery', 'contact'], true);
+}
+
+function siteQuoteHref(array $settings = [], string $message = 'Hello HighQ Homes, I would like to discuss a project'): string
+{
+    $phone = $settings['whatsapp'] ?? $settings['phone'] ?? '252907734667';
+    $wa = preg_replace('/[^0-9]/', '', (string)$phone) ?: '252907734667';
+    return 'https://wa.me/' . $wa . '?text=' . rawurlencode($message);
+}
+
+function remapHiddenPublicHref(string $url, array $settings = []): string
+{
+    $path = publicPagePath($url);
+    if ($path === 'gallery') {
+        return url('projects');
+    }
+    if ($path === 'contact') {
+        return siteQuoteHref($settings);
+    }
+    return str_starts_with($url, 'http') ? $url : (str_starts_with($url, '/') ? menuUrl($url) : $url);
+}
+
 function navMenus(string $location = 'primary'): array
 {
     static $cache = [];
@@ -931,22 +962,21 @@ function navMenus(string $location = 'primary'): array
                 ['label' => 'About', 'url' => '/about', 'target' => '_self'],
                 ['label' => 'Services', 'url' => '/services', 'target' => '_self'],
                 ['label' => 'Projects', 'url' => '/projects', 'target' => '_self'],
-                ['label' => 'Gallery', 'url' => '/gallery', 'target' => '_self'],
-                ['label' => 'Contact', 'url' => '/contact', 'target' => '_self'],
             ]
             : [
                 ['label' => 'Home', 'url' => '/', 'target' => '_self'],
                 ['label' => 'About', 'url' => '/about', 'target' => '_self'],
                 ['label' => 'Services', 'url' => '/services', 'target' => '_self'],
                 ['label' => 'Projects', 'url' => '/projects', 'target' => '_self'],
-                ['label' => 'Gallery', 'url' => '/gallery', 'target' => '_self'],
-                ['label' => 'Contact', 'url' => '/contact', 'target' => '_self'],
             ];
     }
 
     $seen = [];
     $menus = array_values(array_filter($menus, static function (array $menu) use (&$seen): bool {
-        $path = trim(strtolower(parse_url($menu['url'] ?? '', PHP_URL_PATH) ?: (string)($menu['url'] ?? '')), '/') ?: '/';
+        $path = publicPagePath((string)($menu['url'] ?? ''));
+        if (isHiddenPublicPage($path)) {
+            return false;
+        }
         if (isset($seen[$path])) {
             return false;
         }

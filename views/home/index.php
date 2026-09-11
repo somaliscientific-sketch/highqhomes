@@ -84,7 +84,7 @@ $capabilities = [
     'text' => 'Concept-to-blueprint support with clear scope, budget, and timelines.',
     'icon' => 'bi-rulers',
     'img' => asset('images/builds/stone-residence.jpg'),
-    'href' => url('contact'),
+    'href' => url('services'),
     'mod' => 'wide',
   ],
 ];
@@ -703,7 +703,6 @@ $portfolioIntroLabel = $portfolioHero
           <p class="hq-port-intro__desc"><?= e(cmsText($projectsSec, 'content', 'Explore featured builds and recent completions — each project reflects our commitment to quality, clarity, and premium finish.')) ?></p>
           <div class="hq-port-intro__actions">
             <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange"><?= e($projectsMeta['cta_primary'] ?? 'Full Portfolio') ?> <i class="bi bi-arrow-up-right"></i></a>
-            <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline"><?= e($projectsMeta['cta_secondary'] ?? 'View Gallery') ?></a>
           </div>
         </div>
 
@@ -764,7 +763,6 @@ $portfolioIntroLabel = $portfolioHero
       </div>
       <div class="hq-hp-portfolio__band-actions">
         <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange"><i class="bi bi-whatsapp"></i> Get a Quote</a>
-        <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline">View Gallery</a>
       </div>
     </div>
   </div>
@@ -877,7 +875,7 @@ $portfolioIntroLabel = $portfolioHero
           <li><i class="bi bi-check2"></i> <?= e(is_array($check) ? (string)($check['title'] ?? $check['text'] ?? $check['label'] ?? '') : (string)$check) ?></li>
           <?php endforeach; ?>
         </ul>
-        <a href="<?= url('gallery') ?>" class="hq-btn hq-btn--outline"><?= e($excellenceMeta['cta_label'] ?? 'View Gallery') ?> <i class="bi bi-images"></i></a>
+        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline"><?= e($excellenceMeta['cta_label'] ?? 'View projects') ?> <i class="bi bi-arrow-up-right"></i></a>
       </div>
       <div class="hq-excellence__grid" data-anim="right">
         <?php foreach ($excellencePillars as $i => $pillar): ?>
@@ -1127,9 +1125,6 @@ $portfolioIntroLabel = $portfolioHero
             <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block">
               WhatsApp Us <i class="bi bi-whatsapp"></i>
             </a>
-            <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--block">
-              Contact Form <i class="bi bi-envelope"></i>
-            </a>
           </div>
           <a href="tel:<?= e($phoneHref) ?>" class="hq-faq-premium__ask-phone">
             <i class="bi bi-telephone-fill"></i> <?= e($phone) ?>
@@ -1172,7 +1167,6 @@ $portfolioIntroLabel = $portfolioHero
     <p class="hq-lead hq-lead--light"><?= e(cmsText($ctaSec, 'content', $settings['home_cta_text'] ?? 'Share your vision with our team for confident planning from groundbreaking to handover.')) ?></p>
     <div class="hq-actions hq-mt-xl">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMeta['button_text'] ?? 'WhatsApp Us') ?></a>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--ghost hq-btn--lg"><?= e($ctaMeta['button_text_2'] ?? 'Contact Us') ?></a>
     </div>
     <div class="hq-final__meta">
       <a href="tel:<?= e($phoneHref) ?>"><i class="bi bi-telephone"></i> <?= e($phone) ?></a>

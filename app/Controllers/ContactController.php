@@ -5,20 +5,7 @@ class ContactController extends Controller
 {
     public function index(array $params = []): void
     {
-        $settings = [];
-        $sections = [];
-        $seo      = [
-            'meta_title' => 'Contact HighQ Homes',
-            'meta_description' => 'Contact HighQ Homes for construction, architecture, interiors, paints, and project consultation.',
-        ];
-
-        $this->tryLoad(function () use (&$settings, &$sections, &$seo): void {
-            $settings = (new SettingModel())->getAllAsMap();
-            $sections = (new PageSectionModel())->getByPage('contact');
-            $seo      = (new SeoModel())->findBySlug('contact') ?? $seo;
-        });
-
-        $this->render('contact/index', compact('settings', 'seo', 'sections'));
+        $this->redirect('/');
     }
 
     public function submit(array $params = []): void
@@ -33,12 +20,12 @@ class ContactController extends Controller
         $trap    = trim((string)$this->post('website', ''));
 
         if ($trap !== '') {
-            $this->redirect('/contact');
+            $this->redirect('/');
         }
 
         if ($name === '' || !$email || $message === '') {
-            Session::flash('error', 'Please enter your name, a valid email, and your message.');
-            $this->redirect('/contact');
+            Session::flash('error', 'Please enter your name, a valid email, and your message — or reach us on WhatsApp.');
+            $this->redirect('/');
         }
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? '';
@@ -46,7 +33,7 @@ class ContactController extends Controller
             $model = new MessageModel();
             if (!$model->rateLimitCheck($ip)) {
                 Session::flash('error', 'Please wait before sending another message.');
-                $this->redirect('/contact');
+                $this->redirect('/');
             }
 
             $model->insert([
@@ -60,10 +47,10 @@ class ContactController extends Controller
         } catch (\Throwable $e) {
             Production::log('contact submit: ' . $e->getMessage());
             Session::flash('error', 'We could not save your message just now. Please try WhatsApp or email.');
-            $this->redirect('/contact');
+            $this->redirect('/');
         }
 
         Session::flash('success', 'Thank you. We have your message and will reply shortly. WhatsApp is fastest if you need us today.');
-        $this->redirect('/contact');
+        $this->redirect('/');
     }
 }
