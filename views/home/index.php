@@ -120,13 +120,7 @@ $excellencePillars = [
   ['icon' => 'bi-house-check', 'title' => 'After-Handover Care', 'text' => 'Responsive support after completion so your space continues to perform as intended.'],
 ];
 
-$faqItems = [
-  ['q' => 'How do I get a project quote?', 'a' => 'Share your site details, scope, and timeline via WhatsApp, phone, or our contact form. We respond with a structured consultation and transparent proposal.', 'icon' => 'bi-calculator'],
-  ['q' => 'What types of projects do you handle?', 'a' => 'HighQ Homes delivers residential homes, commercial spaces, renovations, premium finishing, and design-to-build planning for clients across Somalia.', 'icon' => 'bi-buildings'],
-  ['q' => 'How long does a typical build take?', 'a' => 'Timelines depend on scope, materials, and site conditions. After discovery, we provide a milestone schedule with clear dates and progress checkpoints.', 'icon' => 'bi-calendar2-week'],
-  ['q' => 'Can I track progress during construction?', 'a' => 'Yes. We provide regular site updates and milestone reviews so you stay informed at every major phase of the project.', 'icon' => 'bi-camera-reels'],
-  ['q' => 'Do you manage finishing and interior details?', 'a' => 'Absolutely. From structural work to paints and refined interior finishes, we offer integrated delivery for a complete, move-in-ready result.', 'icon' => 'bi-brush'],
-];
+
 
 $cms = $sections ?? [];
 $heroSec          = cmsRow($cms, 'hero');
@@ -140,13 +134,11 @@ $excellenceSec    = cmsRow($cms, 'excellence');
 $connectSec       = cmsRow($cms, 'connect');
 $statsSec         = cmsRow($cms, 'stats');
 $testimonialsSec  = cmsRow($cms, 'testimonials');
-$faqSec           = cmsRow($cms, 'faq');
 $ctaSec           = cmsRow($cms, 'cta');
 $projectsMeta     = cmsMap($projectsSec);
 $testimonialsMeta = cmsMap($testimonialsSec);
 $ctaMeta          = cmsMap($ctaSec);
 $excellenceMeta   = cmsMap($excellenceSec);
-$faqMeta          = cmsMap($faqSec);
 $heroMetricsCms   = [];
 
 $excellenceChecklist = [
@@ -226,10 +218,7 @@ $excellenceList = cmsList($excellenceSec);
 if ($excellenceList !== []) {
   $excellencePillars = $excellenceList;
 }
-$faqList = cmsList($faqSec);
-if ($faqList !== []) {
-  $faqItems = $faqList;
-}
+
 $statsList = cmsList($statsSec);
 if ($statsList !== []) {
   $mappedStats = [];
@@ -309,7 +298,6 @@ $showExcellence   = false;
 $showConnect      = false;
 $showStats        = false;
 $showTestimonials = cmsRowEnabled($cms, 'testimonials', ($settings['home_testimonials_enabled'] ?? '1') === '1') && !empty($testimonials);
-$showFaq          = cmsRowEnabled($cms, 'faq', true);
 $showCta          = false;
 ?>
 
@@ -954,67 +942,4 @@ $portfolioIntroLabel = $portfolioHero
 </section>
 <?php endif; ?>
 
-<!-- FAQ -->
-<?php if ($showFaq && !empty($faqItems)): ?>
-<section class="hq-section hq-faq-premium" id="faq">
-  <div class="hq-faq-premium__bg" aria-hidden="true"></div>
-  <div class="container-site">
-    <div class="hq-faq-premium__shell">
-      <aside class="hq-faq-premium__aside" data-anim="left">
-        <p class="hq-faq-premium__kicker"><?= e(cmsText($faqSec, 'title', 'Questions & Answers')) ?></p>
-        <?php
-          $faqHeading = cmsText($faqSec, 'subtitle', 'Everything You Need to Know');
-          $faqHasAccent = (bool)preg_match('/before you build/i', $faqHeading);
-        ?>
-        <h2 class="hq-faq-premium__title"><?= e($faqHeading) ?><?php if (!$faqHasAccent): ?> <em>Before You Build</em><?php endif; ?></h2>
-        <p class="hq-faq-premium__lead"><?= e(cmsText($faqSec, 'content', 'Clear answers to the questions clients ask most — so you can plan your project with confidence.')) ?></p>
-        <?php $faqChipIcons = ['bi-lightning-charge', 'bi-shield-check', 'bi-chat-square-text']; ?>
-        <ul class="hq-faq-premium__chips">
-          <?php foreach (array_slice($faqChips, 0, 4) as $i => $chip): ?>
-          <li><i class="bi <?= e(is_array($chip) ? ($chip['icon'] ?? $faqChipIcons[$i] ?? 'bi-check2') : ($faqChipIcons[$i] ?? 'bi-check2')) ?>"></i> <?= e(is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? '') : (string)$chip) ?></li>
-          <?php endforeach; ?>
-        </ul>
-        <div class="hq-faq-premium__ask" id="ask-our-team">
-          <div class="hq-faq-premium__ask-glow" aria-hidden="true"></div>
-          <div class="hq-faq-premium__ask-head">
-            <span class="hq-faq-premium__ask-icon"><i class="bi bi-headset"></i></span>
-            <div>
-              <strong>Ask Our Team</strong>
-              <span>Still have questions? Talk to us directly.</span>
-            </div>
-          </div>
-          <div class="hq-faq-premium__ask-actions">
-            <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block">
-              WhatsApp Us <i class="bi bi-whatsapp"></i>
-            </a>
-          </div>
-          <a href="tel:<?= e($phoneHref) ?>" class="hq-faq-premium__ask-phone">
-            <i class="bi bi-telephone-fill"></i> <?= e($phone) ?>
-          </a>
-        </div>
-      </aside>
-      <div class="hq-faq-premium__panel" data-anim="right">
-        <div class="hq-faq-premium__panel-head">
-          <span class="hq-faq-premium__count"><?= count($faqItems) ?> topics</span>
-          <span class="hq-faq-premium__hint">Tap a question to expand</span>
-        </div>
-        <div class="hq-faq__list">
-          <?php foreach ($faqItems as $i => $faq): ?>
-          <article class="hq-faq__item<?= $i === 0 ? ' is-open' : '' ?>">
-            <button type="button" class="hq-faq__toggle" data-faq-toggle aria-expanded="<?= $i === 0 ? 'true' : 'false' ?>">
-              <span class="hq-faq__num"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
-              <span class="hq-faq__icon"><i class="bi <?= e($faq['icon']) ?>"></i></span>
-              <span class="hq-faq__label"><?= e($faq['q']) ?></span>
-              <i class="bi bi-plus-lg hq-faq__chev" aria-hidden="true"></i>
-            </button>
-            <div class="hq-faq__panel">
-              <p><?= e($faq['a']) ?></p>
-            </div>
-          </article>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
+

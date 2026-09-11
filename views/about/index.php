@@ -39,6 +39,20 @@ $heroMeta      = cmsMap($heroSec);
 $historyMeta   = cmsMap($historySec);
 $ctaMeta       = cmsMap($ctaSec);
 
+
+
+// About FAQ data
+$aboutFaqItems = [
+    ['q' => 'How do I get a project quote?', 'a' => 'Share your site details, scope, and timeline via WhatsApp, phone, or our contact form. We respond with a structured consultation and transparent proposal.', 'icon' => 'bi-calculator'],
+    ['q' => 'What types of projects do you handle?', 'a' => 'HighQ Homes delivers residential homes, commercial spaces, renovations, premium finishing, and design-to-build planning for clients across Somalia.', 'icon' => 'bi-buildings'],
+    ['q' => 'How long does a typical build take?', 'a' => 'Timelines depend on scope, materials, and site conditions. After discovery, we provide a milestone schedule with clear dates and progress checkpoints.', 'icon' => 'bi-calendar2-week'],
+    ['q' => 'Can I track progress during construction?', 'a' => 'Yes. We provide regular site updates and milestone reviews so you stay informed at every major phase of the project.', 'icon' => 'bi-camera-reels'],
+    ['q' => 'Do you manage finishing and interior details?', 'a' => 'Absolutely. From structural work to paints and refined interior finishes, we offer integrated delivery for a complete, move-in-ready result.', 'icon' => 'bi-brush'],
+];
+$aboutFaqSec = cmsRow($cms, 'faq');
+$aboutFaqList = cmsList($aboutFaqSec);
+if ($aboutFaqList !== []) { $aboutFaqItems = $aboutFaqList; }
+$showAboutFaq = true;
 $heroImageDefault = asset('images/builds/grey-villa-evening.jpg');
 $storyImageDefault = asset('images/builds/about-residence.jpg');
 
@@ -410,6 +424,90 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
         </footer>
       </article>
       <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+<?php if ($showAboutFaq && !empty($aboutFaqItems)): ?>
+<section class="hq-section hq-about-faq" id="about-faq" aria-labelledby="about-faq-title">
+  <div class="container-site">
+    <div class="hq-about-faq__shell">
+      <!-- Left Column: Sticky Header & Direct Consultation Card -->
+      <aside class="hq-about-faq__aside">
+        <div class="hq-about-faq__badge">
+          <i class="bi bi-question-circle-fill"></i>
+          <span>Clear Answers</span>
+        </div>
+        <h2 class="hq-about-faq__title" id="about-faq-title">
+          Questions &amp; <span class="hq-about-faq__highlight">Answers</span>
+        </h2>
+        <p class="hq-about-faq__lead">
+          Everything you need to know about building, renovating, or investing with HighQ Homes in Garowe and across Puntland.
+        </p>
+
+        <ul class="hq-about-faq__trust-points">
+          <li>
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Transparent, itemized BOQ quotes</span>
+          </li>
+          <li>
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Licensed civil engineers on every site</span>
+          </li>
+          <li>
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Structured milestone payments &amp; reporting</span>
+          </li>
+        </ul>
+
+        <div class="hq-about-faq__card">
+          <div class="hq-about-faq__card-header">
+            <div class="hq-about-faq__card-icon" aria-hidden="true">
+              <i class="bi bi-chat-quote-fill"></i>
+            </div>
+            <div>
+              <h3 class="hq-about-faq__card-title">Have a specific question?</h3>
+              <p class="hq-about-faq__card-sub">Speak directly with our technical team.</p>
+            </div>
+          </div>
+          <div class="hq-about-faq__card-actions">
+            <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--sm hq-about-faq__wa-btn">
+              <i class="bi bi-whatsapp"></i> Chat on WhatsApp
+            </a>
+            <a href="tel:<?= e($phoneHref) ?>" class="hq-about-faq__call-btn">
+              <i class="bi bi-telephone"></i> <?= e($phone) ?>
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Premium Accordion -->
+      <div class="hq-about-faq__main">
+        <div class="hq-about-faq__meta-bar">
+          <span class="hq-about-faq__count">
+            <i class="bi bi-collection"></i> <?= count($aboutFaqItems) ?> Common Questions
+          </span>
+          <span class="hq-about-faq__hint">Click to expand</span>
+        </div>
+
+        <div class="hq-faq__list hq-about-faq__list">
+          <?php foreach ($aboutFaqItems as $i => $faq): ?>
+          <article class="hq-faq__item<?= $i === 0 ? ' is-open' : '' ?>">
+            <button type="button" class="hq-faq__toggle" data-faq-toggle
+              aria-expanded="<?= $i === 0 ? 'true' : 'false' ?>"
+              aria-controls="about-faq-panel-<?= $i ?>"
+              id="about-faq-btn-<?= $i ?>">
+              <span class="hq-faq__num"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
+              <span class="hq-faq__icon"><i class="bi <?= e($faq['icon'] ?? 'bi-buildings') ?>"></i></span>
+              <span class="hq-faq__label"><?= e($faq['q'] ?? $faq['title'] ?? '') ?></span>
+              <span class="hq-faq__chev" aria-hidden="true"><i class="bi bi-plus-lg"></i></span>
+            </button>
+            <div class="hq-faq__panel" id="about-faq-panel-<?= $i ?>" role="region" aria-labelledby="about-faq-btn-<?= $i ?>">
+              <p><?= e($faq['a'] ?? $faq['text'] ?? $faq['content'] ?? '') ?></p>
+            </div>
+          </article>
+          <?php endforeach; ?>
+        </div>
+      </div>
     </div>
   </div>
 </section>
