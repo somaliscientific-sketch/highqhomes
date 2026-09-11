@@ -55,7 +55,7 @@ class ProjectsController extends Controller
             $this->abort(404);
         }
 
-        $related  = $model->getRelated((int)$project['id'], $project['category'] ?? null, 3);
+        $related  = $model->getRelated((int)$project['id'], $project['category'] ?? null, 3, (string)($project['slug'] ?? ''));
         $settings = (new SettingModel())->getAllAsMap();
         $seo      = (new SeoModel())->findBySlug('project-' . $project['slug']);
 
