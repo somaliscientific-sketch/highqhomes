@@ -305,12 +305,12 @@ $showAbout        = cmsRowEnabled($cms, 'about_highlights', ($settings['home_abo
 $showProjects     = cmsRowEnabled($cms, 'projects', ($settings['home_projects_enabled'] ?? '1') === '1');
 $showWhyUs        = cmsRowEnabled($cms, 'why_us', true);
 $showProcess      = cmsRowEnabled($cms, 'process', true);
-$showExcellence   = cmsRowEnabled($cms, 'excellence', true);
-$showConnect      = cmsRowEnabled($cms, 'connect', true);
-$showStats        = cmsRowEnabled($cms, 'stats', true);
+$showExcellence   = false;
+$showConnect      = false;
+$showStats        = false;
 $showTestimonials = cmsRowEnabled($cms, 'testimonials', ($settings['home_testimonials_enabled'] ?? '1') === '1') && !empty($testimonials);
 $showFaq          = cmsRowEnabled($cms, 'faq', true);
-$showCta          = cmsRowEnabled($cms, 'cta', ($settings['home_cta_enabled'] ?? '1') === '1');
+$showCta          = false;
 ?>
 
 <!-- HERO -->
@@ -861,123 +861,6 @@ $portfolioIntroLabel = $portfolioHero
 </section>
 <?php endif; ?>
 
-<!-- EXCELLENCE -->
-<?php if ($showExcellence && !empty($excellencePillars)): ?>
-<section class="hq-section hq-section--soft hq-excellence" id="excellence">
-  <div class="container-site">
-    <div class="hq-excellence__shell">
-      <div class="hq-excellence__intro" data-anim="left">
-        <p class="hq-eyebrow"><?= e(cmsText($excellenceSec, 'title', 'Built to Last')) ?></p>
-        <h2 class="hq-title"><?= e(cmsText($excellenceSec, 'subtitle', 'Construction Excellence You Can Measure')) ?></h2>
-        <p class="hq-lead"><?= e(cmsText($excellenceSec, 'content', 'Every HighQ Homes project is managed with the same standard — rigorous planning, accountable execution, and finishes that stand up to daily use and time.')) ?></p>
-        <ul class="hq-excellence__list">
-          <?php foreach ($excellenceChecklist as $check): ?>
-          <li><i class="bi bi-check2"></i> <?= e(is_array($check) ? (string)($check['title'] ?? $check['text'] ?? $check['label'] ?? '') : (string)$check) ?></li>
-          <?php endforeach; ?>
-        </ul>
-        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline"><?= e($excellenceMeta['cta_label'] ?? 'View projects') ?> <i class="bi bi-arrow-up-right"></i></a>
-      </div>
-      <div class="hq-excellence__grid" data-anim="right">
-        <?php foreach ($excellencePillars as $i => $pillar): ?>
-        <article class="hq-excellence__card" data-anim="up" data-delay="<?= $i * 55 ?>">
-          <span class="hq-excellence__icon"><i class="bi <?= e($pillar['icon']) ?>"></i></span>
-          <h3><?= e($pillar['title']) ?></h3>
-          <p><?= e($pillar['text']) ?></p>
-        </article>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
-<!-- CONNECT -->
-<?php if ($showConnect): ?>
-<section class="hq-section hq-connect" id="connect">
-  <div class="container-site">
-    <div class="hq-connect__shell">
-      <div class="hq-connect__copy" data-anim="left">
-        <p class="hq-eyebrow"><?= e(cmsText($connectSec, 'title', 'Start With Confidence')) ?></p>
-        <h2 class="hq-title"><?= e(cmsText($connectSec, 'subtitle', 'Your Project Deserves a Builder You Can Trust')) ?></h2>
-        <p class="hq-lead"><?= e(cmsText($connectSec, 'content', 'HighQ Homes combines disciplined project management, skilled craftsmanship, and transparent communication — so you stay informed from the first conversation to final handover.')) ?></p>
-        <ul class="hq-connect__promises">
-          <?php foreach ($promiseItems as $item): ?>
-          <li>
-            <span class="hq-connect__promise-icon"><i class="bi <?= e($item['icon']) ?>"></i></span>
-            <div>
-              <strong><?= e($item['title']) ?></strong>
-              <span><?= e($item['text']) ?></span>
-            </div>
-          </li>
-          <?php endforeach; ?>
-        </ul>
-        <a href="<?= url('about') ?>" class="hq-btn hq-btn--outline">Learn About Us <i class="bi bi-arrow-right"></i></a>
-      </div>
-
-      <div class="hq-connect__cards" data-anim="right">
-        <a href="tel:<?= e($phoneHref) ?>" class="hq-connect__card">
-          <span class="hq-connect__card-icon"><i class="bi bi-telephone-fill"></i></span>
-          <div>
-            <strong>Call Us</strong>
-            <span><?= e($phone) ?></span>
-          </div>
-          <i class="bi bi-arrow-up-right hq-connect__card-arrow"></i>
-        </a>
-        <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-connect__card hq-connect__card--accent">
-          <span class="hq-connect__card-icon"><i class="bi bi-whatsapp"></i></span>
-          <div>
-            <strong>WhatsApp Quote</strong>
-            <span>Fast response · Free consultation</span>
-          </div>
-          <i class="bi bi-arrow-up-right hq-connect__card-arrow"></i>
-        </a>
-        <a href="mailto:<?= e($email) ?>" class="hq-connect__card">
-          <span class="hq-connect__card-icon"><i class="bi bi-envelope-fill"></i></span>
-          <div>
-            <strong>Email Us</strong>
-            <span><?= e($email) ?></span>
-          </div>
-          <i class="bi bi-arrow-up-right hq-connect__card-arrow"></i>
-        </a>
-        <?php if ($address !== ''): ?>
-        <div class="hq-connect__card hq-connect__card--static">
-          <span class="hq-connect__card-icon"><i class="bi bi-geo-alt-fill"></i></span>
-          <div>
-            <strong>Visit Us</strong>
-            <span><?= e($address) ?></span>
-          </div>
-        </div>
-        <?php endif; ?>
-      </div>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
-<!-- STATS -->
-<?php if ($showStats): ?>
-<section class="hq-section hq-section--navy">
-  <div class="container-site">
-    <?php View::partial('home/section-head', [
-      'kicker' => cmsText($statsSec, 'title', 'Achievements'),
-      'title' => cmsText($statsSec, 'subtitle', 'Proof of Excellence'),
-      'desc' => cmsText($statsSec, 'content', 'Real outcomes from real projects.'),
-      'light' => true,
-      'id' => 'hp-stats-title'
-    ]); ?>
-    <div class="hq-stats__grid">
-      <?php foreach ($statItems as $i => $stat): ?>
-      <article class="hq-stat" data-anim="up" data-delay="<?= $i * 55 ?>">
-        <span class="hq-stat__icon"><i class="bi <?= e($stat['icon']) ?>"></i></span>
-        <strong data-counter data-target="<?= e($stat['num']) ?>" data-suffix="<?= e($stat['suffix']) ?>"><?= e(rtrim((string)$stat['value'], '+')) ?><?= e($stat['suffix']) ?></strong>
-        <span><?= e($stat['label']) ?></span>
-      </article>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
 <!-- TESTIMONIALS -->
 <?php if ($showTestimonials): ?>
 <?php
@@ -1152,26 +1035,6 @@ $portfolioIntroLabel = $portfolioHero
           <?php endforeach; ?>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
-<!-- FINAL CTA -->
-<?php if ($showCta): ?>
-<section class="hq-final" style="background-image:url('<?= e($ctaImg) ?>')">
-  <div class="hq-final__overlay"></div>
-  <div class="container-site hq-final__inner" data-anim="up">
-    <p class="hq-eyebrow hq-eyebrow--light"><?= e(cmsText($ctaSec, 'title', 'Ready When You Are')) ?></p>
-    <h2 class="hq-title hq-title--light"><?= e(cmsText($ctaSec, 'subtitle', $settings['home_cta_title'] ?? 'Let\'s Build Something Exceptional')) ?></h2>
-    <p class="hq-lead hq-lead--light"><?= e(cmsText($ctaSec, 'content', $settings['home_cta_text'] ?? 'Share your vision with our team for confident planning from groundbreaking to handover.')) ?></p>
-    <div class="hq-actions hq-mt-xl">
-      <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMeta['button_text'] ?? 'WhatsApp Us') ?></a>
-    </div>
-    <div class="hq-final__meta">
-      <a href="tel:<?= e($phoneHref) ?>"><i class="bi bi-telephone"></i> <?= e($phone) ?></a>
-      <a href="mailto:<?= e($email) ?>"><i class="bi bi-envelope"></i> <?= e($email) ?></a>
-      <?php if ($address !== ''): ?><span><i class="bi bi-geo-alt"></i> <?= e($address) ?></span><?php endif; ?>
     </div>
   </div>
 </section>
