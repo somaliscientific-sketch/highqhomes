@@ -192,27 +192,36 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
 ?>
 
 <?php if ($showHero): ?>
-<section class="hq-about-pro-hero hq-about-pro-hero--simple">
+<section class="hq-about-pro-hero hq-about-pro-hero--cinematic">
+  <div class="hq-about-pro-hero__bg" aria-hidden="true">
+    <img src="<?= e($heroImage) ?>" alt="" loading="eager">
+  </div>
+  <div class="hq-about-pro-hero__overlay" aria-hidden="true"></div>
   <div class="container-site hq-about-pro-hero__inner">
-    <nav class="hq-breadcrumb" aria-label="Breadcrumb">
+    <nav class="hq-breadcrumb hq-breadcrumb--light" aria-label="Breadcrumb">
       <a href="<?= url() ?>">Home</a>
       <span class="sep"><i class="bi bi-chevron-right"></i></span>
       <span class="current">About</span>
     </nav>
-
     <div class="hq-about-pro-hero__content" data-anim="up">
       <p class="hq-about-pro-hero__kicker"><?= e($heroKicker) ?></p>
       <h1 class="hq-about-pro-hero__title"><?= e($heroTitle) ?></h1>
       <p class="hq-about-pro-hero__lead"><?= e($heroLead) ?></p>
       <div class="hq-about-pro-hero__actions">
-        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange"><?= e($heroMeta['button_text'] ?? 'View our work') ?></a>
-        <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--outline"><i class="bi bi-whatsapp"></i> <?= e($heroMeta['button_text_2'] ?? 'Get a quote') ?></a>
+        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--orange hq-btn--lg"><?= e($heroMeta['button_text'] ?? 'View our work') ?> <i class="bi bi-arrow-down"></i></a>
+        <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($heroMeta['button_text_2'] ?? 'Get a quote') ?></a>
       </div>
+      <ul class="hq-about-pro-hero__chips">
+        <?php foreach (array_slice($heroChips, 0, 4) as $chip): ?>
+        <?php
+          $chipLabel = is_array($chip) ? (string)($chip['label'] ?? $chip['title'] ?? $chip['text'] ?? '') : (string)$chip;
+          $chipIcon  = is_array($chip) ? (string)($chip['icon'] ?? 'bi-check-circle-fill') : 'bi-check-circle-fill';
+          if ($chipLabel === '') continue;
+        ?>
+        <li><i class="bi <?= e($chipIcon) ?>"></i> <?= e($chipLabel) ?></li>
+        <?php endforeach; ?>
+      </ul>
     </div>
-
-    <figure class="hq-about-pro-hero__media" data-anim="up">
-      <img src="<?= e($heroImage) ?>" alt="<?= e($siteName) ?> completed residence in Garowe" loading="eager" decoding="async">
-    </figure>
   </div>
 </section>
 <?php endif; ?>
