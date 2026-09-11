@@ -194,7 +194,7 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
 <?php if ($showHero): ?>
 <section class="hq-about-pro-hero hq-about-pro-hero--cinematic">
   <div class="hq-about-pro-hero__bg" aria-hidden="true">
-    <img src="<?= e($heroImage) ?>" alt="" loading="eager">
+    <img src="<?= e($heroImage) ?>" alt="" loading="eager" decoding="async">
   </div>
   <div class="hq-about-pro-hero__overlay" aria-hidden="true"></div>
   <div class="container-site hq-about-pro-hero__inner">
