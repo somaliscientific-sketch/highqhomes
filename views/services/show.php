@@ -9,29 +9,29 @@ $phoneHref = preg_replace('/\s+/', '', $phone);
 $sImg      = serviceImageUrl($service);
 
 $serviceMeta = [
-  'architecture' => [
-    'deliverables' => ['Concept & schematic design', 'Detailed architectural drawings', '3D visualisations', 'Regulatory coordination', 'Construction documentation'],
-    'ideal_for'    => 'New builds, extensions, and commercial structures requiring cohesive architectural vision.',
+  'residential-construction' => [
+    'deliverables' => ['Written scope and milestone plan', 'Structure, envelope, and finishing under one team', 'Site updates you can follow', 'Quality checks before each stage is signed off', 'Handover walkthrough'],
+    'ideal_for'    => 'Family villas, two-storey homes, and gated residences in Garowe that need one accountable builder.',
   ],
-  'exterior-design' => [
-    'deliverables' => ['Facade concept development', 'Material & colour palettes', 'Elevation drawings', 'Lighting & signage integration', 'Exterior finishing specs'],
-    'ideal_for'    => 'Clients who want standout curb appeal with durable, climate-appropriate exterior solutions.',
+  'architecture-planning' => [
+    'deliverables' => ['Site-aware concept drawings', 'Plot layout and openings', 'Buildable plans before construction starts', 'Milestone schedule', 'Coordination with the build team'],
+    'ideal_for'    => 'Landowners who want a calm, practical house plan before the first block is laid.',
   ],
-  'landscape-design' => [
-    'deliverables' => ['Site landscape master plan', 'Planting & hardscape layout', 'Outdoor living zones', 'Irrigation & drainage guidance', 'Maintenance recommendations'],
-    'ideal_for'    => 'Residential compounds, commercial entrances, and outdoor spaces that complement the built form.',
+  'finishing-interiors' => [
+    'deliverables' => ['Finish schedule for sun, dust, and daily use', 'Joinery, openings, and colour specified together', 'Interior and exterior finishing in one pass', 'Phased upgrades on existing homes', 'Inspection before handover'],
+    'ideal_for'    => 'New builds and renovations that need a durable, complete interior — not leftover finishing.',
   ],
-  'site-planning' => [
-    'deliverables' => ['Site analysis & constraints review', 'Master layout planning', 'Access & circulation design', 'Utility routing guidance', 'Phased development planning'],
-    'ideal_for'    => 'Landowners and developers optimising plot use before design and construction begin.',
+  'compounds-site-works' => [
+    'deliverables' => ['Gate and boundary wall design', 'Approach and street elevation', 'Hardscape coordinated with the house', 'Security and proportion in one delivery', 'Finished compound at handover'],
+    'ideal_for'    => 'Residences where the compound is the first room of the house.',
   ],
-  'interior-design' => [
-    'deliverables' => ['Space planning & layouts', 'Material & finish schedules', 'Custom joinery concepts', 'Lighting & furniture coordination', 'Installation oversight'],
-    'ideal_for'    => 'Homes, offices, and hospitality spaces needing functional, elegant interiors.',
+  'multi-unit-homes' => [
+    'deliverables' => ['Paired or family-plot layout', 'Independent living with a composed street front', 'Shared structure, separate homes', 'Aligned levels, materials, and access', 'Delivery as one programme'],
+    'ideal_for'    => 'Twin residences and plots that house two households without looking like an add-on.',
   ],
-  'furniture-design' => [
-    'deliverables' => ['Bespoke furniture concepts', 'Material selection', 'Production drawings', 'Workshop coordination', 'Delivery & placement'],
-    'ideal_for'    => 'Projects requiring custom pieces aligned with architectural and interior themes.',
+  'project-delivery' => [
+    'deliverables' => ['Set-out and programme', 'Milestone control from foundation to keys', 'Site updates you can see', 'Inspections before the next stage', 'Finish standard matched to our portfolio'],
+    'ideal_for'    => 'Clients who want the build managed to the same standard as the completed villas on this site.',
   ],
 ];
 
@@ -43,13 +43,13 @@ $deliverables = $meta['deliverables'] ?? [
   'Progress updates & quality checks',
   'Handover support',
 ];
-$idealFor = $meta['ideal_for'] ?? 'Residential and commercial clients seeking professional design and build support in Puntland.';
+$idealFor = $meta['ideal_for'] ?? 'Residential and commercial clients in Garowe who want a written scope, visible progress, and a finish they can inspect.';
 
 $processSteps = [
-  ['icon' => 'bi-chat-dots', 'title' => 'Discovery', 'text' => 'We align on goals, constraints, and budget before work begins.'],
-  ['icon' => 'bi-pencil-square', 'title' => 'Design', 'text' => 'Concepts, drawings, and approvals with clear revision rounds.'],
-  ['icon' => 'bi-hammer', 'title' => 'Delivery', 'text' => 'Execution with milestone reviews and quality assurance.'],
-  ['icon' => 'bi-key', 'title' => 'Handover', 'text' => 'Final walkthrough, documentation, and after-care guidance.'],
+  ['icon' => 'bi-search', 'title' => 'Discovery', 'text' => 'We walk the site, confirm your goals, and test what the plot can support.'],
+  ['icon' => 'bi-rulers', 'title' => 'Design', 'text' => 'Drawings, a written scope, and a schedule with checkpoints you can follow.'],
+  ['icon' => 'bi-hammer', 'title' => 'Build', 'text' => 'Disciplined site work with inspections before each stage is signed off.'],
+  ['icon' => 'bi-key', 'title' => 'Handover', 'text' => 'Final walkthrough, documentation, and after-care when you move in.'],
 ];
 ?>
 
@@ -67,7 +67,7 @@ $processSteps = [
       <span class="current"><?= e($service['title']) ?></span>
     </nav>
     <div class="hq-services-pro-hero__content" data-anim="up">
-      <span class="hq-services-pro-service__icon"><i class="bi <?= e($service['icon'] ?? 'bi-building') ?>"></i></span>
+      <p class="hq-services-pro-hero__kicker">Service</p>
       <h1 class="hq-services-pro-hero__title"><?= e($service['title']) ?></h1>
       <?php if (!empty($service['short_description'])): ?>
       <p class="hq-services-pro-hero__lead"><?= e($service['short_description']) ?></p>
@@ -130,7 +130,7 @@ $processSteps = [
         <nav class="hq-services-pro-nav" data-anim="right">
           <strong>All services</strong>
           <?php foreach ($allServices as $s): ?>
-          <a href="<?= url('services/' . $s['slug']) ?>" class="hq-services-pro-nav__link<?= $s['id'] === $service['id'] ? ' is-active' : '' ?>">
+          <a href="<?= url('services/' . $s['slug']) ?>" class="hq-services-pro-nav__link<?= ($s['slug'] ?? '') === ($service['slug'] ?? '') ? ' is-active' : '' ?>">
             <i class="bi <?= e($s['icon'] ?? 'bi-building') ?>"></i>
             <span><?= e($s['title']) ?></span>
             <i class="bi bi-chevron-right"></i>
@@ -140,7 +140,7 @@ $processSteps = [
 
         <div class="hq-services-pro-enquiry" data-anim="right" data-delay="50">
           <h3>Request a quote</h3>
-          <p>Tell us about your project — we'll respond with scope, timeline, and next steps.</p>
+          <p>Tell us about the plot and the brief — we will come back with a clear plan and an honest quote.</p>
           <div class="hq-services-pro-enquiry__actions">
             <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--block"><i class="bi bi-whatsapp"></i> WhatsApp enquiry</a>
             <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline hq-btn--block">Contact form</a>
@@ -152,7 +152,7 @@ $processSteps = [
 
         <div class="hq-services-pro-aside-note">
           <h4><i class="bi bi-shield-check"></i> Quality commitment</h4>
-          <p>Every service follows structured milestones, documented scope, and quality checks before handover.</p>
+          <p>Every service follows a written scope, site updates, and a finish you can inspect before handover.</p>
         </div>
       </aside>
     </div>

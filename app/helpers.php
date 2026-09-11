@@ -345,12 +345,112 @@ function projectShowcaseItems(?string $category = null, ?string $status = null):
 
 function serviceImageUrl(array $service, string $fallback = ''): string
 {
-    $fallback = $fallback ?: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80';
-    if (empty($service['image'])) {
+    $fallback = $fallback ?: asset('images/builds/modern-villa.jpg');
+    $image = (string)($service['image'] ?? '');
+    if ($image === '' || str_contains($image, 'unsplash.com')) {
         return $fallback;
     }
-    $image = $service['image'];
-    return str_starts_with($image, 'http') ? $image : uploadUrl($image);
+    return mediaPathUrl($image, $fallback);
+}
+
+function isStaleServiceSlug(string $slug): bool
+{
+    static $stale = [
+        'architecture',
+        'exterior-design',
+        'landscape-design',
+        'site-planning',
+        'interior-design',
+        'furniture-design',
+        'project-consulting',
+        'construction',
+        'renovation',
+    ];
+
+    return in_array($slug, $stale, true);
+}
+
+/**
+ * Core HighQ Homes services used when the services table is empty.
+ *
+ * @return list<array<string, mixed>>
+ */
+function serviceShowcaseItems(): array
+{
+    return [
+        [
+            'id' => 101,
+            'title' => 'Residential construction',
+            'slug' => 'residential-construction',
+            'short_description' => 'Family villas and two-storey homes in Garowe — structure, envelope, and finishing under one team.',
+            'description' => '<p>We build family homes from foundation to handover: gated villas, two-storey residences, and compounds planned for how people live in Puntland.</p><p>One HighQ Homes team owns the structure, the façade, and the finish so nothing is split between trades. You get a written scope, milestone updates, and a walkthrough you can inspect before the keys are handed over.</p>',
+            'icon' => 'bi-house-heart',
+            'image' => 'images/builds/grey-villa-evening.jpg',
+            'is_featured' => 1,
+            'is_published' => 1,
+            'sort_order' => 1,
+        ],
+        [
+            'id' => 102,
+            'title' => 'Architecture & planning',
+            'slug' => 'architecture-planning',
+            'short_description' => 'Drawings, plot layout, and a buildable plan before the first block is laid.',
+            'description' => '<p>Architecture here is practical: shade, privacy, a calm street elevation, and a plan the site can support.</p><p>We prepare drawings, openings, and a milestone schedule so construction starts with a clear brief — not a sketch that changes on site.</p>',
+            'icon' => 'bi-rulers',
+            'image' => 'images/builds/modern-villa.jpg',
+            'is_featured' => 1,
+            'is_published' => 1,
+            'sort_order' => 2,
+        ],
+        [
+            'id' => 103,
+            'title' => 'Finishing & interiors',
+            'slug' => 'finishing-interiors',
+            'short_description' => 'Durable interiors and exterior finishes specified for Puntland sun, dust, and daily family use.',
+            'description' => '<p>Finishing is not an afterthought. Render, openings, joinery, and colour are specified so the completed house matches the drawing and lasts in local conditions.</p><p>We can deliver finishing as part of a new build or as a phased upgrade on an existing home.</p>',
+            'icon' => 'bi-brush',
+            'image' => 'images/builds/yellow-residence.jpg',
+            'is_featured' => 1,
+            'is_published' => 1,
+            'sort_order' => 3,
+        ],
+        [
+            'id' => 104,
+            'title' => 'Compounds & site works',
+            'slug' => 'compounds-site-works',
+            'short_description' => 'Gates, boundary walls, and the approach that makes a house feel finished from the street.',
+            'description' => '<p>The compound is the first room of the house. We design and build gates, walls, and the approach with the residence — not as leftover site works.</p><p>Security, proportion, and craft sit in one delivery so the street face matches the home behind it.</p>',
+            'icon' => 'bi-house-lock',
+            'image' => 'images/builds/stone-residence.jpg',
+            'is_featured' => 0,
+            'is_published' => 1,
+            'sort_order' => 4,
+        ],
+        [
+            'id' => 105,
+            'title' => 'Multi-unit homes',
+            'slug' => 'multi-unit-homes',
+            'short_description' => 'Paired residences and family plots with independent living and a composed street frontage.',
+            'description' => '<p>Twin houses and multi-unit plots give two households a single composed building while keeping each home independent.</p><p>We align levels, materials, and access so neither house reads as an add-on — one programme, two complete homes.</p>',
+            'icon' => 'bi-buildings',
+            'image' => 'images/builds/twin-residences.jpg',
+            'is_featured' => 0,
+            'is_published' => 1,
+            'sort_order' => 5,
+        ],
+        [
+            'id' => 106,
+            'title' => 'Project delivery',
+            'slug' => 'project-delivery',
+            'short_description' => 'Milestone control, site updates, and quality checks from set-out to handover.',
+            'description' => '<p>Active builds are how completed homes begin: a set-out, a programme, and inspections before the next stage is released.</p><p>Clients receive progress you can see and a finish standard that matches the villas already in our portfolio.</p>',
+            'icon' => 'bi-clipboard-check',
+            'image' => 'images/builds/active-build.jpg',
+            'is_featured' => 0,
+            'is_published' => 1,
+            'sort_order' => 6,
+        ],
+    ];
 }
 
 function galleryImageUrl(array $item, string $fallback = ''): string

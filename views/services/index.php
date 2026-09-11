@@ -7,87 +7,138 @@ $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%
 $phone     = $settings['phone'] ?? '';
 $phoneHref = preg_replace('/\s+/', '', $phone);
 
+$copyIf = static function (string $current, array $stale, string $fresh): string {
+    $norm = strtolower(trim($current));
+    if ($norm === '') {
+        return $fresh;
+    }
+    foreach ($stale as $old) {
+        if ($norm === strtolower($old)) {
+            return $fresh;
+        }
+    }
+    return $current;
+};
+
 $cms        = $sections ?? [];
 $hero       = cmsRow($cms, 'hero');
 $intro      = cmsRow($cms, 'intro');
-$pillarsSec = cmsRow($cms, 'pillars');
 $catalogSec = cmsRow($cms, 'catalog');
-$scopeSec   = cmsRow($cms, 'scope');
 $process    = cmsRow($cms, 'process');
 $faqBlock   = cmsRow($cms, 'faq');
 $ctaSec     = cmsRow($cms, 'cta');
 $ctaMap     = cmsMap($ctaSec);
-$scopeMap   = cmsMap($scopeSec);
 
-$heroKicker = cmsText($hero, 'title', 'Our Services');
-$heroTitle  = cmsText($hero, 'subtitle', 'Design, build & deliver with one trusted team');
-$heroLead   = cmsText($hero, 'content', 'From architecture to finishing — clear scope, premium quality, and accountable delivery at every step.');
-$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=80');
+$heroImageDefault = asset('images/builds/modern-villa.jpg');
+$heroKicker = $copyIf(cmsText($hero, 'title', ''), ['Our Services'], 'Our services');
+$heroTitle  = $copyIf(cmsText($hero, 'subtitle', ''), ['Design, build & deliver with one trusted team'], 'One team from drawings to handover.');
+$heroLead   = $copyIf(cmsText($hero, 'content', ''), [
+    'From architecture to finishing — clear scope, premium quality, and accountable delivery at every step.',
+], 'Architecture, construction, and finishing in Garowe — a written scope, visible progress, and a finish you can inspect.');
+$heroImage  = cmsMediaUrl($hero['image_url'] ?? '', $heroImageDefault);
+if ($heroImage === '' || str_contains($heroImage, 'unsplash.com')) {
+    $heroImage = $heroImageDefault;
+}
 
-$heroBadges = cmsList($hero) ?: [
-  'Licensed & Insured',
-  'Transparent Quotes',
-  'Premium Finishes',
-  'On-Time Delivery',
+$heroBadges = [
+    'Based in Garowe',
+    'Clear quotes',
+    'On-site photos',
+    'Handover you can walk',
 ];
+$cmsBadges = cmsList($hero);
+if ($cmsBadges !== [] && !in_array('Licensed & Insured', $cmsBadges, true) && !in_array('Transparent Quotes', $cmsBadges, true)) {
+    $mapped = [];
+    foreach ($cmsBadges as $badge) {
+        if (is_string($badge) && $badge !== '') {
+            $mapped[] = $badge;
+        }
+    }
+    if ($mapped !== []) {
+        $heroBadges = $mapped;
+    }
+}
 
-$processSteps = cmsList($process) ?: [
-  ['num' => '01', 'title' => 'Consultation', 'text' => 'Goals, site, budget, and timeline.'],
-  ['num' => '02', 'title' => 'Design & Scope', 'text' => 'Drawings and transparent pricing.'],
-  ['num' => '03', 'title' => 'Build & QA', 'text' => 'Execution with quality checks.'],
-  ['num' => '04', 'title' => 'Handover', 'text' => 'Walkthrough and after-care.'],
+$processSteps = [
+    ['num' => '01', 'title' => 'Discovery', 'text' => 'We walk the site, confirm your goals, and test what the plot can support.'],
+    ['num' => '02', 'title' => 'Design & planning', 'text' => 'Drawings, a written scope, and a schedule with checkpoints you can follow.'],
+    ['num' => '03', 'title' => 'Build execution', 'text' => 'Disciplined site work with inspections before each stage is signed off.'],
+    ['num' => '04', 'title' => 'Handover', 'text' => 'Final walkthrough, documentation, and after-care when you move in.'],
 ];
+$cmsProcess = cmsList($process);
+if ($cmsProcess !== []) {
+    $titles = array_map(static fn(array $row): string => (string)($row['title'] ?? ''), $cmsProcess);
+    $seed = ['Consultation', 'Design & Scope', 'Build & QA', 'Handover'];
+    $processSteps = array_intersect($seed, $titles) === $seed ? $processSteps : $cmsProcess;
+}
 
-$faqItems = cmsList($faqBlock) ?: [
-  ['q' => 'Do you offer design-only services?', 'a' => 'Yes. Architecture, exterior, interior, and site planning are available standalone or as integrated packages.', 'icon' => 'bi-rulers'],
-  ['q' => 'Can I combine multiple services?', 'a' => 'Most clients choose one team for design, construction, and finishing — we coordinate everything end to end.', 'icon' => 'bi-layers'],
-  ['q' => 'How are quotes structured?', 'a' => 'Milestone-based with clear scope, materials, and timeline before work begins.', 'icon' => 'bi-calculator'],
-  ['q' => 'Do you handle renovations?', 'a' => 'Yes — new builds, renovations, premium finishing, and phased upgrades.', 'icon' => 'bi-tools'],
+$faqItems = [
+    ['q' => 'Do you offer design without construction?', 'a' => 'Yes. Architecture and planning can be delivered on their own, or as part of a full design-build.', 'icon' => 'bi-rulers'],
+    ['q' => 'Can one team handle the whole project?', 'a' => 'That is how we prefer to work — design, construction, and finishing under one standard so nothing is lost between trades.', 'icon' => 'bi-layers'],
+    ['q' => 'How do quotes work?', 'a' => 'We price a written scope with materials and milestones before work begins. You know what is included, and what is not.', 'icon' => 'bi-calculator'],
+    ['q' => 'Do you take renovations and finishing only?', 'a' => 'Yes. New builds, extensions, compound works, and phased finishing upgrades are all in scope.', 'icon' => 'bi-tools'],
 ];
+$cmsFaq = cmsList($faqBlock);
+if ($cmsFaq !== []) {
+    $qs = array_map(static fn(array $row): string => (string)($row['q'] ?? ''), $cmsFaq);
+    $seed = ['Do you offer design-only services?', 'Can I combine multiple services?', 'How are quotes structured?', 'Do you handle renovations?'];
+    $faqItems = array_intersect($seed, $qs) === $seed ? $faqItems : $cmsFaq;
+}
 
-$pillars = cmsList($pillarsSec) ?: [
-  ['icon' => 'bi-diagram-3', 'title' => 'Integrated delivery', 'text' => 'Design, construction, and finishing coordinated under one accountable team.'],
-  ['icon' => 'bi-clipboard-check', 'title' => 'Clear milestones', 'text' => 'Structured scope, progress updates, and quality inspections at every phase.'],
-  ['icon' => 'bi-gem', 'title' => 'Premium standards', 'text' => 'Materials and workmanship selected for durability in local conditions.'],
-  ['icon' => 'bi-headset', 'title' => 'Responsive support', 'text' => 'Direct communication from consultation through handover and after-care.'],
-];
-
-$scopeItems = (isset($scopeMap['cards']) && is_array($scopeMap['cards'])) ? $scopeMap['cards'] : [
-  ['icon' => 'bi-building', 'title' => 'Residential builds', 'text' => 'Homes, villas, and gated communities with full design-build support.'],
-  ['icon' => 'bi-shop', 'title' => 'Commercial projects', 'text' => 'Offices, retail, and mixed-use spaces built to operational requirements.'],
-  ['icon' => 'bi-brush', 'title' => 'Finishing & upgrades', 'text' => 'Interior fit-outs, exterior refreshes, and phased renovation work.'],
-];
-$scopeList = (isset($scopeMap['checklist']) && is_array($scopeMap['checklist'])) ? $scopeMap['checklist'] : [
-  'New builds with integrated architecture and construction',
-  'Renovations, extensions, and premium finishing upgrades',
-  'Site planning and landscape design for optimal land use',
-  'Bespoke interior and furniture solutions',
-];
+if (empty($services)) {
+    $services = serviceShowcaseItems();
+    $stats['total'] = count($services);
+    $stats['featured'] = count(array_filter($services, static fn(array $row): bool => !empty($row['is_featured'])));
+}
 
 $schemaServices = array_map(static fn(array $s): array => [
-  '@type'       => 'Service',
-  'name'        => $s['title'],
-  'description' => $s['short_description'] ?? '',
-  'url'         => url('services/' . $s['slug']),
-  'provider'    => ['@type' => 'Organization', 'name' => $settings['site_name'] ?? 'HighQ Homes'],
+    '@type'       => 'Service',
+    'name'        => $s['title'],
+    'description' => $s['short_description'] ?? '',
+    'url'         => url('services/' . $s['slug']),
+    'provider'    => ['@type' => 'Organization', 'name' => $settings['site_name'] ?? 'HighQ Homes'],
 ], $services);
 
 $schemaJson = json_encode([
-  '@context'        => 'https://schema.org',
-  '@type'           => 'ItemList',
-  'name'            => 'HighQ Homes Construction Services',
-  'itemListElement' => array_values(array_map(static fn(array $item, int $i): array => [
-    '@type'    => 'ListItem',
-    'position' => $i + 1,
-    'item'     => $item,
-  ], $schemaServices, array_keys($schemaServices))),
+    '@context'        => 'https://schema.org',
+    '@type'           => 'ItemList',
+    'name'            => 'HighQ Homes Construction Services',
+    'itemListElement' => array_values(array_map(static fn(array $item, int $i): array => [
+        '@type'    => 'ListItem',
+        'position' => $i + 1,
+        'item'     => $item,
+    ], $schemaServices, array_keys($schemaServices))),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+$introKicker = $copyIf((string)($intro['title'] ?? ''), ['What We Deliver'], 'What we deliver');
+$introTitle  = $copyIf((string)($intro['subtitle'] ?? ''), ['One team. Every phase.'], 'Clear scope. One accountable team.');
+$introLead   = $copyIf((string)($intro['content'] ?? ''), [
+    'Each service is managed with structured milestones, quality inspections, and clear communication — so you always know where your project stands.',
+], 'Pick a service, or ask us to combine them. Every engagement has a written scope, site updates, and a handover you can walk.');
+
+$catalogKicker = $copyIf(cmsText($catalogSec, 'title', ''), ['Service catalog'], 'Services');
+$catalogTitle  = $copyIf(cmsText($catalogSec, 'subtitle', ''), ['Everything your project needs'], 'What we build and deliver');
+$catalogLead   = $copyIf(cmsText($catalogSec, 'content', ''), [
+    'Architecture, design, planning, and finishing — delivered with professional oversight from first sketch to final handover.',
+], 'Six services, one standard. Open a card for scope, process, and how we work in Garowe.');
+
+$processKicker = $copyIf((string)($process['title'] ?? ''), ['How We Work'], 'How we work');
+$processTitle  = $copyIf((string)($process['subtitle'] ?? ''), ['Simple steps, clear delivery'], 'From site visit to keys');
+$processLead   = $copyIf((string)($process['content'] ?? ''), [
+    'A structured path that keeps your project transparent, controlled, and on schedule.',
+], 'A short path you can follow — no surprise stages, no split accountability.');
+
+$ctaKicker = $copyIf(cmsText($ctaSec, 'title', ''), ['Start your project'], 'Start a project');
+$ctaTitle  = $copyIf(cmsText($ctaSec, 'subtitle', ''), ['Ready to build with confidence?'], 'Tell us what you want to build.');
+$ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
+    'Get a free consultation — scope, budget, and timeline with no obligation.',
+], 'Share the plot and the brief. We will come back with a clear plan and an honest quote.');
 ?>
 
 <script type="application/ld+json"><?= $schemaJson ?></script>
 
 <?php if (cmsRowEnabled($cms, 'hero', true)): ?>
-<section class="hq-services-pro-hero">
+<section class="hq-services-pro-hero hq-services-pro-hero--cinematic">
   <div class="hq-services-pro-hero__bg" aria-hidden="true">
     <img src="<?= e($heroImage) ?>" alt="" loading="eager">
   </div>
@@ -102,19 +153,17 @@ $schemaJson = json_encode([
       <p class="hq-services-pro-hero__kicker"><?= e($heroKicker) ?></p>
       <h1 class="hq-services-pro-hero__title"><?= e($heroTitle) ?></h1>
       <p class="hq-services-pro-hero__lead"><?= e($heroLead) ?></p>
-      <?php if (!empty($heroBadges)): ?>
-      <ul class="hq-services-pro-hero__badges">
-        <?php foreach ($heroBadges as $badge): ?>
-        <?php if (is_string($badge) && $badge !== ''): ?>
-        <li><i class="bi bi-check-circle-fill"></i> <?= e($badge) ?></li>
-        <?php endif; ?>
-        <?php endforeach; ?>
-      </ul>
-      <?php endif; ?>
       <div class="hq-services-pro-hero__actions">
         <a href="#svc-catalog" class="hq-btn hq-btn--orange hq-btn--lg">Explore services <i class="bi bi-arrow-down"></i></a>
         <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--ghost hq-btn--lg"><i class="bi bi-whatsapp"></i> Get a quote</a>
       </div>
+      <?php if (!empty($heroBadges)): ?>
+      <ul class="hq-services-pro-hero__chips">
+        <?php foreach ($heroBadges as $badge): ?>
+        <li><i class="bi bi-check-circle-fill"></i> <?= e($badge) ?></li>
+        <?php endforeach; ?>
+      </ul>
+      <?php endif; ?>
     </div>
   </div>
 </section>
@@ -125,14 +174,14 @@ $schemaJson = json_encode([
   <div class="container-site">
     <div class="hq-services-pro-intro__shell" data-anim="up">
       <div class="hq-services-pro-intro__copy">
-        <p class="hq-services-pro-eyebrow"><?= e($intro['title'] ?? 'What We Deliver') ?></p>
-        <h2 class="hq-services-pro-title"><?= e($intro['subtitle'] ?? 'One team. Every phase.') ?></h2>
-        <p class="hq-services-pro-lead"><?= e($intro['content'] ?? 'Each service is managed with structured milestones, quality inspections, and clear communication — so you always know where your project stands.') ?></p>
+        <p class="hq-services-pro-eyebrow"><?= e($introKicker) ?></p>
+        <h2 class="hq-services-pro-title"><?= e($introTitle) ?></h2>
+        <p class="hq-services-pro-lead"><?= e($introLead) ?></p>
       </div>
       <div class="hq-services-pro-intro__stats">
-        <?php foreach ($statItems as $stat): ?>
+        <?php foreach ($statItems ?? [] as $stat): ?>
         <div class="hq-services-pro-stat">
-          <strong data-counter data-target="<?= e($stat['num']) ?>" data-suffix="<?= e($stat['suffix']) ?>"><?= e($stat['num']) ?><?= e($stat['suffix']) ?></strong>
+          <strong><?= e($stat['num']) ?><?= e($stat['suffix'] ?? '') ?></strong>
           <span><?= e($stat['label']) ?></span>
         </div>
         <?php endforeach; ?>
@@ -142,77 +191,19 @@ $schemaJson = json_encode([
 </section>
 <?php endif; ?>
 
-<?php if (cmsRowEnabled($cms, 'pillars', true) && !empty($pillars)): ?>
-<section class="hq-services-pro-pillars">
-  <div class="container-site">
-    <div class="hq-services-pro-pillars__grid">
-      <?php foreach ($pillars as $i => $item): ?>
-      <article class="hq-services-pro-pillar" data-anim="up" data-delay="<?= $i * 45 ?>">
-        <span class="hq-services-pro-pillar__icon"><i class="bi <?= e($item['icon'] ?? 'bi-check-circle') ?>"></i></span>
-        <h3><?= e($item['title'] ?? '') ?></h3>
-        <p><?= e($item['text'] ?? $item['body'] ?? '') ?></p>
-      </article>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
-
 <?php if (cmsRowEnabled($cms, 'catalog', true)): ?>
 <section class="hq-services-pro-catalog" id="svc-catalog" aria-labelledby="svc-catalog-title">
   <div class="container-site">
     <header class="hq-services-pro-section-head" data-anim="up">
-      <p class="hq-services-pro-eyebrow"><?= e(cmsText($catalogSec, 'title', 'Service catalog')) ?></p>
-      <h2 id="svc-catalog-title" class="hq-services-pro-title"><?= e(cmsText($catalogSec, 'subtitle', 'Everything your project needs')) ?></h2>
-      <p class="hq-services-pro-lead hq-services-pro-section-head__lead"><?= e(cmsText($catalogSec, 'content', 'Architecture, design, planning, and finishing — delivered with professional oversight from first sketch to final handover.')) ?></p>
+      <p class="hq-services-pro-eyebrow"><?= e($catalogKicker) ?></p>
+      <h2 id="svc-catalog-title" class="hq-services-pro-title"><?= e($catalogTitle) ?></h2>
+      <p class="hq-services-pro-lead hq-services-pro-section-head__lead"><?= e($catalogLead) ?></p>
     </header>
 
-    <?php if (empty($services)): ?>
-    <div class="hq-services-pro-empty" data-anim="up">
-      <span class="hq-services-pro-empty__icon"><i class="bi bi-building"></i></span>
-      <h3>Services coming soon</h3>
-      <p>Published services will appear here. Contact us to discuss your project in the meantime.</p>
-      <a href="<?= url('contact') ?>" class="hq-btn hq-btn--outline">Contact us</a>
-    </div>
-    <?php else: ?>
-    <p class="hq-services-pro-count" data-anim="up" data-delay="50">
-      <?= $stats['total'] === 1 ? '1 service' : number_format($stats['total']) . ' services' ?>
-      <?= $stats['featured'] > 0 ? ' · ' . number_format($stats['featured']) . ' featured' : '' ?>
-    </p>
     <div class="hq-services-pro-grid">
       <?php foreach ($services as $i => $svc): ?>
         <?php View::partial('services/service-card', ['service' => $svc, 'index' => $i]); ?>
       <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-  </div>
-</section>
-<?php endif; ?>
-
-<?php if (cmsRowEnabled($cms, 'scope', true)): ?>
-<section class="hq-services-pro-scope">
-  <div class="container-site">
-    <div class="hq-services-pro-scope__shell">
-      <div class="hq-services-pro-scope__copy" data-anim="left">
-        <p class="hq-services-pro-eyebrow"><?= e(cmsText($scopeSec, 'title', 'Project scope')) ?></p>
-        <h2 class="hq-services-pro-title"><?= e(cmsText($scopeSec, 'subtitle', 'Built for residential & commercial clients')) ?></h2>
-        <p class="hq-services-pro-lead"><?= e(cmsText($scopeSec, 'content', 'Whether you need a single design discipline or full design-build delivery, we scale our team and timeline to match your project.')) ?></p>
-        <ul class="hq-services-pro-scope__list">
-          <?php foreach ($scopeList as $line): ?>
-          <li><i class="bi bi-check2-circle"></i> <?= e(is_array($line) ? ($line['title'] ?? $line['text'] ?? '') : $line) ?></li>
-          <?php endforeach; ?>
-        </ul>
-        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline"><?= e($scopeMap['cta_label'] ?? 'View our work') ?> <i class="bi bi-arrow-up-right"></i></a>
-      </div>
-      <div class="hq-services-pro-scope__cards" data-anim="right">
-        <?php foreach ($scopeItems as $item): ?>
-        <article class="hq-services-pro-scope__card">
-          <i class="bi <?= e($item['icon']) ?>"></i>
-          <strong><?= e($item['title']) ?></strong>
-          <span><?= e($item['text']) ?></span>
-        </article>
-        <?php endforeach; ?>
-      </div>
     </div>
   </div>
 </section>
@@ -221,24 +212,24 @@ $schemaJson = json_encode([
 <?php if (cmsRowEnabled($cms, 'process', true) && !empty($processSteps)): ?>
 <section class="hq-services-pro-process" aria-labelledby="svc-process-title">
   <div class="container-site">
-    <header class="hq-services-pro-section-head" data-anim="up">
-      <p class="hq-services-pro-eyebrow"><?= e($process['title'] ?? 'How We Work') ?></p>
-      <h2 id="svc-process-title" class="hq-services-pro-title"><?= e($process['subtitle'] ?? 'Simple steps, clear delivery') ?></h2>
-      <?php if (!empty($process['content'])): ?>
-      <p class="hq-services-pro-lead hq-services-pro-section-head__lead"><?= e($process['content']) ?></p>
-      <?php endif; ?>
-    </header>
-    <ol class="hq-services-pro-process__steps">
-      <?php foreach ($processSteps as $i => $step): ?>
-      <li data-anim="up" data-delay="<?= $i * 55 ?>">
-        <span class="hq-services-pro-process__num"><?= e($step['num'] ?? str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT)) ?></span>
-        <div>
-          <h3><?= e($step['title'] ?? '') ?></h3>
-          <p><?= e($step['text'] ?? $step['body'] ?? '') ?></p>
-        </div>
-      </li>
-      <?php endforeach; ?>
-    </ol>
+    <div class="hq-services-pro-process__shell">
+      <header class="hq-services-pro-process__head" data-anim="left">
+        <p class="hq-services-pro-eyebrow"><?= e($processKicker) ?></p>
+        <h2 id="svc-process-title" class="hq-services-pro-title"><?= e($processTitle) ?></h2>
+        <p class="hq-services-pro-lead"><?= e($processLead) ?></p>
+      </header>
+      <ol class="hq-services-pro-process__steps" data-anim="right">
+        <?php foreach ($processSteps as $i => $step): ?>
+        <li>
+          <span class="hq-services-pro-process__num"><?= e($step['num'] ?? str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT)) ?></span>
+          <div>
+            <h3><?= e($step['title'] ?? '') ?></h3>
+            <p><?= e($step['text'] ?? $step['body'] ?? '') ?></p>
+          </div>
+        </li>
+        <?php endforeach; ?>
+      </ol>
+    </div>
   </div>
 </section>
 <?php endif; ?>
@@ -249,10 +240,7 @@ $schemaJson = json_encode([
     <div class="hq-services-pro-faq__shell">
       <header class="hq-services-pro-faq__head" data-anim="up">
         <p class="hq-services-pro-eyebrow"><?= e($faqBlock['title'] ?? 'FAQ') ?></p>
-        <h2 id="svc-faq-title" class="hq-services-pro-title"><?= e($faqBlock['subtitle'] ?? 'Common questions') ?></h2>
-        <?php if (!empty($faqBlock['content'])): ?>
-        <p class="hq-services-pro-lead"><?= e($faqBlock['content']) ?></p>
-        <?php endif; ?>
+        <h2 id="svc-faq-title" class="hq-services-pro-title"><?= e($copyIf((string)($faqBlock['subtitle'] ?? ''), ['Common questions'], 'Questions we hear first')) ?></h2>
       </header>
       <div class="hq-services-pro-faq__list" data-anim="up" data-delay="80">
         <?php foreach ($faqItems as $i => $faq): ?>
@@ -280,9 +268,9 @@ $schemaJson = json_encode([
   <div class="hq-services-pro-cta__bg" aria-hidden="true"></div>
   <div class="container-site hq-services-pro-cta__box" data-anim="up">
     <div class="hq-services-pro-cta__copy">
-      <p class="hq-services-pro-eyebrow hq-services-pro-eyebrow--light"><?= e(cmsText($ctaSec, 'title', 'Start your project')) ?></p>
-      <h2 id="svc-cta-title" class="hq-services-pro-cta__title"><?= e(cmsText($ctaSec, 'subtitle', 'Ready to build with confidence?')) ?></h2>
-      <p class="hq-services-pro-cta__lead"><?= e(cmsText($ctaSec, 'content', 'Get a free consultation — scope, budget, and timeline with no obligation.')) ?></p>
+      <p class="hq-services-pro-eyebrow hq-services-pro-eyebrow--light"><?= e($ctaKicker) ?></p>
+      <h2 id="svc-cta-title" class="hq-services-pro-cta__title"><?= e($ctaTitle) ?></h2>
+      <p class="hq-services-pro-cta__lead"><?= e($ctaLead) ?></p>
     </div>
     <div class="hq-services-pro-cta__actions">
       <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg"><i class="bi bi-whatsapp"></i> <?= e($ctaMap['cta_primary'] ?? 'Get a quote') ?></a>
