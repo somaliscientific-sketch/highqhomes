@@ -6,14 +6,14 @@ class AdminSlidersController extends Controller
     private const TRANSITIONS = ['inherit', 'fade', 'slide', 'kenburns'];
     private const GLOBAL_TRANSITIONS = ['fade', 'slide', 'kenburns'];
     private const EXAMPLE_TITLES = [
-        'A house you can walk in Garowe.',
-        'The same craft, after dark.',
-        'A compound that reads as one home.',
+        'Work you can inspect in Garowe.',
+        'Brickwork rising on the plot.',
+        'A house taking shape today.',
     ];
     private const EXAMPLE_SUBTITLES = [
-        'Finished residential build',
-        'Completed family home',
-        'Residential compound',
+        'Active residential build',
+        'Masonry in progress',
+        'Two-storey structure',
     ];
 
     private SliderModel $model;
@@ -37,7 +37,7 @@ class AdminSlidersController extends Controller
     public function create(array $params = []): void
     {
         $this->requireManage();
-        $index = $this->model->count() % 3;
+        $index = $this->model->count() % max(1, count(heroSliderCatalog()));
         $catalog = heroSliderCatalog();
         $example = $catalog[$index];
         $slider = [

@@ -470,59 +470,83 @@ function isStaleGalleryImage(?string $image): bool
 }
 
 /**
- * Three Garowe project photos for the homepage hero.
+ * Eight on-site frames from the current Garowe build video for the homepage hero.
  *
  * @return list<array<string, mixed>>
  */
 function heroSliderCatalog(): array
 {
-    return [
+    $base = [
+        'button_text' => 'Get a quote',
+        'button_link' => '/contact',
+        'button_text_2' => 'View our work',
+        'button_link_2' => '/projects',
+        'image_focus' => 'right',
+        'overlay_opacity' => 0.48,
+        'is_published' => 1,
+        'show_description' => 1,
+    ];
+
+    $slides = [
         [
-            'title' => 'A house you can walk in Garowe.',
-            'subtitle' => 'Finished residential build',
-            'description' => 'Photographed on a HighQ Homes street — not a stock library. One team from drawings to the gate.',
-            'button_text' => 'Get a quote',
-            'button_link' => '/contact',
-            'button_text_2' => 'View our work',
-            'button_link_2' => '/projects',
-            'image' => 'images/builds/hero-street-villa.jpg',
-            'badge_text' => 'Garowe · Street villa',
-            'image_focus' => 'right',
-            'overlay_opacity' => 0.55,
-            'is_published' => 1,
-            'show_description' => 1,
+            'title' => 'Work you can inspect in Garowe.',
+            'subtitle' => 'Active residential build',
+            'description' => 'Shot on a HighQ Homes plot — brickwork and openings going up under a Garowe sky, not a stock library.',
+            'image' => 'images/builds/hero-site-01.jpg',
+            'badge_text' => 'Garowe · Active build',
         ],
         [
-            'title' => 'The same craft, after dark.',
-            'subtitle' => 'Completed family home',
-            'description' => 'Warm light on a finished HighQ Homes residence. Visit the work before you decide.',
-            'button_text' => 'Get a quote',
-            'button_link' => '/contact',
-            'button_text_2' => 'View our work',
-            'button_link_2' => '/projects',
-            'image' => 'images/builds/hero-night-villa.jpg',
-            'badge_text' => 'Garowe · Night',
-            'image_focus' => 'right',
-            'overlay_opacity' => 0.5,
-            'is_published' => 1,
-            'show_description' => 1,
+            'title' => 'Brickwork rising on the plot.',
+            'subtitle' => 'Masonry in progress',
+            'description' => 'The structure you can walk before paint and fittings. One team from drawings to handover.',
+            'image' => 'images/builds/hero-site-02.jpg',
+            'badge_text' => 'Garowe · Masonry',
         ],
         [
-            'title' => 'A compound that reads as one home.',
-            'subtitle' => 'Residential compound',
-            'description' => 'Planned for the plot, the climate, and daily family use — with a finish you can inspect.',
-            'button_text' => 'Get a quote',
-            'button_link' => '/contact',
-            'button_text_2' => 'View our work',
-            'button_link_2' => '/projects',
-            'image' => 'images/builds/hero-compound-villa.jpg',
-            'badge_text' => 'Garowe · Compound',
-            'image_focus' => 'right',
-            'overlay_opacity' => 0.55,
-            'is_published' => 1,
-            'show_description' => 1,
+            'title' => 'A house taking shape today.',
+            'subtitle' => 'Two-storey structure',
+            'description' => 'Two-storey brickwork in progress — the same street, the same crew, progress you can see.',
+            'image' => 'images/builds/hero-site-03.jpg',
+            'badge_text' => 'Garowe · Structure',
+        ],
+        [
+            'title' => 'See the walls before the paint.',
+            'subtitle' => 'On-site progress',
+            'description' => 'Visit the plot. Check the masonry. Decide from the work itself.',
+            'image' => 'images/builds/hero-site-04.jpg',
+            'badge_text' => 'Garowe · On site',
+        ],
+        [
+            'title' => 'Built on this street, not stock.',
+            'subtitle' => 'Garowe construction',
+            'description' => 'Residential construction photographed on the job — honest progress, local accountability.',
+            'image' => 'images/builds/hero-site-05.jpg',
+            'badge_text' => 'Garowe · Construction',
+        ],
+        [
+            'title' => 'Openings, masonry, and clear progress.',
+            'subtitle' => 'Residential brickwork',
+            'description' => 'Window openings and brick elevations you can inspect before the finish goes on.',
+            'image' => 'images/builds/hero-site-06.jpg',
+            'badge_text' => 'Garowe · Brickwork',
+        ],
+        [
+            'title' => 'The same plot, a closer look.',
+            'subtitle' => 'Current project',
+            'description' => 'A closer pass along the elevation — structure first, finish when the shell is right.',
+            'image' => 'images/builds/hero-site-07.jpg',
+            'badge_text' => 'Garowe · Elevation',
+        ],
+        [
+            'title' => 'From the ground up in Garowe.',
+            'subtitle' => 'Structure before finish',
+            'description' => 'From blockwork to a home you can walk. Get a quote while the crew is on the plot.',
+            'image' => 'images/builds/hero-site-08.jpg',
+            'badge_text' => 'Garowe · Ground up',
         ],
     ];
+
+    return array_map(static fn(array $slide): array => array_merge($base, $slide), $slides);
 }
 
 function isStaleHeroSlideImage(?string $image): bool
@@ -534,7 +558,7 @@ function isStaleHeroSlideImage(?string $image): bool
 function heroSlideImageUrl(array $slide, int $index = 0): string
 {
     $catalog = heroSliderCatalog();
-    $fallbackPath = $catalog[$index % count($catalog)]['image'] ?? 'images/builds/hero-street-villa.jpg';
+    $fallbackPath = $catalog[$index % count($catalog)]['image'] ?? 'images/builds/hero-site-01.jpg';
     $fallback = asset($fallbackPath);
     $image = trim((string)($slide['image'] ?? ''));
     if (isStaleHeroSlideImage($image)) {
@@ -550,6 +574,14 @@ function heroSlideFocus(array $slide, int $index = 0): array
 {
     $image = strtolower((string)($slide['image'] ?? ''));
     $framed = [
+        'hero-site-01' => ['desk' => '82% 48%', 'mobile' => '78% 40%'],
+        'hero-site-02' => ['desk' => '80% 46%', 'mobile' => '76% 40%'],
+        'hero-site-03' => ['desk' => '78% 44%', 'mobile' => '74% 40%'],
+        'hero-site-04' => ['desk' => '76% 42%', 'mobile' => '72% 38%'],
+        'hero-site-05' => ['desk' => '72% 42%', 'mobile' => '68% 38%'],
+        'hero-site-06' => ['desk' => '68% 40%', 'mobile' => '64% 36%'],
+        'hero-site-07' => ['desk' => '62% 38%', 'mobile' => '58% 36%'],
+        'hero-site-08' => ['desk' => '48% 38%', 'mobile' => '50% 34%'],
         'hero-street-villa' => ['desk' => '76% 54%', 'mobile' => '50% 42%'],
         'hero-night-villa' => ['desk' => '62% 32%', 'mobile' => '54% 28%'],
         'hero-compound-villa' => ['desk' => '68% 40%', 'mobile' => '50% 36%'],
@@ -595,6 +627,9 @@ function isStaleHeroSlideCopy(string $title): bool
         'innovative homes built for garowe',
         'quality that lasts',
         'built with integrity',
+        'a house you can walk in garowe.',
+        'the same craft, after dark.',
+        'a compound that reads as one home.',
     ];
     return in_array($title, $stale, true);
 }

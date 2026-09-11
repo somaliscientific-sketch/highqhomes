@@ -1755,6 +1755,22 @@ body.hq-menu-open {
   to { width: 100%; }
 }
 
+@media (max-width: 700px) {
+  .hq-hero--cinematic .hq-hero__dots {
+    flex-wrap: nowrap;
+    max-width: min(100%, 14rem);
+  }
+
+  .hq-hero--cinematic .hq-hero__dot {
+    width: 0.7rem;
+    flex: 0 0 auto;
+  }
+
+  .hq-hero--cinematic .hq-hero__dot.is-active {
+    width: 1.25rem;
+  }
+}
+
 .hq-hero--cinematic .hq-hero__nav { display: flex; gap: var(--hero-space-1); }
 
 .hq-hero--cinematic .hq-hero__nav-btn {

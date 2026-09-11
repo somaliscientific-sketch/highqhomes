@@ -83,47 +83,22 @@ class SliderModel extends Model
     {
         $catalog = heroSliderCatalog();
         $rows = $this->db->query('SELECT * FROM `sliders` ORDER BY `sort_order` ASC, `id` ASC')->fetchAll();
-
-        if ($rows === []) {
-            foreach ($catalog as $i => $slide) {
-                $slide['sort_order'] = $i;
-                $this->insert($this->onlyColumns($slide));
-            }
-            return;
+        $version = 'site-video-8';
+        $current = '';
+        try {
+            $stmt = $this->db->prepare('SELECT `value` FROM `settings` WHERE `key` = ?');
+            $stmt->execute(['hero_showcase_version']);
+            $current = (string)$stmt->fetchColumn();
+        } catch (\Throwable $e) {
+            $current = '';
         }
 
-        $customKept = 0;
-        foreach ($rows as $row) {
-            if (!isStaleHeroSlideImage((string)($row['image'] ?? ''))) {
-                $customKept++;
-            }
-        }
-
-        if ($customKept === 0) {
+        if ($rows === [] || $current !== $version) {
             foreach ($catalog as $i => $slide) {
                 $slide['sort_order'] = $i;
+                $slide['is_published'] = 1;
                 if (isset($rows[$i])) {
-                    $existing = $rows[$i];
-                    $payload = [
-                        'image' => $slide['image'],
-                        'sort_order' => $i,
-                        'is_published' => 1,
-                    ];
-                    if (isStaleHeroSlideCopy((string)($existing['title'] ?? ''))) {
-                        $payload = array_merge($payload, [
-                            'title' => $slide['title'],
-                            'subtitle' => $slide['subtitle'],
-                            'description' => $slide['description'],
-                            'button_text' => $slide['button_text'],
-                            'button_link' => $slide['button_link'],
-                            'button_text_2' => $slide['button_text_2'],
-                            'button_link_2' => $slide['button_link_2'],
-                            'badge_text' => $slide['badge_text'],
-                            'overlay_opacity' => $slide['overlay_opacity'],
-                            'image_focus' => $slide['image_focus'],
-                        ]);
-                    }
-                    $this->update((int)$existing['id'], $this->onlyColumns($payload));
+                    $this->update((int)$rows[$i]['id'], $this->onlyColumns($slide));
                 } else {
                     $this->insert($this->onlyColumns($slide));
                 }
@@ -133,6 +108,16 @@ class SliderModel extends Model
                     'is_published' => 0,
                     'sort_order' => $i,
                 ]));
+            }
+            try {
+                $stmt = $this->db->prepare(
+                    'INSERT INTO `settings` (`key`, `value`, `type`, `label`, `group_name`, `sort_order`) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)'
+                );
+                $stmt->execute(['hero_showcase_version', $version, 'text', 'Hero Showcase Version', 'homepage', 19]);
+            } catch (\Throwable $e) {
+                if (class_exists('Production')) {
+                    Production::log('Hero showcase version: ' . $e->getMessage());
+                }
             }
             return;
         }
