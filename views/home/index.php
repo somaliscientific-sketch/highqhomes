@@ -499,23 +499,8 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         <?php endforeach; ?>
       </div>
 
+      <?php if ($heroMulti): ?>
       <div class="hq-hero__chrome">
-        <div class="hq-hero__trust">
-          <?php
-            $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-gem', 'bi-award', 'bi-patch-check'];
-            foreach (array_slice($trustBarItems, 0, 3) as $tIdx => $trustLabel):
-              $tLabelText = is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel;
-              $tIcon = $trustIcons[$tIdx % count($trustIcons)];
-              if ($tLabelText === '') continue;
-          ?>
-          <div class="hq-hero__trust-item">
-            <span class="hq-hero__trust-icon" aria-hidden="true"><i class="bi <?= e($tIcon) ?>"></i></span>
-            <span class="hq-hero__trust-text"><?= e($tLabelText) ?></span>
-          </div>
-          <?php endforeach; ?>
-        </div>
-
-        <?php if ($heroMulti): ?>
         <div class="hq-hero__controls" aria-label="Hero carousel controls">
           <div class="hq-hero__counter" aria-live="polite">
             <span class="hq-hero__counter-current" data-hero-current>01</span>
@@ -536,8 +521,8 @@ $heroBandStats = array_map(static fn(array $stat): array => [
             <button type="button" class="hq-hero__nav-btn" data-hero-next aria-label="Next slide"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
           </div>
         </div>
-        <?php endif; ?>
       </div>
+      <?php endif; ?>
     </div>
   </div>
 
