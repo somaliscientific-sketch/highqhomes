@@ -4,6 +4,22 @@ $bodyPage  = 'projects';
 
 $hasFilters = (bool)($category || $status);
 $statuses   = $statuses ?? [];
+$projects   = $projects ?? [];
+$stats      = $stats ?? ['showing' => 0, 'total' => 0, 'completed' => 0, 'in_progress' => 0, 'categories' => 0, 'years' => ''];
+
+if ($projects === []) {
+    $projects = projectShowcaseItems(($category ?? '') ?: null, ($status ?? '') ?: null);
+    $allShowcase = projectShowcaseItems();
+    $years = array_values(array_filter(array_map(static fn(array $row): int => (int)($row['project_year'] ?? 0), $allShowcase)));
+    $stats['showing'] = count($projects);
+    $stats['total'] = count($allShowcase);
+    $stats['completed'] = count(array_filter($allShowcase, static fn(array $row): bool => ($row['status'] ?? '') === 'completed'));
+    $stats['in_progress'] = count(array_filter($allShowcase, static fn(array $row): bool => ($row['status'] ?? '') === 'in_progress'));
+    $stats['categories'] = count(array_unique(array_map(static fn(array $row): string => (string)($row['category'] ?? ''), $allShowcase)));
+    $stats['years'] = $years === [] ? '' : (min($years) === max($years) ? (string) min($years) : min($years) . '–' . max($years));
+    $statuses = array_values(array_unique(array_map(static fn(array $row): string => (string)($row['status'] ?? ''), $allShowcase)));
+    $categories = array_values(array_unique(array_map(static fn(array $row): string => (string)($row['category'] ?? ''), $allShowcase)));
+}
 
 $wa        = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $settings['phone'] ?? '252907734667');
 $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20to%20discuss%20a%20project';

@@ -243,6 +243,106 @@ function projectStatusLabel(?string $status): string
     return ucwords(str_replace('_', ' ', (string)($status ?: 'completed')));
 }
 
+/**
+ * On-site HighQ Homes portfolio used when the projects table is empty.
+ *
+ * @return list<array<string, mixed>>
+ */
+function projectShowcaseItems(?string $category = null, ?string $status = null): array
+{
+    $rows = [
+        [
+            'id' => 0, 'title' => 'Evening Family Villa', 'slug' => 'evening-family-villa',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Two-storey gated villa', 'project_year' => 2025,
+            'short_description' => 'A two-storey grey villa with a gated compound, warm evening lighting, and a finished façade built for family living in Garowe.',
+            'description' => '<p>This Garowe family villa was delivered as a complete residential build — structure, envelope, and finishing under one HighQ Homes team.</p><p>The compound is gated, the façade is finished in a durable grey render, and the two-storey plan is organised for privacy at the street and comfortable living inside. Lighting, boundary walls, and the entrance sequence were treated as part of the architecture, not as afterthoughts.</p><p>The result is a home that reads clearly at night and holds its finish in Puntland’s climate — a standard we apply from first setting-out through handover.</p>',
+            'featured_image' => 'images/builds/grey-villa-evening.jpg',
+            'gallery_images' => ['images/builds/grey-villa.jpg'],
+            'is_featured' => 1, 'is_published' => 1, 'sort_order' => 1,
+        ],
+        [
+            'id' => 0, 'title' => 'Twin Family Residences', 'slug' => 'twin-family-residences',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Paired two-storey homes', 'project_year' => 2025,
+            'short_description' => 'A pair of matching two-storey residences sharing a composed street frontage, with independent living for two households.',
+            'description' => '<p>Twin residences give two families the presence of a single composed building while keeping each home independent.</p><p>HighQ Homes delivered the pair with aligned floor levels, a shared material language, and separate access so the street elevation stays calm and the living remains private. Windows, roof edges, and the boundary treatment were coordinated so neither house reads as an add-on.</p><p>This is a practical model for family plots in Garowe: one construction programme, two complete homes, one accountable finish standard.</p>',
+            'featured_image' => 'images/builds/twin-residences.jpg',
+            'gallery_images' => [],
+            'is_featured' => 1, 'is_published' => 1, 'sort_order' => 2,
+        ],
+        [
+            'id' => 0, 'title' => 'Modern Courtyard Villa', 'slug' => 'modern-courtyard-villa',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Two-storey villa', 'project_year' => 2024,
+            'short_description' => 'A contemporary two-storey villa with a strong street elevation, deep openings, and a courtyard plan for shade and privacy.',
+            'description' => '<p>This villa is planned around shade, privacy, and a clear modern elevation — a courtyard sequence that cools the house and keeps family life off the street.</p><p>We delivered the structure, openings, and exterior finish as one package, with careful attention to proportions at the gate, the first-floor balcony line, and the roof edge. Interior rooms follow the courtyard so daylight arrives without exposing the home.</p><p>It is a HighQ Homes residential standard: contemporary form, local climate sense, and a finish you can inspect at handover.</p>',
+            'featured_image' => 'images/builds/modern-villa.jpg',
+            'gallery_images' => [],
+            'is_featured' => 1, 'is_published' => 1, 'sort_order' => 3,
+        ],
+        [
+            'id' => 0, 'title' => 'Stone Compound Residence', 'slug' => 'stone-compound-residence',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Gated family compound', 'project_year' => 2024,
+            'short_description' => 'A family residence set behind a stone compound wall, with a composed gate, landscaped approach, and durable exterior finishes.',
+            'description' => '<p>The stone compound is the first room of this house: a gated approach, a planted setback, and a residence that sits calmly behind the wall.</p><p>HighQ Homes built the home and the compound as one project — masonry, openings, and exterior finishes specified to last. The gate and boundary are not temporary site works; they are part of the architecture clients see every day.</p><p>This is typical of our Garowe residential work: a secure compound, a finished elevation, and a family plan that stays private from the street.</p>',
+            'featured_image' => 'images/builds/stone-residence.jpg',
+            'gallery_images' => [],
+            'is_featured' => 0, 'is_published' => 1, 'sort_order' => 4,
+        ],
+        [
+            'id' => 0, 'title' => 'Two-Storey Family Residence', 'slug' => 'two-storey-family-residence',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Two-storey residence', 'project_year' => 2024,
+            'short_description' => 'A completed two-storey family home with a warm rendered façade, balanced openings, and a clear street presence.',
+            'description' => '<p>This two-storey residence is a straightforward family house, finished with care: a warm render, balanced window rhythm, and a roof line that sits cleanly on the plot.</p><p>We delivered it from structure to finishing under one programme — no split between “builder” and “finisher”. Interior rooms are planned for daily family use; the exterior is specified for sun, dust, and long-term maintenance.</p><p>It is the kind of home HighQ Homes is known for in Garowe: honest construction, a composed elevation, and a handover you can walk with a checklist.</p>',
+            'featured_image' => 'images/builds/yellow-residence.jpg',
+            'gallery_images' => [],
+            'is_featured' => 0, 'is_published' => 1, 'sort_order' => 5,
+        ],
+        [
+            'id' => 0, 'title' => 'Green Roof Family Home', 'slug' => 'green-roof-family-home',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Two-storey residence', 'project_year' => 2023,
+            'short_description' => 'A two-storey family home with a distinctive green roof, deep eaves, and a finished compound that reads clearly from the street.',
+            'description' => '<p>The green roof is the signature of this house — a practical shade device and a strong identity on the street.</p><p>HighQ Homes delivered the residence with coordinated eaves, openings, and exterior colour so the roof belongs to the building rather than sitting on it. The compound, approach, and façade were finished together so the first impression matches the completed interior.</p><p>Clients looking for a family home with a distinct profile — not a generic box — will recognise the standard: design intent carried through construction and finishing.</p>',
+            'featured_image' => 'images/builds/green-roof-residence.jpg',
+            'gallery_images' => [],
+            'is_featured' => 0, 'is_published' => 1, 'sort_order' => 6,
+        ],
+        [
+            'id' => 0, 'title' => 'Gated Villa Entrance', 'slug' => 'gated-villa-entrance',
+            'category' => 'residential', 'status' => 'completed', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Villa compound & gate', 'project_year' => 2025,
+            'short_description' => 'A custom gate and compound wall for a two-storey villa — the street face of a finished HighQ Homes residence.',
+            'description' => '<p>The entrance is where a residential project meets the city. This gate and compound wall were designed and built with the villa, not added later.</p><p>We coordinated masonry, metalwork, and the house elevation so the street composition is one piece: solid boundary, a considered opening, and a two-storey home that sits correctly behind it. Daylight on the façade shows the same finish quality as the evening view of the related villa.</p><p>HighQ Homes treats compound works as architecture — security, proportion, and craft in a single delivery.</p>',
+            'featured_image' => 'images/builds/grey-villa.jpg',
+            'gallery_images' => ['images/builds/grey-villa-evening.jpg'],
+            'is_featured' => 0, 'is_published' => 1, 'sort_order' => 7,
+        ],
+        [
+            'id' => 0, 'title' => 'Residential Build in Progress', 'slug' => 'residential-build-in-progress',
+            'category' => 'residential', 'status' => 'in_progress', 'location' => 'Garowe, Puntland',
+            'client_name' => 'Private client', 'project_area' => 'Active residential site', 'project_year' => 2026,
+            'short_description' => 'An active HighQ Homes residential site — structure rising with programmed inspections before each stage is signed off.',
+            'description' => '<p>This active build is how our completed homes begin: a cleared plot, a set-out, and a structure rising under a written programme.</p><p>Clients receive milestone updates and quality checks before the next stage is released. Scaffolding, blockwork, and site access are managed so the finished house can meet the same standard as the villas already in this portfolio.</p><p>If you are planning a home in Garowe, this is the delivery model — visible progress, accountable stages, and a finish that will photograph like the completed projects beside it.</p>',
+            'featured_image' => 'images/builds/active-build.jpg',
+            'gallery_images' => [],
+            'is_featured' => 1, 'is_published' => 1, 'sort_order' => 8,
+        ],
+    ];
+
+    if ($category) {
+        $rows = array_values(array_filter($rows, static fn(array $row): bool => ($row['category'] ?? '') === $category));
+    }
+    if ($status) {
+        $rows = array_values(array_filter($rows, static fn(array $row): bool => ($row['status'] ?? '') === $status));
+    }
+
+    return $rows;
+}
+
 function serviceImageUrl(array $service, string $fallback = ''): string
 {
     $fallback = $fallback ?: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80';

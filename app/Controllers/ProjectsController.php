@@ -51,7 +51,18 @@ class ProjectsController extends Controller
         $model->ensureShowcase();
         $project = $model->findBySlug($params['slug'] ?? '');
 
-        if (!$project || !$project['is_published']) {
+        if (!$project || empty($project['is_published'])) {
+            $slug = (string)($params['slug'] ?? '');
+            $project = null;
+            foreach (projectShowcaseItems() as $item) {
+                if (($item['slug'] ?? '') === $slug) {
+                    $project = $item;
+                    break;
+                }
+            }
+        }
+
+        if (!$project || empty($project['is_published'])) {
             $this->abort(404);
         }
 
