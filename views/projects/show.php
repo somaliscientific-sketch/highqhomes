@@ -91,7 +91,7 @@ $scopeItems = $scopeMap[$project['category'] ?? ''] ?? $scopeMap['other'];
           </header>
           <div class="hq-projects-pro-detail__gallery-grid">
             <?php foreach ($gallery as $img): ?>
-            <?php $gSrc = str_starts_with($img, 'http') ? $img : uploadUrl($img); ?>
+            <?php $gSrc = mediaPathUrl((string)$img); ?>
             <button type="button" class="hq-projects-pro-gallery-item lightbox-trigger" data-lightbox="gallery" data-src="<?= e($gSrc) ?>" data-alt="<?= e($project['title']) ?>">
               <img src="<?= e($gSrc) ?>" alt="<?= e($project['title']) ?>" loading="lazy">
               <span class="hq-projects-pro-gallery-item__zoom"><i class="bi bi-zoom-in"></i></span>

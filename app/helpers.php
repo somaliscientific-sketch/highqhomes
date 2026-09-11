@@ -208,14 +208,29 @@ function cmsList(array $section): array
     return is_array($items) && array_is_list($items) ? $items : [];
 }
 
+function mediaPathUrl(?string $path, string $fallback = ''): string
+{
+    $path = trim((string)$path);
+    if ($path === '') {
+        return $fallback;
+    }
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+        return $path;
+    }
+    $normalized = ltrim((string)preg_replace('#^/?public/#', '', $path), '/');
+    if (str_starts_with($normalized, 'images/')) {
+        return asset($normalized);
+    }
+    return uploadUrl($path);
+}
+
 function projectImageUrl(array $project, string $fallback = ''): string
 {
-    $fallback = $fallback ?: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80';
+    $fallback = $fallback ?: asset('images/builds/grey-villa-evening.jpg');
     if (empty($project['featured_image'])) {
         return $fallback;
     }
-    $image = $project['featured_image'];
-    return str_starts_with($image, 'http') ? $image : uploadUrl($image);
+    return mediaPathUrl((string)$project['featured_image'], $fallback);
 }
 
 function projectCategoryLabel(?string $category): string

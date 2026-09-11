@@ -15,6 +15,7 @@ class HomeController extends Controller
 
         $this->tryLoad(function () use (&$featuredProjects, &$latestProjects, &$sliders, &$testimonials, &$settings, &$seo, &$sections): void {
             $projectModel     = new ProjectModel();
+            $projectModel->ensureShowcase();
             $featuredProjects = $projectModel->getFeatured(6);
             $latestProjects   = $projectModel->getLatest(6);
             if (count($latestProjects) < 3) {

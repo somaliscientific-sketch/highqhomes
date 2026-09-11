@@ -18,12 +18,17 @@ class ProjectsController extends Controller
             'completed'   => 0,
             'in_progress' => 0,
             'categories'  => 0,
+            'years'       => '',
         ];
 
-        $this->tryLoad(function () use ($category, $status, &$projects, &$categories, &$settings, &$seo, &$sections, &$stats): void {
+        $statuses = [];
+
+        $this->tryLoad(function () use ($category, $status, &$projects, &$categories, &$statuses, &$settings, &$seo, &$sections, &$stats): void {
             $model      = new ProjectModel();
+            $model->ensureShowcase();
             $projects   = $model->getPublished($category ?: null, $status ?: null);
             $categories = $model->getCategories();
+            $statuses   = $model->getStatuses();
             $settings   = (new SettingModel())->getAllAsMap();
             $seo        = (new SeoModel())->findBySlug('projects');
             $sections   = (new PageSectionModel())->getByPage('projects');
@@ -33,15 +38,17 @@ class ProjectsController extends Controller
                 'completed'   => $model->countByStatus('completed'),
                 'in_progress' => $model->countByStatus('in_progress'),
                 'categories'  => count($categories),
+                'years'       => $model->yearSpan(),
             ];
         });
 
-        $this->render('projects/index', compact('projects', 'categories', 'category', 'status', 'settings', 'seo', 'stats', 'sections'));
+        $this->render('projects/index', compact('projects', 'categories', 'statuses', 'category', 'status', 'settings', 'seo', 'stats', 'sections'));
     }
 
     public function show(array $params = []): void
     {
         $model   = new ProjectModel();
+        $model->ensureShowcase();
         $project = $model->findBySlug($params['slug'] ?? '');
 
         if (!$project || !$project['is_published']) {
