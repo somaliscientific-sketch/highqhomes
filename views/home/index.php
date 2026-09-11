@@ -572,14 +572,15 @@ $heroBandStats = array_map(static fn(array $stat): array => [
   <div class="container-site">
     <div class="hq-about-premium__shell">
       <div class="hq-about-premium__media" data-anim="left">
-        <div class="hq-about-premium__frame">
+        <figure class="hq-about-premium__frame">
           <img src="<?= e($aboutImg) ?>" alt="Completed HighQ Homes residence in Garowe, Puntland" loading="lazy">
-          <div class="hq-about-premium__badge">
+          <span class="hq-about-premium__shade" aria-hidden="true"></span>
+          <figcaption class="hq-about-premium__badge">
             <strong><?= e($settings['stat_years'] ?? '4') ?>+</strong>
             <span>Years Building<br>With Excellence</span>
-          </div>
-        </div>
-        <div class="hq-about-premium__chip"><i class="bi bi-house-check"></i> Completed Residential Project</div>
+          </figcaption>
+          <span class="hq-about-premium__chip"><i class="bi bi-house-check" aria-hidden="true"></i> Completed Residential Project</span>
+        </figure>
       </div>
 
       <div class="hq-about-premium__content" data-anim="right">
@@ -590,8 +591,8 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         <div class="hq-about-premium__highlights">
           <?php foreach ($aboutHighlights as $i => $h): ?>
           <article class="hq-about-premium__highlight" data-anim="up" data-delay="<?= $i * 50 ?>">
-            <span class="hq-about-premium__highlight-icon"><i class="bi <?= e($h['icon']) ?>"></i></span>
-            <div>
+            <span class="hq-about-premium__highlight-icon" aria-hidden="true"><i class="bi <?= e($h['icon']) ?>"></i></span>
+            <div class="hq-about-premium__highlight-copy">
               <h3><?= e($h['title']) ?></h3>
               <p><?= e($h['text']) ?></p>
             </div>
@@ -607,8 +608,8 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         <?php endif; ?>
 
         <div class="hq-about-premium__actions">
-          <a href="<?= url('about') ?>" class="hq-btn hq-btn--navy">Our Story <i class="bi bi-arrow-right"></i></a>
-          <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange"><i class="bi bi-whatsapp"></i> Start a Project</a>
+          <a href="<?= url('about') ?>" class="hq-btn hq-btn--navy hq-about-premium__btn">Our Story <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-about-premium__btn"><i class="bi bi-whatsapp" aria-hidden="true"></i> Start a Project</a>
         </div>
       </div>
     </div>
