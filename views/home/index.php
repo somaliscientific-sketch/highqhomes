@@ -89,7 +89,7 @@ $capabilities = [
     'title' => 'Residential Builds',
     'text' => 'Comfortable, durable homes designed for families and long-term living.',
     'icon' => 'bi-house-heart',
-    'img' => 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80',
+    'img' => asset('images/builds/grey-villa-evening.jpg'),
     'href' => url('projects'),
     'mod' => 'feature',
   ],
@@ -97,7 +97,7 @@ $capabilities = [
     'title' => 'Commercial Spaces',
     'text' => 'Offices and business environments built for performance and presence.',
     'icon' => 'bi-building',
-    'img' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80',
+    'img' => asset('images/builds/twin-residences.jpg'),
     'href' => url('projects'),
     'mod' => '',
   ],
@@ -105,7 +105,7 @@ $capabilities = [
     'title' => 'Premium Finishing',
     'text' => 'Refined interiors, paints, and detail work that elevate every space.',
     'icon' => 'bi-brush',
-    'img' => 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=900&q=80',
+    'img' => asset('images/builds/modern-villa.jpg'),
     'href' => url('paints'),
     'mod' => '',
   ],
@@ -113,10 +113,17 @@ $capabilities = [
     'title' => 'Design & Planning',
     'text' => 'Concept-to-blueprint support with clear scope, budget, and timelines.',
     'icon' => 'bi-rulers',
-    'img' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&q=80',
+    'img' => asset('images/builds/stone-residence.jpg'),
     'href' => url('contact'),
     'mod' => 'wide',
   ],
+];
+$capabilityDefaults = $capabilities;
+$buildGallery = [
+  ['src' => asset('images/builds/yellow-residence.jpg'), 'alt' => 'Completed family residence by HighQ Homes'],
+  ['src' => asset('images/builds/green-roof-residence.jpg'), 'alt' => 'Two-storey residence with premium exterior finishes'],
+  ['src' => asset('images/builds/active-build.jpg'), 'alt' => 'Residential project under construction'],
+  ['src' => asset('images/builds/grey-villa.jpg'), 'alt' => 'Modern villa with custom gate and finishing'],
 ];
 
 $promiseItems = [
@@ -196,17 +203,22 @@ if ($trustList !== []) {
 
 $capList = cmsList($capabilitiesSec);
 if ($capList !== []) {
-  $capabilities = array_map(static function ($row) {
+  $capabilities = [];
+  foreach (array_values($capList) as $i => $row) {
     if (!is_array($row)) {
-      return $row;
+      continue;
     }
     if (empty($row['img']) && !empty($row['image_url'])) {
       $row['img'] = cmsMediaUrl((string)$row['image_url']);
     } elseif (!empty($row['img'])) {
       $row['img'] = cmsMediaUrl((string)$row['img'], (string)$row['img']);
     }
-    return $row;
-  }, $capList);
+    $img = (string)($row['img'] ?? '');
+    if ($img === '' || str_contains($img, 'unsplash.com')) {
+      $row['img'] = $capabilityDefaults[$i]['img'] ?? $img;
+    }
+    $capabilities[] = $row;
+  }
 }
 
 $aboutList = cmsList($aboutSec);
@@ -590,7 +602,7 @@ $heroBandStats = array_map(static fn(array $stat): array => [
     <div class="hq-bento">
       <?php foreach ($capabilities as $i => $cap): ?>
       <a href="<?= e(menuUrl($cap['href'] ?? '/projects')) ?>" class="hq-bento__card<?= !empty($cap['mod']) ? ' hq-bento__card--' . e($cap['mod']) : '' ?>" data-anim="up" data-delay="<?= $i * 60 ?>">
-        <img src="<?= e($cap['img'] ?? '') ?>" alt="" loading="lazy" aria-hidden="true">
+        <img src="<?= e($cap['img'] ?? '') ?>" alt="<?= e($cap['title'] ?? 'HighQ Homes project') ?>" loading="lazy">
         <div class="hq-bento__shade"></div>
         <div class="hq-bento__body">
           <span class="hq-bento__icon"><i class="bi <?= e($cap['icon'] ?? 'bi-building') ?>"></i></span>
@@ -601,6 +613,15 @@ $heroBandStats = array_map(static fn(array $stat): array => [
       </a>
       <?php endforeach; ?>
     </div>
+    <?php if (!empty($buildGallery)): ?>
+    <div class="hq-bento-gallery" aria-label="Recent HighQ Homes projects">
+      <?php foreach ($buildGallery as $g): ?>
+      <a href="<?= url('projects') ?>" class="hq-bento-gallery__item">
+        <img src="<?= e($g['src']) ?>" alt="<?= e($g['alt']) ?>" loading="lazy">
+      </a>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
   </div>
 </section>
 <?php endif; ?>

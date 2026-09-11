@@ -1957,7 +1957,37 @@ body.hq-menu-open {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 72%;
   transition: transform .6s var(--hq-ease);
+}
+
+.hq-bento-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.hq-bento-gallery__item {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--hq-radius);
+  box-shadow: var(--hq-shadow-sm);
+}
+
+.hq-bento-gallery__item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center 70%;
+  transition: transform .45s var(--hq-ease);
+}
+
+.hq-bento-gallery__item:hover img {
+  transform: scale(1.05);
 }
 
 .hq-bento__card:hover img { transform: scale(1.06); }
@@ -5372,6 +5402,7 @@ body.hq-menu-open {
   .hq-bento__card--feature,
   .hq-bento__card--wide { grid-column: span 12; grid-row: auto; min-height: 280px; }
   .hq-bento__card--feature { min-height: 360px; }
+  .hq-bento-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hq-connect__shell { grid-template-columns: 1fr; }
   .hq-port-intro__grid,
   .hq-hp-portfolio__mosaic { grid-template-columns: 1fr; }
