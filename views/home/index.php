@@ -345,7 +345,6 @@ $heroCarouselOpts = [
     : 'kenburns',
 ];
 $heroMulti = count($sliders) > 1;
-$imageFocusMap = ['center' => 'center', 'top' => 'center top', 'bottom' => 'center bottom'];
 
 $heroMetrics = [
   ['num' => statNumber((string)($settings['stat_projects'] ?? '8')), 'suffix' => '+', 'label' => 'Projects Profiled', 'icon' => 'bi-buildings'],
@@ -385,7 +384,7 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         $sMobile = !empty($slide['mobile_image']) && !isStaleHeroSlideImage((string)$slide['mobile_image'])
           ? mediaPathUrl((string)$slide['mobile_image'])
           : '';
-        $focus = $imageFocusMap[$slide['image_focus'] ?? 'center'] ?? 'center';
+        $focus = heroSlideFocus($slide, (int)$i);
         $badge = trim((string)($slide['badge_text'] ?? '')) ?: $defaultHeroTag;
         $slideTitle = (string)($slide['title'] ?? $siteName);
         $slideOverlay = min(0.4, max(0, (float)($slide['overlay_opacity'] ?? 0.6) * 0.45));
@@ -402,6 +401,7 @@ $heroBandStats = array_map(static fn(array $stat): array => [
         data-hero-pane
         data-hero-transition="<?= e($slideTransition) ?>"
         data-hero-duration="<?= (int)$slideDuration * 1000 ?>"
+        style="--hero-focus: <?= e($focus['desk']) ?>; --hero-focus-mobile: <?= e($focus['mobile']) ?>;"
         aria-hidden="<?= $i === 0 ? 'false' : 'true' ?>"
       >
         <picture>
@@ -417,7 +417,6 @@ $heroBandStats = array_map(static fn(array $stat): array => [
             loading="<?= $i === 0 ? 'eager' : 'lazy' ?>"
             decoding="async"
             fetchpriority="<?= $i === 0 ? 'high' : 'low' ?>"
-            style="object-position:<?= e($focus) ?>"
           >
         </picture>
         <span class="hq-hero__shot-dim" style="opacity:<?= e((string)$slideOverlay) ?>" aria-hidden="true"></span>

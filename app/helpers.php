@@ -487,7 +487,7 @@ function heroSliderCatalog(): array
             'button_link_2' => '/projects',
             'image' => 'images/builds/hero-street-villa.jpg',
             'badge_text' => 'Garowe · Street villa',
-            'image_focus' => 'center',
+            'image_focus' => 'right',
             'overlay_opacity' => 0.55,
             'is_published' => 1,
             'show_description' => 1,
@@ -502,7 +502,7 @@ function heroSliderCatalog(): array
             'button_link_2' => '/projects',
             'image' => 'images/builds/hero-night-villa.jpg',
             'badge_text' => 'Garowe · Night',
-            'image_focus' => 'center',
+            'image_focus' => 'right',
             'overlay_opacity' => 0.5,
             'is_published' => 1,
             'show_description' => 1,
@@ -517,7 +517,7 @@ function heroSliderCatalog(): array
             'button_link_2' => '/projects',
             'image' => 'images/builds/hero-compound-villa.jpg',
             'badge_text' => 'Garowe · Compound',
-            'image_focus' => 'center',
+            'image_focus' => 'right',
             'overlay_opacity' => 0.55,
             'is_published' => 1,
             'show_description' => 1,
@@ -541,6 +541,47 @@ function heroSlideImageUrl(array $slide, int $index = 0): string
         return $fallback;
     }
     return mediaPathUrl($image, $fallback);
+}
+
+/**
+ * @return array{desk: string, mobile: string}
+ */
+function heroSlideFocus(array $slide, int $index = 0): array
+{
+    $image = strtolower((string)($slide['image'] ?? ''));
+    $framed = [
+        'hero-street-villa' => ['desk' => '76% 54%', 'mobile' => '50% 42%'],
+        'hero-night-villa' => ['desk' => '62% 32%', 'mobile' => '54% 28%'],
+        'hero-compound-villa' => ['desk' => '68% 40%', 'mobile' => '50% 36%'],
+    ];
+    foreach ($framed as $key => $pos) {
+        if (str_contains($image, $key)) {
+            $raw = trim((string)($slide['image_focus'] ?? ''));
+            if ($raw !== '' && !in_array($raw, ['center', 'top', 'bottom'], true)) {
+                return ['desk' => $raw, 'mobile' => $pos['mobile']];
+            }
+            if ($raw === 'top') {
+                return ['desk' => '70% 28%', 'mobile' => '50% 22%'];
+            }
+            if ($raw === 'bottom') {
+                return ['desk' => '70% 72%', 'mobile' => '50% 58%'];
+            }
+            return $pos;
+        }
+    }
+
+    $map = [
+        'center' => ['desk' => '70% 42%', 'mobile' => '50% 34%'],
+        'top' => ['desk' => '50% 28%', 'mobile' => '50% 22%'],
+        'bottom' => ['desk' => '50% 72%', 'mobile' => '50% 58%'],
+        'right' => ['desk' => '78% 46%', 'mobile' => '62% 38%'],
+        'left' => ['desk' => '28% 46%', 'mobile' => '40% 38%'],
+    ];
+    $raw = trim((string)($slide['image_focus'] ?? 'center'));
+    if (str_contains($raw, '%')) {
+        return ['desk' => $raw, 'mobile' => $raw];
+    }
+    return $map[$raw] ?? $map['center'];
 }
 
 function isStaleHeroSlideCopy(string $title): bool
