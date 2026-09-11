@@ -8,8 +8,23 @@ $vision    = $settings['vision'] ?? '';
 $aboutText = $settings['about_text'] ?? '';
 $phone     = $settings['phone'] ?? '+252 907 734 667';
 $phoneHref = preg_replace('/\s+/', '', $phone);
+$phone2    = $settings['phone_2'] ?? '';
+$phone2Href = preg_replace('/\s+/', '', $phone2);
+$email     = $settings['email'] ?? 'info@highqhomes.net';
 $wa        = preg_replace('/[^0-9]/', '', $settings['whatsapp'] ?? $settings['phone'] ?? '252907734667');
 $quoteHref = 'https://wa.me/' . $wa . '?text=Hello%20HighQ%20Homes,%20I%20would%20like%20to%20learn%20more%20about%20your%20company';
+$address   = '3CCC, Garowe, Puntland, Somalia';
+if (!empty($settings['address'])) {
+    $address = (string)$settings['address'];
+}
+$hours     = 'Sat–Thu 8:00 AM – 8:00 PM';
+if (!empty($settings['hours'])) {
+    $hours = (string)$settings['hours'];
+}
+$mapEmbed      = trim($settings['map_embed'] ?? '');
+$mapQuery      = rawurlencode($address);
+$mapFallback   = 'https://www.google.com/maps?q=' . $mapQuery . '&output=embed';
+$directionsUrl = 'https://www.google.com/maps/search/?api=1&query=' . $mapQuery;
 
 $copyIf = static function (string $current, array $stale, string $fresh): string {
     $norm = strtolower(trim($current));
@@ -514,6 +529,117 @@ $ctaLead   = $copyIf(cmsText($ctaSec, 'content', ''), [
   </div>
 </section>
 <?php endif; ?>
+
+<!-- CONTACT & OFFICE LOCATION -->
+<section class="hq-section hq-about-contact" id="about-contact" aria-labelledby="about-contact-title">
+  <div class="container-site">
+    <div class="hq-about-contact__shell">
+      <!-- Left: Contact Details & Action -->
+      <div class="hq-about-contact__info">
+        <div class="hq-about-contact__badge">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>Garowe Office &amp; Operations</span>
+        </div>
+        <h2 class="hq-about-contact__title" id="about-contact-title">
+          Visit Our Office &amp; <span class="hq-about-contact__highlight">Connect With Us</span>
+        </h2>
+        <p class="hq-about-contact__lead">
+          Plan your project in person. Our engineering and design team in Garowe is available for on-site plot assessments, architectural reviews, and construction consultations.
+        </p>
+
+        <div class="hq-about-contact__grid">
+          <!-- Address -->
+          <div class="hq-about-contact__card">
+            <div class="hq-about-contact__card-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="hq-about-contact__card-body">
+              <span class="hq-about-contact__card-label">Office Address</span>
+              <p class="hq-about-contact__card-val"><?= e($address) ?></p>
+              <a href="<?= e($directionsUrl) ?>" target="_blank" rel="noopener" class="hq-about-contact__card-link">
+                Get Directions <i class="bi bi-arrow-up-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="hq-about-contact__card">
+            <div class="hq-about-contact__card-icon">
+              <i class="bi bi-telephone-fill"></i>
+            </div>
+            <div class="hq-about-contact__card-body">
+              <span class="hq-about-contact__card-label">Phone &amp; Consultation</span>
+              <p class="hq-about-contact__card-val"><a href="tel:<?= e($phoneHref) ?>"><?= e($phone) ?></a></p>
+              <?php if ($phone2 !== ''): ?>
+              <p class="hq-about-contact__card-val"><a href="tel:<?= e($phone2Href) ?>"><?= e($phone2) ?></a></p>
+              <?php endif; ?>
+              <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-about-contact__card-link">
+                Chat via WhatsApp <i class="bi bi-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="hq-about-contact__card">
+            <div class="hq-about-contact__card-icon">
+              <i class="bi bi-envelope-fill"></i>
+            </div>
+            <div class="hq-about-contact__card-body">
+              <span class="hq-about-contact__card-label">Direct Email</span>
+              <p class="hq-about-contact__card-val"><a href="mailto:<?= e($email) ?>"><?= e($email) ?></a></p>
+              <span class="hq-about-contact__card-sub">Fast replies within 24 hours</span>
+            </div>
+          </div>
+
+          <!-- Hours -->
+          <div class="hq-about-contact__card">
+            <div class="hq-about-contact__card-icon">
+              <i class="bi bi-clock-fill"></i>
+            </div>
+            <div class="hq-about-contact__card-body">
+              <span class="hq-about-contact__card-label">Office Hours</span>
+              <p class="hq-about-contact__card-val"><?= e($hours) ?></p>
+              <span class="hq-about-contact__card-sub">Friday: Closed / By appointment</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hq-about-contact__actions">
+          <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange hq-btn--lg">
+            <i class="bi bi-whatsapp"></i> Schedule a Visit on WhatsApp
+          </a>
+          <a href="<?= e($directionsUrl) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--outline hq-btn--lg">
+            <i class="bi bi-map"></i> Open in Google Maps
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Interactive Map -->
+      <div class="hq-about-contact__map-wrap">
+        <div class="hq-about-contact__map-frame">
+          <?php if ($mapEmbed !== ''): ?>
+            <?= $mapEmbed ?>
+          <?php else: ?>
+            <iframe
+              src="<?= e($mapFallback) ?>"
+              title="HighQ Homes Office Location in Garowe"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+            ></iframe>
+          <?php endif; ?>
+          <div class="hq-about-contact__map-tag">
+            <div class="hq-about-contact__map-tag-dot"></div>
+            <div>
+              <strong><?= e($siteName) ?> HQ</strong>
+              <span>Garowe, Puntland, Somalia</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <?php if ($showCta): ?>
 <section class="hq-about-pro-cta" id="about-cta" aria-labelledby="about-cta-title">
