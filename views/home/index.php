@@ -453,43 +453,43 @@ $heroBandStats = array_map(static fn(array $stat): array => [
       </div>
 
       <div class="hq-hero__chrome">
-      <div class="hq-hero__trust">
-        <?php
-          $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-gem', 'bi-award', 'bi-patch-check'];
-          foreach (array_slice($trustBarItems, 0, 3) as $tIdx => $trustLabel):
-            $tLabelText = is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel;
-            $tIcon = $trustIcons[$tIdx % count($trustIcons)];
-            if ($tLabelText === '') continue;
-        ?>
-        <div class="hq-hero__trust-item">
-          <span class="hq-hero__trust-icon" aria-hidden="true"><i class="bi <?= e($tIcon) ?>"></i></span>
-          <span><?= e($tLabelText) ?></span>
-        </div>
-        <?php endforeach; ?>
-      </div>
-
-      <?php if ($heroMulti): ?>
-      <div class="hq-hero__controls" aria-label="Hero carousel controls">
-        <div class="hq-hero__counter" aria-live="polite">
-          <span class="hq-hero__counter-current" data-hero-current>01</span>
-          <span class="hq-hero__counter-sep">/</span>
-          <span class="hq-hero__counter-total"><?= str_pad((string)count($sliders), 2, '0', STR_PAD_LEFT) ?></span>
-        </div>
-        <?php if ($heroCarouselOpts['dots']): ?>
-        <div class="hq-hero__dots" role="tablist" aria-label="Hero slides">
-          <?php foreach ($sliders as $i => $slide): ?>
-          <button type="button" class="hq-hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>" role="tab" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-controls="hero" aria-label="Slide <?= $i + 1 ?>: <?= e($slide['title']) ?>">
-            <span class="hq-hero__dot-fill" data-hero-dot-fill></span>
-          </button>
+        <div class="hq-hero__trust">
+          <?php
+            $trustIcons = ['bi-shield-check', 'bi-calendar2-check', 'bi-gem', 'bi-award', 'bi-patch-check'];
+            foreach (array_slice($trustBarItems, 0, 3) as $tIdx => $trustLabel):
+              $tLabelText = is_array($trustLabel) ? ($trustLabel['label'] ?? $trustLabel['title'] ?? '') : $trustLabel;
+              $tIcon = $trustIcons[$tIdx % count($trustIcons)];
+              if ($tLabelText === '') continue;
+          ?>
+          <div class="hq-hero__trust-item">
+            <span class="hq-hero__trust-icon" aria-hidden="true"><i class="bi <?= e($tIcon) ?>"></i></span>
+            <span class="hq-hero__trust-text"><?= e($tLabelText) ?></span>
+          </div>
           <?php endforeach; ?>
         </div>
-        <?php endif; ?>
-        <div class="hq-hero__nav">
-          <button type="button" class="hq-hero__nav-btn" data-hero-prev aria-label="Previous slide"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
-          <button type="button" class="hq-hero__nav-btn" data-hero-next aria-label="Next slide"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+
+        <?php if ($heroMulti): ?>
+        <div class="hq-hero__controls" aria-label="Hero carousel controls">
+          <div class="hq-hero__counter" aria-live="polite">
+            <span class="hq-hero__counter-current" data-hero-current>01</span>
+            <span class="hq-hero__counter-sep">/</span>
+            <span class="hq-hero__counter-total"><?= str_pad((string)count($sliders), 2, '0', STR_PAD_LEFT) ?></span>
+          </div>
+          <?php if ($heroCarouselOpts['dots']): ?>
+          <div class="hq-hero__dots" role="tablist" aria-label="Hero slides">
+            <?php foreach ($sliders as $i => $slide): ?>
+            <button type="button" class="hq-hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>" role="tab" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-controls="hero" aria-label="Slide <?= $i + 1 ?>: <?= e($slide['title']) ?>">
+              <span class="hq-hero__dot-fill" data-hero-dot-fill></span>
+            </button>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
+          <div class="hq-hero__nav">
+            <button type="button" class="hq-hero__nav-btn" data-hero-prev aria-label="Previous slide"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+            <button type="button" class="hq-hero__nav-btn" data-hero-next aria-label="Next slide"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+          </div>
         </div>
-      </div>
-      <?php endif; ?>
+        <?php endif; ?>
       </div>
     </div>
   </div>
