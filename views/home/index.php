@@ -70,12 +70,10 @@ $statItems = [
 ];
 
 $whyItems = [
-  ['icon' => 'bi-geo-alt', 'title' => 'Based in Garowe', 'text' => 'We build for Puntland sites, climate, and family living — with local accountability from first meeting to handover.'],
-  ['icon' => 'bi-people', 'title' => 'One accountable team', 'text' => 'Design, construction, and finishing stay under one standard so nothing is lost between trades.'],
-  ['icon' => 'bi-clipboard-check', 'title' => 'Written scope & timeline', 'text' => 'Transparent quotes, milestone updates, and a finish you can inspect before the keys are handed over.'],
-  ['icon' => 'bi-house-heart', 'title' => 'Finish built to last', 'text' => 'Materials and workmanship chosen for sun, dust, and daily use — not a short-lived look.'],
-  ['icon' => 'bi-camera', 'title' => 'Real homes, not renders', 'text' => 'The villas on this site were photographed on HighQ Homes jobs in Garowe.'],
-  ['icon' => 'bi-chat-dots', 'title' => 'Direct communication', 'text' => 'You talk to the team doing the work — from the first site visit to after-care.'],
+  ['icon' => 'bi-house-check', 'title' => 'Visit a finished home', 'text' => 'Completed Garowe houses you can walk before you decide.'],
+  ['icon' => 'bi-camera', 'title' => 'Job-site photos', 'text' => 'The villas here were shot on our sites — not a stock library.'],
+  ['icon' => 'bi-broadcast', 'title' => 'Progress you can follow', 'text' => 'Updates from the crew on the plot, not a sales desk.'],
+  ['icon' => 'bi-key', 'title' => 'After the keys', 'text' => 'We stay reachable after handover, not only until the last invoice.'],
 ];
 
 $steps = [
@@ -229,8 +227,21 @@ if ($aboutList !== []) {
 $whyList = cmsList($whySec);
 if ($whyList !== []) {
   $whyTitles = array_map(static fn(array $row): string => (string)($row['title'] ?? ''), $whyList);
-  $seedWhy = ['Quality Assured', 'Clear Timelines', 'Premium Finishes', 'Documented Process', 'Integrated Delivery', 'Client Support'];
-  $whyItems = array_intersect($seedWhy, $whyTitles) === $seedWhy ? $whyItems : $whyList;
+  $staleWhySets = [
+    ['Quality Assured', 'Clear Timelines', 'Premium Finishes', 'Documented Process', 'Integrated Delivery', 'Client Support'],
+    ['Exceptional Quality', 'Sustainable Practices', 'Customer Experience', 'Lasting Relationships'],
+    ['Based in Garowe', 'One accountable team', 'Written scope & timeline', 'Finish built to last', 'Real homes, not renders', 'Direct communication'],
+  ];
+  $keepCmsWhy = true;
+  foreach ($staleWhySets as $seedWhy) {
+    if (array_intersect($seedWhy, $whyTitles) === $seedWhy) {
+      $keepCmsWhy = false;
+      break;
+    }
+  }
+  if ($keepCmsWhy) {
+    $whyItems = $whyList;
+  }
 }
 $processList = cmsList($processSec);
 if ($processList !== []) {
@@ -782,38 +793,54 @@ $portfolioIntroLabel = $portfolioHero
     }
     return $current;
   };
-  $whyKicker = $whyNorm(cmsText($whySec, 'title', ''), ['Why Choose Us', 'Why choose us'], 'Why us');
-  $whyTitle  = $whyNorm(cmsText($whySec, 'subtitle', ''), ['The HighQ Homes Difference', 'The HighQ Homes difference'], 'A builder you can inspect, not just trust.');
+  $whyKicker = $whyNorm(cmsText($whySec, 'title', ''), ['Why Choose Us', 'Why choose us', 'Why HighQ Homes'], 'Why us');
+  $whyTitle  = $whyNorm(cmsText($whySec, 'subtitle', ''), [
+    'The HighQ Homes Difference',
+    'The HighQ Homes difference',
+    'Built on Trust & Craft',
+    'Quality, trust, and accountable delivery.',
+  ], 'A builder you can inspect, not just trust.');
   $whyLead   = $whyNorm(cmsText($whySec, 'content', ''), [
     'Six principles that guide every project — from first consultation to final handover.',
-  ], 'Clients pick HighQ Homes for one team, a written scope, and homes photographed on site in Garowe.');
+    'We create durable homes and commercial spaces that meet practical needs and enhance the Garowe community.',
+    'Clients pick HighQ Homes for one team, a written scope, and homes photographed on site in Garowe.',
+  ], 'Walk a finished house in Garowe. The photos on this site are from our jobs — you can inspect the work, not a brochure.');
   $whyImg = asset('images/builds/yellow-residence.jpg');
+  $whyChips = ['On-site photos', 'Written quotes', 'After-care'];
 ?>
 <section class="hq-section hq-section--soft hq-why-section" id="why-us" aria-labelledby="hp-why-title">
   <div class="container-site">
     <div class="hq-why__shell">
-      <div class="hq-why__intro" data-anim="left">
+      <figure class="hq-why__photo" data-anim="left">
+        <img src="<?= e($whyImg) ?>" alt="Completed HighQ Homes family residence in Garowe" loading="lazy">
+        <span class="hq-why__photo-shade" aria-hidden="true"></span>
+        <figcaption>Finished family home · Garowe</figcaption>
+      </figure>
+      <div class="hq-why__intro" data-anim="right">
         <p class="hq-eyebrow"><?= e($whyKicker) ?></p>
         <h2 class="hq-title" id="hp-why-title"><?= e($whyTitle) ?></h2>
         <p class="hq-lead"><?= e($whyLead) ?></p>
-        <figure class="hq-why__photo">
-          <img src="<?= e($whyImg) ?>" alt="Completed HighQ Homes family residence in Garowe" loading="lazy">
-          <figcaption>Finished family home · Garowe</figcaption>
-        </figure>
-        <a href="<?= url('projects') ?>" class="hq-btn hq-btn--outline">View our work <i class="bi bi-arrow-right"></i></a>
+        <ul class="hq-why__chips">
+          <?php foreach ($whyChips as $chip): ?>
+          <li><?= e($chip) ?></li>
+          <?php endforeach; ?>
+        </ul>
+        <ul class="hq-why__list">
+          <?php foreach ($whyItems as $i => $item): ?>
+          <li class="hq-why-row" data-anim="up" data-delay="<?= $i * 40 ?>">
+            <span class="hq-why-row__icon" aria-hidden="true"><i class="bi <?= e($item['icon'] ?? 'bi-check-circle') ?>"></i></span>
+            <div class="hq-why-row__copy">
+              <h3><?= e($item['title'] ?? '') ?></h3>
+              <p><?= e($item['text'] ?? '') ?></p>
+            </div>
+          </li>
+          <?php endforeach; ?>
+        </ul>
+        <div class="hq-why__actions">
+          <a href="<?= url('projects') ?>" class="hq-btn hq-btn--navy">View our work <i class="bi bi-arrow-right"></i></a>
+          <a href="<?= e($quoteHref) ?>" target="_blank" rel="noopener" class="hq-btn hq-btn--orange"><i class="bi bi-whatsapp"></i> Get a quote</a>
+        </div>
       </div>
-      <ol class="hq-why__list" data-anim="right">
-        <?php foreach ($whyItems as $i => $item): ?>
-        <li class="hq-why-row" data-anim="up" data-delay="<?= $i * 40 ?>">
-          <span class="hq-why-row__num"><?= str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
-          <span class="hq-why-row__icon" aria-hidden="true"><i class="bi <?= e($item['icon'] ?? 'bi-check-circle') ?>"></i></span>
-          <div class="hq-why-row__copy">
-            <h3><?= e($item['title'] ?? '') ?></h3>
-            <p><?= e($item['text'] ?? '') ?></p>
-          </div>
-        </li>
-        <?php endforeach; ?>
-      </ol>
     </div>
   </div>
 </section>
