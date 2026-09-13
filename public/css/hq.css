@@ -12719,3 +12719,211 @@ body.hq-menu-open {
     padding-bottom: 2rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   HighQ Homes — Mobile Image & Content Perfect Fit Architecture
+   Covers viewports 320px, 360px, 375px, 390px, 414px, 430px, 480px, 768px
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Universal Image Fit & Anti-Distortion */
+img, picture, svg, video, figure {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.hq-img-cover,
+.hq-portfolio__media img,
+.hq-projects-pro-card__img img,
+.hq-home-portfolio-card img,
+.home-project-card img,
+.hq-service__img img,
+.hq-services-pro-card__media img,
+.hq-upcoming-spotlight__media img,
+.hq-gallery-pro-item img,
+.hq-paints-pro-card__visual img,
+.hq-about-pro-story__visual img,
+.hq-about-pro-grid img,
+.hq-about__frame img,
+.hq-bento__card img,
+.hq-leader-card__photo img,
+.hq-team-card img {
+  width: 100%;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block;
+}
+
+/* Container safety & zero horizontal overflow */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+}
+
+.container-site,
+.container,
+.hq-section,
+.hq-header,
+.hq-footer,
+main {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Form input optimization for mobile (prevents iOS auto-zoom on focus) */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  input[type="search"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 46px;
+  }
+
+  /* Responsive image aspect ratios on phone screens */
+  .hq-portfolio__media,
+  .hq-projects-pro-card__img,
+  .hq-service__img,
+  .hq-services-pro-card__media {
+    aspect-ratio: 16 / 10 !important;
+    width: 100% !important;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .hq-upcoming-spotlight__media {
+    aspect-ratio: 16 / 9 !important;
+    width: 100% !important;
+    overflow: hidden;
+    border-radius: 14px;
+  }
+
+  .hq-about-pro-story__visual,
+  .hq-about__frame {
+    aspect-ratio: 4 / 3 !important;
+    width: 100% !important;
+    overflow: hidden;
+    border-radius: 14px;
+    margin-top: 1rem;
+  }
+
+  .hq-leader-card__photo,
+  .hq-team-card__photo {
+    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    max-width: 240px;
+    margin: 0 auto 1rem auto;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hq-gallery-pro-item,
+  .hq-gallery-pro-item__inner {
+    aspect-ratio: 4 / 3 !important;
+    width: 100% !important;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .hq-paints-pro-card__visual {
+    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  /* Tables and Data grids horizontal scroll container */
+  table,
+  .table-responsive,
+  .hq-paints-pro-specs-table-wrap,
+  .hq-specs-table,
+  .hq-pro-table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Lightbox Mobile Optimization */
+  .lightbox-modal {
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  }
+
+  .lightbox-modal .lightbox-img {
+    max-width: 95vw !important;
+    max-height: 75vh !important;
+    object-fit: contain !important;
+    border-radius: 8px;
+    margin: auto;
+  }
+
+  .lightbox-close {
+    top: max(1rem, env(safe-area-inset-top)) !important;
+    right: max(1rem, env(safe-area-inset-right)) !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(2, 29, 69, 0.75) !important;
+    border-radius: 50% !important;
+    color: #fff !important;
+    border: none !important;
+    z-index: 10001 !important;
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(2, 29, 69, 0.75) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #fff !important;
+    border: none !important;
+  }
+
+  .lightbox-prev {
+    left: max(0.75rem, env(safe-area-inset-left)) !important;
+  }
+
+  .lightbox-next {
+    right: max(0.75rem, env(safe-area-inset-right)) !important;
+  }
+}
+
+/* Ultra-compact screens (320px - 360px) */
+@media (max-width: 360px) {
+  .container-site {
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+  }
+
+  .hq-btn {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .hq-hero__panes--copy h1,
+  .hq-hero__title {
+    font-size: 1.65rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .hq-projects-pro-filter,
+  .hq-gallery-pro-filter,
+  .hq-paints-pro-filter {
+    gap: 0.35rem !important;
+  }
+}
+
