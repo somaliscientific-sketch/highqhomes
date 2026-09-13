@@ -1,0 +1,13 @@
+.env
+.env.production
+uploads/*
+!uploads/.htaccess
+tmp/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.agents/
+node_modules/
+vendor/
