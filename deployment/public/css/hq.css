@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════════════════════
    HighQ Homes — Unified Premium Design System
    Navy #021D45 · Orange #E88B09 · Inter + Playfair Display
    ═══════════════════════════════════════════════════════════════ */
@@ -2180,35 +2180,50 @@ body.hq-menu-open {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0.65rem 0.35rem;
-    border-radius: 12px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    gap: 0.2rem;
+    padding: 0.7rem 0.35rem;
+    border-radius: 14px;
+    background: linear-gradient(165deg, rgba(3, 24, 58, 0.82) 0%, rgba(1, 12, 28, 0.92) 100%);
+    border: 1px solid rgba(232, 139, 9, 0.22);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 12px rgba(232, 139, 9, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    gap: 0.25rem;
     min-width: 0;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hq-hero--cinematic .hq-hero__band-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232, 139, 9, 0.65), transparent);
+    pointer-events: none;
   }
 
   .hq-hero--cinematic .hq-hero__band-item:active {
-    transform: scale(0.97);
-    border-color: rgba(232, 139, 9, 0.4);
-    background: rgba(232, 139, 9, 0.08);
+    transform: scale(0.96);
+    border-color: rgba(232, 139, 9, 0.6);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(232, 139, 9, 0.3);
   }
 
   .hq-hero--cinematic .hq-hero__band-icon {
-    width: 1.85rem;
-    height: 1.85rem;
-    font-size: 0.85rem;
-    border-radius: 8px;
-    background: rgba(232, 139, 9, 0.16);
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+    border-radius: 9px;
+    background: linear-gradient(135deg, rgba(232, 139, 9, 0.24) 0%, rgba(232, 139, 9, 0.1) 100%);
+    border: 1px solid rgba(232, 139, 9, 0.28);
     color: var(--hq-orange-light);
     display: grid;
     place-items: center;
     margin-bottom: 0.1rem;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(232, 139, 9, 0.18);
   }
 
   .hq-hero--cinematic .hq-hero__band-content {
