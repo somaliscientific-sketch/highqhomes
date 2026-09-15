@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    HighQ Homes — Unified Premium Design System
    Navy #021D45 · Orange #E88B09 · Inter + Playfair Display
    ═══════════════════════════════════════════════════════════════ */
@@ -1947,7 +1947,7 @@ body.hq-menu-open {
 
 .hq-hero--cinematic .hq-hero__band-inner {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: .65rem 1.5rem;
   padding: 0.75rem 0;
 }
@@ -2147,46 +2147,129 @@ body.hq-menu-open {
     font-size: 0.85rem;
   }
 
-  /* Mobile stats band styling */
+  /* Mobile stats band styling — perfectly fitted glass cards */
+  .hq-hero--cinematic .hq-hero__band {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(1, 10, 24, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0.35rem 0;
+  }
+
+  .hq-hero--cinematic .hq-hero__band .container-site {
+    padding-left: max(0.65rem, env(safe-area-inset-left, 10px));
+    padding-right: max(0.65rem, env(safe-area-inset-right, 10px));
+  }
+
   .hq-hero--cinematic .hq-hero__band-inner {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+    padding: 0.35rem 0;
+    align-items: stretch;
+  }
+
+  /* When there are 4 items, adapt to 2x2 grid */
+  .hq-hero--cinematic .hq-hero__band-inner:has(.hq-hero__band-item:nth-child(4)) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.55rem;
-    padding: 0.75rem 0;
   }
 
   .hq-hero--cinematic .hq-hero__band-item {
-    padding: 0.6rem 0.75rem;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.65rem 0.35rem;
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    gap: 0.2rem;
+    min-width: 0;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .hq-hero--cinematic .hq-hero__band-item:active {
+    transform: scale(0.97);
+    border-color: rgba(232, 139, 9, 0.4);
+    background: rgba(232, 139, 9, 0.08);
+  }
+
+  .hq-hero--cinematic .hq-hero__band-icon {
+    width: 1.85rem;
+    height: 1.85rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    background: rgba(232, 139, 9, 0.16);
+    color: var(--hq-orange-light);
+    display: grid;
+    place-items: center;
+    margin-bottom: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  .hq-hero--cinematic .hq-hero__band-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 0;
+    width: 100%;
   }
 
   .hq-hero--cinematic .hq-hero__band-content strong {
-    font-size: 1.3rem;
+    display: block;
+    font-size: clamp(1.15rem, 4.2vw, 1.4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--hq-white);
+    letter-spacing: -0.02em;
   }
 
   .hq-hero--cinematic .hq-hero__band-content span {
-    font-size: 0.65rem;
+    display: block;
+    font-size: clamp(0.58rem, 2.1vw, 0.68rem);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.22;
+    margin-top: 0.2rem;
+    text-transform: capitalize;
+    overflow-wrap: break-word;
+    word-break: normal;
+    text-align: center;
   }
 }
 
 @media (max-width: 480px) {
+  .hq-hero--cinematic .hq-hero__band-inner {
+    gap: 0.35rem;
+    padding: 0.25rem 0;
+  }
+
   .hq-hero--cinematic .hq-hero__band-item {
-    padding: 0.5rem 0.6rem;
-    gap: 0.5rem;
+    padding: 0.55rem 0.25rem;
+    border-radius: 10px;
+    gap: 0.15rem;
   }
+
   .hq-hero--cinematic .hq-hero__band-icon {
-    width: 1.9rem;
-    height: 1.9rem;
-    font-size: 0.9rem;
-    border-radius: 8px;
+    width: 1.65rem;
+    height: 1.65rem;
+    font-size: 0.8rem;
+    border-radius: 7px;
   }
+
   .hq-hero--cinematic .hq-hero__band-content strong {
     font-size: 1.2rem;
   }
+
   .hq-hero--cinematic .hq-hero__band-content span {
-    font-size: 0.62rem;
+    font-size: 0.6rem;
+    line-height: 1.15;
   }
 }
 
@@ -2203,13 +2286,25 @@ body.hq-menu-open {
     font-size: 0.8rem;
   }
   .hq-hero--cinematic .hq-hero__band-inner {
-    gap: 0.75rem 0.45rem;
+    gap: 0.25rem;
   }
-}
-
-@media (max-width: 420px) {
-  .hq-hero--cinematic .hq-hero__band-inner { gap: .85rem .5rem; }
-  .hq-hero--cinematic .hq-hero__band-content span { font-size: .62rem; }
+  .hq-hero--cinematic .hq-hero__band-item {
+    padding: 0.45rem 0.2rem;
+    border-radius: 8px;
+  }
+  .hq-hero--cinematic .hq-hero__band-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.05rem;
+  }
+  .hq-hero--cinematic .hq-hero__band-content strong {
+    font-size: 1.05rem;
+  }
+  .hq-hero--cinematic .hq-hero__band-content span {
+    font-size: 0.54rem;
+    letter-spacing: 0;
+  }
 }
 
 @media (min-width: 1440px) {
