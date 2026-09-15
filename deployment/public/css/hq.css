@@ -1281,14 +1281,14 @@ body.hq-menu-open {
 @media (max-width: 768px) {
   .hq-hero--cinematic {
     height: auto;
-    min-height: clamp(380px, 66svh, 580px);
+    min-height: clamp(380px, 70svh, 600px);
   }
 }
 
 @media (max-width: 640px) {
   .hq-hero--cinematic {
     height: auto;
-    min-height: clamp(350px, 62svh, 520px);
+    min-height: clamp(350px, 68svh, 560px);
   }
 }
 
@@ -2057,13 +2057,14 @@ body.hq-menu-open {
 
 /* ── Mobile Phone UI/UX: Pure Cinematic Visual Showcase ── */
 @media (max-width: 768px) {
-  /* Hide all slide text content, headings, descriptions, eyebrows, and CTA buttons on phones */
+  /* Hide all slide text content, headings, descriptions, eyebrows, CTA buttons, and stats cards on phones */
   .hq-hero--cinematic .hq-hero__panes--copy,
   .hq-hero--cinematic .hq-hero__eyebrow,
   .hq-hero--cinematic .hq-hero__title,
   .hq-hero--cinematic .hq-hero__desc,
   .hq-hero--cinematic .hq-hero__actions,
-  .hq-hero--cinematic .hq-hero__trust {
+  .hq-hero--cinematic .hq-hero__trust,
+  .hq-hero--cinematic .hq-hero__band {
     display: none !important;
   }
 
@@ -2087,7 +2088,7 @@ body.hq-menu-open {
   /* Container alignment: let swipe touches pass through, pin controls gracefully to the bottom */
   .hq-hero--cinematic .hq-hero__wrap {
     padding-top: calc(var(--hq-header-h, 64px) + 0.5rem);
-    padding-bottom: 0.85rem;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 16px));
     padding-left: max(1rem, env(safe-area-inset-left, 16px));
     padding-right: max(1rem, env(safe-area-inset-right, 16px));
     justify-content: center;
