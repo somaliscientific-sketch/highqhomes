@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════════════════════
    HighQ Homes — Unified Premium Design System
    Navy #021D45 · Orange #E88B09 · Inter + Playfair Display
    ═══════════════════════════════════════════════════════════════ */
@@ -1278,10 +1278,17 @@ body.hq-menu-open {
   }
 }
 
+@media (max-width: 768px) {
+  .hq-hero--cinematic {
+    height: auto;
+    min-height: min(100svh, 800px);
+  }
+}
+
 @media (max-width: 640px) {
   .hq-hero--cinematic {
     height: auto;
-    min-height: 560px;
+    min-height: calc(100svh - 3.5rem);
   }
 }
 
@@ -1420,9 +1427,9 @@ body.hq-menu-open {
 .hq-hero--cinematic .hq-hero__scrim {
   position: absolute;
   inset: auto 0 0;
-  height: 42%;
+  height: 55%;
   z-index: 2;
-  background: linear-gradient(180deg, transparent 0%, rgba(1, 10, 24, 0.72) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(1, 10, 24, 0.88) 100%);
 }
 
 .hq-hero--cinematic .hq-hero__caption {
@@ -1477,8 +1484,8 @@ body.hq-menu-open {
   min-width: 0;
   padding-left: max(1.5rem, env(safe-area-inset-left));
   padding-right: max(1.5rem, env(safe-area-inset-right));
-  padding-top: calc(var(--hq-chrome-h) + 0.5rem);
-  padding-bottom: 0.5rem;
+  padding-top: calc(var(--hq-chrome-h, 72px) + 0.75rem);
+  padding-bottom: 1.25rem;
   flex: 1 1 auto;
   overflow-x: clip;
   box-sizing: border-box;
@@ -1667,7 +1674,7 @@ body.hq-menu-open {
   overflow: hidden;
   color: var(--hq-navy) !important;
   font-weight: 700;
-  box-shadow: 0 14px 32px rgba(232, 139, 9, 0.38);
+  box-shadow: 0 10px 28px rgba(232, 139, 9, 0.44), 0 2px 8px rgba(0,0,0,.2);
 }
 
 .hq-hero--cinematic .hq-hero__btn-primary .hq-btn__arrow,
@@ -1979,9 +1986,9 @@ body.hq-menu-open {
       linear-gradient(180deg, rgba(1, 15, 36, 0.28) 0%, rgba(1, 15, 36, 0.46) 42%, rgba(1, 15, 36, 0.9) 100%);
   }
   .hq-hero--cinematic .hq-hero__wrap {
-    padding-top: calc(var(--hq-chrome-h) + var(--hero-space-3));
-    padding-bottom: var(--hero-space-3);
-    align-items: flex-end;
+    padding-top: calc(var(--hq-chrome-h, 72px) + 1rem);
+    padding-bottom: 1rem;
+    align-items: center;
   }
   .hq-hero--cinematic .hq-hero__copy { max-width: 100%; }
   .hq-hero--cinematic .hq-hero__title { font-size: clamp(1.95rem, 6.5vw, 2.7rem); }
@@ -2014,46 +2021,80 @@ body.hq-menu-open {
   .hq-hero--cinematic {
     --hero-space-5: 1.5rem;
     --hero-btn-h: 3rem;
-    --hero-ctrl-h: 2.75rem;
+    --hero-ctrl-h: 2.65rem;
   }
   .hq-hero--cinematic .hq-hero__trust { gap: var(--hero-space-1); }
+  .hq-hero--cinematic .hq-hero__band-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    padding: 0.75rem 0;
+  }
+  .hq-hero--cinematic .hq-hero__band-item {
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    align-items: center;
+  }
+  .hq-hero--cinematic .hq-hero__band-content strong { font-size: 1.3rem; }
+  .hq-hero--cinematic .hq-hero__band-content span { font-size: .65rem; }
 }
 
 @media (max-width: 640px) {
-  .hq-hero--cinematic .hq-hero__title { font-size: clamp(1.75rem, 8vw, 2.25rem); }
-  .hq-hero--cinematic .hq-hero__eyebrow-tag { display: none; }
-  .hq-hero--cinematic .hq-hero__eyebrow-label { letter-spacing: .06em; }
-  .hq-hero--cinematic .hq-hero__desc {
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+  .hq-hero--cinematic .hq-hero__wrap {
+    padding-top: calc(var(--hq-header-h, 64px) + 1rem);
+    padding-bottom: 1rem;
+    padding-left: max(1rem, env(safe-area-inset-left, 16px));
+    padding-right: max(1rem, env(safe-area-inset-right, 16px));
   }
+  .hq-hero--cinematic .hq-hero__title {
+    font-size: clamp(1.75rem, 7.5vw, 2.3rem);
+    line-height: 1.13;
+  }
+  .hq-hero--cinematic .hq-hero__desc {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .hq-hero--cinematic .hq-hero__eyebrow-tag { display: none; }
+  .hq-hero--cinematic .hq-hero__eyebrow-label { letter-spacing: .07em; font-size: .7rem; }
   .hq-hero--cinematic .hq-hero__actions {
     flex-direction: column;
     align-items: stretch;
-    margin-top: var(--hero-space-2);
+    width: 100%;
+    max-width: 26rem;
+    margin: 0.75rem auto 0;
+    gap: 0.6rem;
   }
   .hq-hero--cinematic .hq-hero__actions .hq-btn {
-    flex: 1 1 auto;
     width: 100%;
+    height: 3.1rem;
+    border-radius: 12px;
+    font-size: 0.9375rem;
   }
   .hq-hero--cinematic .hq-hero__trust-item {
     max-width: 100%;
     font-size: 0.75rem;
   }
   .hq-hero--cinematic .hq-hero__controls {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: var(--hero-ctrl-h);
-    row-gap: var(--hero-space-1);
-    padding: var(--hero-space-1) var(--hero-space-1) var(--hero-space-1) var(--hero-space-2);
+    margin-top: 0.15rem;
   }
-  .hq-hero--cinematic .hq-hero__nav-btn { width: 2.75rem; height: 2.75rem; }
-  .hq-hero--cinematic .hq-hero__band-item { flex-direction: column; align-items: flex-start; gap: .4rem; }
+  .hq-hero--cinematic .hq-hero__nav-btn { width: 2.5rem; height: 2.5rem; }
 }
 
-@media (max-width: 414px) {
-  .hq-hero--cinematic .hq-hero__title { font-size: clamp(1.65rem, 8.5vw, 2.05rem); }
+@media (max-width: 480px) {
+  .hq-hero--cinematic .hq-hero__title { font-size: clamp(1.6rem, 7.8vw, 2rem); }
   .hq-hero--cinematic .hq-hero__trust-item { font-size: 0.72rem; }
+  .hq-hero--cinematic .hq-hero__band-item { padding: 0.5rem 0.6rem; gap: 0.5rem; }
+  .hq-hero--cinematic .hq-hero__band-icon { width: 1.9rem; height: 1.9rem; font-size: .9rem; border-radius: 8px; }
+  .hq-hero--cinematic .hq-hero__band-content strong { font-size: 1.2rem; }
+  .hq-hero--cinematic .hq-hero__band-content span { font-size: .62rem; }
+}
+
+@media (max-width: 380px) {
+  .hq-hero--cinematic .hq-hero__title { font-size: 1.5rem; }
+  .hq-hero--cinematic .hq-hero__desc { font-size: 0.85rem; }
 }
 
 @media (max-width: 320px) {
@@ -2061,7 +2102,8 @@ body.hq-menu-open {
     --hero-space-4: 1rem;
     --hero-space-5: 1.25rem;
   }
-  .hq-hero--cinematic .hq-hero__actions .hq-btn { padding: 0 1rem; font-size: 0.875rem; }
+  .hq-hero--cinematic .hq-hero__title { font-size: 1.4rem; }
+  .hq-hero--cinematic .hq-hero__actions .hq-btn { padding: 0 1rem; font-size: 0.875rem; height: 2.85rem; }
 }
 
 @media (max-width: 420px) {
