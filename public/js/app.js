@@ -209,6 +209,10 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
   const syncCopyHeight = () => {
     if (!copyWrap) return;
+    if (window.innerWidth <= 768) {
+      copyWrap.style.minHeight = '0px';
+      return;
+    }
     const active = copyWrap.querySelector('.hq-hero__pane.is-active');
     if (active) {
       copyWrap.style.minHeight = `${active.offsetHeight}px`;

@@ -2,9 +2,12 @@
 
 // ─── Navbar scroll effect ────────────────────────────────────
 const navbar = document.getElementById('main-navbar');
-if (navbar) {
+const headerWrap = document.getElementById('main-header-wrapper');
+if (navbar || headerWrap) {
   const updateNav = () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 8);
+    const on = window.scrollY > 12;
+    navbar?.classList.toggle('scrolled', on);
+    headerWrap?.classList.toggle('is-scrolled', on);
   };
   window.addEventListener('scroll', updateNav, { passive: true });
   updateNav();
@@ -17,11 +20,21 @@ if (navbar) {
   const menuClose = document.getElementById('mobile-menu-close');
   if (!menuBtn || !mobileMenu) return;
 
-  const desktopQuery = window.matchMedia('(min-width: 1181px)');
+  const desktopQuery = window.matchMedia('(min-width: 1024px)');
   let lastFocus = null;
   let lastScrollY = 0;
 
   const isOpen = () => mobileMenu.classList.contains('is-open');
+
+  const focusable = () => Array.from(
+    mobileMenu.querySelectorAll('a[href], button:not([disabled])')
+  ).filter((el) => el.getAttribute('tabindex') !== '-1');
+
+  const setInert = (on) => {
+    if ('inert' in mobileMenu) {
+      mobileMenu.inert = on;
+    }
+  };
 
   const lockScroll = () => {
     lastScrollY = window.scrollY;
@@ -38,13 +51,14 @@ if (navbar) {
   };
 
   const openMenu = () => {
-    if (isOpen()) return;
+    if (isOpen() || desktopQuery.matches) return;
     lastFocus = document.activeElement;
     mobileMenu.classList.add('is-open');
     menuBtn.classList.add('is-active');
     menuBtn.setAttribute('aria-expanded', 'true');
     menuBtn.setAttribute('aria-label', 'Close menu');
     mobileMenu.setAttribute('aria-hidden', 'false');
+    setInert(false);
     lockScroll();
     window.requestAnimationFrame(() => {
       (menuClose || mobileMenu.querySelector('.hq-mobile__links a'))?.focus();
@@ -58,6 +72,7 @@ if (navbar) {
     menuBtn.setAttribute('aria-expanded', 'false');
     menuBtn.setAttribute('aria-label', 'Open menu');
     mobileMenu.setAttribute('aria-hidden', 'true');
+    setInert(true);
     unlockScroll();
     if (lastFocus && typeof lastFocus.focus === 'function') {
       lastFocus.focus();
@@ -78,9 +93,23 @@ if (navbar) {
     link.addEventListener('click', () => closeMenu());
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isOpen()) {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') {
       e.preventDefault();
       closeMenu();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const items = focusable();
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
     }
   });
   const onDesktopChange = (event) => {
@@ -91,19 +120,21 @@ if (navbar) {
   } else {
     desktopQuery.addListener(onDesktopChange);
   }
+  setInert(true);
 })();
 
-// ─── Hero parallax (premium frame + legacy bg) ───────────────
-const heroParallaxImg = document.querySelector('.hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
+// ─── Hero parallax (cinematic + legacy) ──────────────────────
+const heroParallaxRoot = document.querySelector('#hero.hq-hero--carousel');
+const heroParallaxImg = heroParallaxRoot ? null : document.querySelector('.hq-hero__shot.is-active img, .hq-hero__photo.is-active img, .hq-hero__photo img, .hq-hero__frame img, .hq-hero__bg img, .lux-hero-bg img');
 if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       requestAnimationFrame(() => {
         const scrolled = window.scrollY;
-        const img = document.querySelector('.hq-hero__photo.is-active img') || heroParallaxImg;
+        const img = document.querySelector('.hq-hero__shot.is-active img, .hq-hero__photo.is-active img') || heroParallaxImg;
         if (scrolled < window.innerHeight && img) {
-          img.style.transform = `scale(${1 + scrolled * 0.0002}) translateY(${scrolled * 0.12}px)`;
+          img.style.transform = `scale(${1 + scrolled * 0.00018}) translateY(${scrolled * 0.1}px)`;
         }
         ticking = false;
       });
@@ -121,6 +152,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
   const autoplay = hero.dataset.autoplay === '1' && !reduceMotion;
   const interval = parseInt(hero.dataset.interval || '6000', 10);
   const pauseOnHover = hero.dataset.pauseHover === '1';
+  const defaultTransition = hero.dataset.transition || 'kenburns';
 
   hero.style.setProperty('--hero-interval', `${interval}ms`);
 
@@ -137,11 +169,50 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
   let current = 0;
   let timer = null;
   let paused = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
 
   const pad = (n) => String(n + 1).padStart(2, '0');
 
+  const slideDuration = (index) => {
+    const pane = mediaPanes[index] || copyPanes[index];
+    const custom = parseInt(pane?.dataset.heroDuration || '0', 10);
+    return custom >= 3000 ? custom : interval;
+  };
+
+  const slideTransition = (index) => {
+    const pane = mediaPanes[index];
+    const value = pane?.dataset.heroTransition || defaultTransition;
+    return value === 'inherit' ? defaultTransition : value;
+  };
+
+  const syncMedia = (index) => {
+    mediaPanes.forEach((pane, i) => {
+      const video = pane.querySelector('video.hq-hero__video');
+      if (!video) return;
+      if (i === index) {
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {});
+        }
+      } else {
+        video.pause();
+        try {
+          video.currentTime = 0;
+        } catch (err) {
+          /* ignore */
+        }
+      }
+    });
+  };
+
   const syncCopyHeight = () => {
     if (!copyWrap) return;
+    if (window.innerWidth <= 768) {
+      copyWrap.style.minHeight = '0px';
+      return;
+    }
     const active = copyWrap.querySelector('.hq-hero__pane.is-active');
     if (active) {
       copyWrap.style.minHeight = `${active.offsetHeight}px`;
@@ -155,6 +226,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
       fill.style.animation = 'none';
       void fill.offsetWidth;
       if (dot.classList.contains('is-active') && autoplay && !paused) {
+        fill.style.animationDuration = `${slideDuration(current)}ms`;
         fill.style.animation = '';
       }
     });
@@ -162,6 +234,8 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
   const setSlide = (index) => {
     current = (index + count) % count;
+    hero.dataset.transition = slideTransition(current);
+    hero.style.setProperty('--hero-interval', `${slideDuration(current)}ms`);
     copyPanes.forEach((pane, i) => {
       const active = i === current;
       pane.classList.toggle('is-active', active);
@@ -178,6 +252,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
       dot.setAttribute('aria-selected', active ? 'true' : 'false');
     });
     if (counterEl) counterEl.textContent = pad(current);
+    syncMedia(current);
     window.requestAnimationFrame(() => {
       syncCopyHeight();
       resetDotProgress();
@@ -186,7 +261,7 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
   const stop = () => {
     if (timer) {
-      clearInterval(timer);
+      clearTimeout(timer);
       timer = null;
     }
     resetDotProgress();
@@ -196,7 +271,10 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
     stop();
     if (!autoplay || paused) return;
     resetDotProgress();
-    timer = setInterval(() => setSlide(current + 1), interval);
+    timer = window.setTimeout(() => {
+      setSlide(current + 1);
+      start();
+    }, slideDuration(current));
   };
 
   dots.forEach((dot) => {
@@ -238,6 +316,49 @@ if (heroParallaxImg && !window.matchMedia('(prefers-reduced-motion: reduce)').ma
   }
 
   window.addEventListener('resize', syncCopyHeight);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      paused = true;
+      stop();
+      mediaPanes.forEach((pane) => pane.querySelector('video.hq-hero__video')?.pause());
+    } else {
+      paused = false;
+      syncMedia(current);
+      start();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    const rect = hero.getBoundingClientRect();
+    if (rect.bottom < 80 || rect.top > window.innerHeight - 80) return;
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      setSlide(current + 1);
+      start();
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      setSlide(current - 1);
+      start();
+    }
+  });
+
+  hero.addEventListener('touchstart', (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }, { passive: true });
+
+  hero.addEventListener('touchend', (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy)) return;
+    setSlide(current + (dx < 0 ? 1 : -1));
+    start();
+  }, { passive: true });
+
   setSlide(0);
   start();
 })();
